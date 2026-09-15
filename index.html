@@ -623,7 +623,7 @@ select:focus, input[type="search"]:focus {
         <button class="mobile-menu" id="mobileMenu" aria-label="פתיחת תפריט">☰</button>
         <div>
           <h1 id="pageTitle">לוח בקרה</h1>
-          <div class="page-subtitle" id="pageSubtitle">תמונת מצב עדכנית מתוך הקובץ הראשי בלבד</div>
+          <div class="page-subtitle" id="pageSubtitle">תמונת מצב עדכנית מתוך קובץ המקור</div>
         </div>
         <div class="topbar-actions">
           <div class="last-sync" id="lastSync">עדכון אחרון: —</div>
@@ -642,7 +642,7 @@ select:focus, input[type="search"]:focus {
           <div class="hero-copy">
             <div class="eyebrow">מקור אמת אחד</div>
             <h2>כל מערכות המורים במקום אחד</h2>
-            <p>המערכת קוראת רק את הנתונים מתוך “מערכות באופקית תשפ״ז”, ומציגה אותם בצורה נוחה לניהול, בדיקה והדפסה.</p>
+            <p>המערכת קוראת את הנתונים מתוך “מערכות באופקית תשפ״ז”, ומציגה אותם בצורה נוחה לניהול, בדיקה והדפסה.</p>
           </div>
           <div class="hero-actions">
             <button class="btn btn-primary" data-jump="teacher">הצג מערכת מורה</button>
@@ -657,7 +657,7 @@ select:focus, input[type="search"]:focus {
             <div class="panel-head">
               <div>
                 <h3>חלוקת שעות לפי תכנית</h3>
-                <p>סיכום כל השעות המופיעות בקובץ הראשי</p>
+                <p>סיכום שעות התכניות המופיעות בלשונית הראשית</p>
               </div>
             </div>
             <div id="programBars" class="bar-list"></div>
@@ -678,7 +678,7 @@ select:focus, input[type="search"]:focus {
           <div class="panel-head">
             <div>
               <h3>המורים בעלי היקף השעות הגבוה ביותר</h3>
-              <p>מיון לפי סה״כ השעות בקובץ הראשי</p>
+              <p>מיון לפי סה״כ שעות התכניות בלשונית הראשית</p>
             </div>
           </div>
           <div class="compact-table-wrap">
@@ -764,14 +764,14 @@ select:focus, input[type="search"]:focus {
 
         <article class="panel info-panel">
           <h3>איך הסנכרון עובד?</h3>
-          <p>במצב חי, האתר קורא בכל טעינה את Google Sheet הראשי דרך Web App קטן של Google Apps Script. אין בסיס נתונים נוסף ואין הזנת נתונים ידנית באתר.</p>
+          <p>במצב חי, האתר קורא בכל טעינה את Google Sheet הראשי דרך Web App קטן של Google Apps Script, ובנוסף קורא את לשונית “שהייה ופרטני” מאותו קובץ. אין בסיס נתונים נוסף ואין הזנת נתונים ידנית באתר.</p>
           <ol>
             <li>משנים נתון בקובץ “מערכות באופקית תשפ״ז”.</li>
             <li>לוחצים “רענון נתונים” באתר, או פותחים אותו מחדש.</li>
             <li>המערכת מציגה את הנתון המעודכן.</li>
           </ol>
           <div class="notice">
-            הקובץ הראשי מכיל היקף שעות לפי יום ותכנית, אך אינו מכיל שעות התחלה/סיום, פרטני או שהייה. לכן האתר אינו ממציא נתונים כאלה.
+            שעות התכניות נקראות מהלשונית “מערכת כללית תשפ״ז”, ושעות השהייה והפרטני נקראות מהלשונית “שהייה ופרטני”. שעות התחלה/סיום אינן קיימות במקור ולכן אינן מוצגות.
           </div>
         </article>
       </section>
@@ -785,6 +785,8 @@ window.APP_CONFIG = {
   API_URL: "https://script.google.com/macros/s/AKfycbyQoKF6f9RoTHw9-cqMKlZBh-eAJ4Pon29IqyT2cOlLK7QaJOQrXS-MR7afha4rals/exec",
   SOURCE_FILE_NAME: "מערכות באופקית תשפ״ז",
   SOURCE_SHEET_NAME: "מערכת כללית תשפ״ז",
+  SOURCE_SPREADSHEET_ID: "1-VyMH84tm1kMS24_VibF1sTUoh2uwEBtG-VTBM8R5XI",
+  AUX_SHEET_NAME: "שהייה ופרטני",
   USE_DEMO_IF_API_MISSING: true,
   APP_TITLE: "מערכת ניהול מערכות מורים – תשפ״ז"
 };
@@ -4931,7 +4933,7 @@ window.FALLBACK_DATA = {
     document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === `view-${view}`));
     document.querySelectorAll('.nav-item').forEach(v => v.classList.toggle('active', v.dataset.view === view));
     const meta = {
-      overview: ['לוח בקרה', 'תמונת מצב עדכנית מתוך הקובץ הראשי בלבד'],
+      overview: ['לוח בקרה', 'תמונת מצב עדכנית מתוך קובץ המקור'],
       teacher: ['מערכת מורה', 'בחירת מורה והפקת מערכת שבועית'],
       teachers: ['כל המורים', 'חיפוש, סינון והשוואת היקפי שעות'],
       source: ['מקור וסנכרון', 'מצב החיבור לקובץ “מערכות באופקית תשפ״ז”']
@@ -4952,11 +4954,18 @@ window.FALLBACK_DATA = {
     const apiUrl = (window.APP_CONFIG && window.APP_CONFIG.API_URL || '').trim();
     if (apiUrl) {
       loadJsonp(apiUrl)
-        .then(data => applyData(data, 'live'))
-        .catch(err => {
+        .then(async data => {
+          const extra = await loadStayIndividualSafe();
+          if (extra) mergeStayIndividual(data, extra);
+          applyData(data, 'live', extra ? '' : 'נתוני המערכת נטענו, אך לא ניתן היה לטעון כרגע את לשונית “שהייה ופרטני”.');
+        })
+        .catch(async err => {
           console.error(err);
           if (window.APP_CONFIG.USE_DEMO_IF_API_MISSING && window.FALLBACK_DATA) {
-            applyData(window.FALLBACK_DATA, 'snapshot', 'החיבור החי לא הצליח, לכן מוצג צילום המצב המצורף לאתר.');
+            const data = cloneData(window.FALLBACK_DATA);
+            const extra = await loadStayIndividualSafe();
+            if (extra) mergeStayIndividual(data, extra);
+            applyData(data, 'snapshot', 'החיבור החי לנתוני התכניות לא הצליח, לכן מוצג צילום המצב המצורף לאתר.');
           } else {
             showError('לא ניתן לטעון נתונים מהמקור.');
           }
@@ -4964,12 +4973,180 @@ window.FALLBACK_DATA = {
         .finally(doneLoading);
     } else {
       if (window.FALLBACK_DATA) {
-        applyData(window.FALLBACK_DATA, 'snapshot', 'האתר עדיין במצב הדגמה. כדי לקבל סנכרון חי, יש להדביק את כתובת ה־Apps Script בקובץ config.js.');
+        const data = cloneData(window.FALLBACK_DATA);
+        loadStayIndividualSafe().then(extra => {
+          if (extra) mergeStayIndividual(data, extra);
+          applyData(data, 'snapshot', 'האתר עדיין במצב הדגמה עבור נתוני התכניות.');
+        }).finally(doneLoading);
       } else {
         showError('לא הוגדר מקור נתונים.');
+        doneLoading();
       }
-      doneLoading();
     }
+  }
+
+  function cloneData(data) {
+    return JSON.parse(JSON.stringify(data));
+  }
+
+  async function loadStayIndividualSafe() {
+    try {
+      const spreadsheetId = (window.APP_CONFIG && window.APP_CONFIG.SOURCE_SPREADSHEET_ID || '').trim();
+      const sheetName = (window.APP_CONFIG && window.APP_CONFIG.AUX_SHEET_NAME || 'שהייה ופרטני').trim();
+      if (!spreadsheetId || !sheetName) return null;
+      const payload = await loadGvizSheet(spreadsheetId, sheetName);
+      return parseStayIndividualSheet(payload);
+    } catch (err) {
+      console.error('Stay/individual sheet load failed:', err);
+      return null;
+    }
+  }
+
+  function loadGvizSheet(spreadsheetId, sheetName) {
+    return new Promise((resolve, reject) => {
+      const callbackName = `__stay_cb_${Date.now()}_${Math.floor(Math.random()*100000)}`;
+      const timer = setTimeout(() => cleanup(new Error('stay/individual timeout')), 15000);
+      const script = document.createElement('script');
+      const tqx = `out:json;responseHandler:${callbackName}`;
+      script.src = `https://docs.google.com/spreadsheets/d/${encodeURIComponent(spreadsheetId)}/gviz/tq?sheet=${encodeURIComponent(sheetName)}&tqx=${encodeURIComponent(tqx)}&_=${Date.now()}`;
+      script.async = true;
+
+      window[callbackName] = (payload) => {
+        if (payload && payload.status === 'error') {
+          cleanup(new Error('Google Sheets returned an error'));
+          return;
+        }
+        cleanup();
+        resolve(payload);
+      };
+      script.onerror = () => cleanup(new Error('stay/individual jsonp error'));
+      document.head.appendChild(script);
+
+      function cleanup(error) {
+        clearTimeout(timer);
+        script.remove();
+        try { delete window[callbackName]; } catch (_) { window[callbackName] = undefined; }
+        if (error) reject(error);
+      }
+    });
+  }
+
+  function parseStayIndividualSheet(payload) {
+    const rows = payload?.table?.rows || [];
+    const entries = [];
+    let totalStay = 0;
+    let totalIndividual = 0;
+
+    for (const row of rows) {
+      const cells = row?.c || [];
+      const name = String(cells[0]?.v ?? '').trim();
+      if (!name || name === 'שם המורה/ יום בשבוע' || name === 'שהייה' || name === 'פרטני') continue;
+
+      const stayDays = [];
+      const individualDays = [];
+      for (let day = 0; day < 6; day++) {
+        stayDays.push(toHours(cells[1 + day * 2]?.v));
+        individualDays.push(toHours(cells[2 + day * 2]?.v));
+      }
+      const stayTotal = sum(stayDays);
+      const individualTotal = sum(individualDays);
+      totalStay += stayTotal;
+      totalIndividual += individualTotal;
+      entries.push({ name, stayDays, individualDays, stayTotal, individualTotal });
+    }
+
+    return { entries, totalStay, totalIndividual };
+  }
+
+  function toHours(value) {
+    const n = Number(value);
+    return Number.isFinite(n) ? n : 0;
+  }
+
+  function mergeStayIndividual(data, extra) {
+    if (!data || !Array.isArray(data.teachers) || !extra) return data;
+
+    data.teachers.forEach(t => {
+      t.stayDays = [0,0,0,0,0,0];
+      t.individualDays = [0,0,0,0,0,0];
+      t.stayTotal = 0;
+      t.individualTotal = 0;
+    });
+
+    const unmatched = [];
+    extra.entries.forEach(entry => {
+      const teacher = resolveTeacher(entry.name, data.teachers);
+      if (!teacher) {
+        unmatched.push(entry.name);
+        return;
+      }
+      teacher.stayDays = entry.stayDays.slice(0, 6);
+      teacher.individualDays = entry.individualDays.slice(0, 6);
+      teacher.stayTotal = entry.stayTotal;
+      teacher.individualTotal = entry.individualTotal;
+    });
+
+    data.stayIndividualTotals = {
+      stay: extra.totalStay,
+      individual: extra.totalIndividual
+    };
+    data.stayIndividualUnmatched = unmatched;
+    data.source = data.source || {};
+    data.source.auxSheetName = window.APP_CONFIG.AUX_SHEET_NAME || 'שהייה ופרטני';
+    return data;
+  }
+
+  const TEACHER_NAME_ALIASES = {
+    'קרן אולברי': 'קרן אולאברי',
+    'ברוקר משה': 'משה ברוקר',
+    'סיון דוארני': 'דוראני סיון',
+    'הלל אמנון': 'אמנון הלל',
+    'חדד יעלה': 'יעלה לילך חדד',
+    'ידלין ענת': 'ענת ידלין',
+    'לינוי יעקוב': 'לינוי יעקב',
+    'מנצור נתי': 'נתי מנצור',
+    'מס שני לביא': 'שני מס לביא',
+    'נעמן שירה דגאי': 'שירה דגאי',
+    'מעין ספושניק': 'מעין שפושניק',
+    'רלסקי סבטלנה': 'סבטלנה רילסקי'
+  };
+
+  function resolveTeacher(rawName, teachers) {
+    const raw = cleanTeacherName(rawName);
+    if (!raw) return null;
+
+    let teacher = teachers.find(t => cleanTeacherName(t.name) === raw);
+    if (teacher) return teacher;
+
+    const aliasTarget = TEACHER_NAME_ALIASES[rawName] || TEACHER_NAME_ALIASES[raw];
+    if (aliasTarget) {
+      teacher = teachers.find(t => cleanTeacherName(t.name) === cleanTeacherName(aliasTarget));
+      if (teacher) return teacher;
+    }
+
+    const canonical = canonicalTeacherName(raw);
+    teacher = teachers.find(t => canonicalTeacherName(t.name) === canonical);
+    if (teacher) return teacher;
+
+    const rawTokens = new Set(raw.split(' ').filter(Boolean));
+    const candidates = teachers.filter(t => {
+      const tokens = new Set(cleanTeacherName(t.name).split(' ').filter(Boolean));
+      const common = [...rawTokens].filter(x => tokens.has(x)).length;
+      const smaller = Math.min(rawTokens.size, tokens.size);
+      return common >= 2 && common === smaller;
+    });
+    return candidates.length === 1 ? candidates[0] : null;
+  }
+
+  function cleanTeacherName(name) {
+    return String(name ?? '')
+      .replace(/["״׳'`.,()\-]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  function canonicalTeacherName(name) {
+    return cleanTeacherName(name).split(' ').filter(Boolean).sort((a,b) => a.localeCompare(b, 'he')).join(' ');
   }
 
   function loadJsonp(baseUrl) {
@@ -5059,6 +5236,8 @@ window.FALLBACK_DATA = {
     const totalHours = sum(teachers.map(t => t.total));
     const totalMoe = sum(teachers.map(t => t.totalMoE));
     const totalTech = sum(teachers.map(t => t.totalTechnoda));
+    const totalStay = Number(state.data.stayIndividualTotals?.stay ?? sum(teachers.map(t => t.stayTotal || 0)));
+    const totalIndividual = Number(state.data.stayIndividualTotals?.individual ?? sum(teachers.map(t => t.individualTotal || 0)));
     const activeTeachers = teachers.filter(t => t.total > 0).length;
     const maxTeacher = [...teachers].sort((a,b) => b.total - a.total)[0];
 
@@ -5067,6 +5246,8 @@ window.FALLBACK_DATA = {
       kpi('סה״כ שעות', fmt(totalHours), 'כלל התכניות'),
       kpi('שעות משה״ח', fmt(totalMoe), `${pct(totalMoe,totalHours)}% מסך הכול`),
       kpi('שעות טכנודע', fmt(totalTech), `${pct(totalTech,totalHours)}% מסך הכול`),
+      kpi('שעות שהייה', fmt(totalStay), 'מתוך לשונית שהייה ופרטני'),
+      kpi('שעות פרטני', fmt(totalIndividual), 'מתוך לשונית שהייה ופרטני'),
       kpi('היקף מרבי למורה', fmt(maxTeacher?.total || 0), maxTeacher?.name || '—', true)
     ].join('');
 
@@ -5125,6 +5306,15 @@ window.FALLBACK_DATA = {
       </tr>`;
     }).join('');
 
+    const stayDays = normalizeSixDays(t.stayDays);
+    const individualDays = normalizeSixDays(t.individualDays);
+    const stayTotal = Number(t.stayTotal || sum(stayDays));
+    const individualTotal = Number(t.individualTotal || sum(individualDays));
+    const extraRows = [
+      auxiliaryHoursRow('שהייה', stayDays, stayTotal),
+      auxiliaryHoursRow('פרטני', individualDays, individualTotal)
+    ].join('');
+
     $('teacherOutput').innerHTML = `
       <article class="teacher-sheet" id="printableTeacherSheet">
         <div class="teacher-sheet-title">מערכת שעות - ${escapeHtml(t.name)} - שנה״ל תשפ״ז</div>
@@ -5140,13 +5330,26 @@ window.FALLBACK_DATA = {
             <tbody>
               ${tableRows}
               <tr class="schedule-total-row"><td>סה״כ ליום</td>${t.dayTotals.map(v => `<td>${fmt(v)}</td>`).join('')}<td>${fmt(t.total)}</td></tr>
+              ${extraRows}
             </tbody>
           </table>
         </div>
         <div class="teacher-note">
-          הפלט מבוסס רק על הקובץ הראשי. הקובץ מכיל היקף שעות לפי יום ותכנית, אך אינו מכיל שעות התחלה/סיום, פרטני או שהייה — ולכן נתונים אלה אינם מוצגים.
+          שעות התכניות מוצגות מהלשונית “מערכת כללית תשפ״ז”; שעות שהייה ופרטני מוצגות מהלשונית “שהייה ופרטני”. שעות התחלה/סיום אינן קיימות במקור ולכן אינן מוצגות.
         </div>
       </article>`;
+  }
+
+  function normalizeSixDays(values) {
+    return Array.from({length: 6}, (_, i) => Number(values?.[i] || 0));
+  }
+
+  function auxiliaryHoursRow(label, days, total) {
+    return `<tr>
+      <td>${escapeHtml(label)}</td>
+      ${days.map(v => `<td><div class="schedule-cell">${v ? `<span class="schedule-value">${fmt(v)} ש׳</span>` : '<span class="schedule-value empty">—</span>'}</div></td>`).join('')}
+      <td><strong>${fmt(total)}</strong></td>
+    </tr>`;
   }
 
   function renderTeachersTable() {
@@ -5184,7 +5387,8 @@ window.FALLBACK_DATA = {
     if (!state.data) return;
     const source = state.data.source || {};
     $('sourceFileName').textContent = source.fileName || window.APP_CONFIG.SOURCE_FILE_NAME || '—';
-    $('sourceSheetName').textContent = source.sheetName ? `לשונית: ${source.sheetName}` : '—';
+    const sheetNames = [source.sheetName || window.APP_CONFIG.SOURCE_SHEET_NAME, source.auxSheetName || window.APP_CONFIG.AUX_SHEET_NAME].filter(Boolean);
+    $('sourceSheetName').textContent = sheetNames.length ? `לשוניות: ${sheetNames.join(' + ')}` : '—';
     const live = state.data.mode === 'live';
     $('connectionMode').textContent = live ? 'סנכרון חי פעיל' : 'צילום מצב מקומי';
     $('connectionDetails').textContent = live
