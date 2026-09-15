@@ -1,0 +1,4877 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#0b5c74" />
+  <title>מערכת ניהול מערכות מורים – תשפ״ז</title>
+  <style>
+:root {
+  --bg: #f3f7f8;
+  --panel: #ffffff;
+  --ink: #15323b;
+  --muted: #6b8087;
+  --line: #dce6e9;
+  --primary: #0b5c74;
+  --primary-2: #0e7893;
+  --accent: #35b8a0;
+  --accent-soft: #e5f8f4;
+  --blue-soft: #e8f4f8;
+  --violet-soft: #f0ebfb;
+  --warning-soft: #fff6dc;
+  --shadow: 0 10px 32px rgba(25, 68, 80, .08);
+  --radius: 18px;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: Arial, "Noto Sans Hebrew", sans-serif;
+}
+button, input, select { font: inherit; }
+button { cursor: pointer; }
+
+.app-shell { min-height: 100vh; display: grid; grid-template-columns: 270px 1fr; }
+.sidebar {
+  background: linear-gradient(180deg, #083f50 0%, #0a5569 62%, #0b6478 100%);
+  color: #fff;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  padding: 24px 18px;
+  display: flex;
+  flex-direction: column;
+  z-index: 10;
+}
+.brand { display: flex; gap: 12px; align-items: center; padding: 0 8px 24px; }
+.brand-mark {
+  width: 48px; height: 48px; border-radius: 14px; display: grid; place-items: center;
+  background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.22);
+  font-size: 24px; font-weight: 800;
+}
+.brand-name { font-size: 22px; font-weight: 800; }
+.brand-sub { font-size: 12px; opacity: .74; margin-top: 3px; }
+.nav-list { display: grid; gap: 8px; }
+.nav-item {
+  border: 0; color: rgba(255,255,255,.78); background: transparent; padding: 13px 14px;
+  border-radius: 13px; display: flex; align-items: center; gap: 10px; text-align: right;
+  transition: .18s ease;
+}
+.nav-item:hover { background: rgba(255,255,255,.08); color: #fff; }
+.nav-item.active { background: #fff; color: var(--primary); font-weight: 700; box-shadow: 0 8px 24px rgba(0,0,0,.12); }
+.nav-icon { width: 24px; text-align: center; font-size: 18px; }
+.sidebar-footer { margin-top: auto; }
+.sync-chip { display: flex; align-items: center; gap: 8px; color: rgba(255,255,255,.78); font-size: 12px; padding: 10px 12px; background: rgba(255,255,255,.08); border-radius: 12px; }
+.sync-dot { width: 8px; height: 8px; border-radius: 999px; background: #ffd166; box-shadow: 0 0 0 4px rgba(255,209,102,.12); }
+.sync-chip.live .sync-dot { background: #62e5bc; box-shadow: 0 0 0 4px rgba(98,229,188,.12); }
+
+.main-content { min-width: 0; padding: 24px 30px 46px; }
+.topbar { display: flex; align-items: center; gap: 20px; justify-content: space-between; margin-bottom: 22px; }
+.topbar h1 { margin: 0; font-size: 28px; }
+.page-subtitle { color: var(--muted); font-size: 13px; margin-top: 4px; }
+.topbar-actions { display: flex; align-items: center; gap: 12px; }
+.last-sync { font-size: 12px; color: var(--muted); }
+.mobile-menu { display: none; border: 0; background: #fff; border-radius: 10px; padding: 8px 11px; }
+
+.btn { border: 1px solid transparent; border-radius: 12px; padding: 10px 15px; font-weight: 700; transition: .17s ease; }
+.btn:hover { transform: translateY(-1px); }
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-primary:hover { background: var(--primary-2); }
+.btn-secondary { background: #fff; color: var(--primary); border-color: var(--line); }
+.btn-ghost { background: transparent; color: var(--primary); border-color: rgba(11,92,116,.18); }
+.btn-small { padding: 7px 10px; border-radius: 9px; font-size: 12px; }
+
+.status-banner { margin-bottom: 18px; padding: 12px 16px; border-radius: 12px; background: var(--warning-soft); color: #705700; border: 1px solid #f1df9d; font-size: 13px; }
+.hidden { display: none !important; }
+
+.view { display: none; }
+.view.active { display: block; }
+
+.hero-panel {
+  background: linear-gradient(135deg, #0a5368, #0b7186 68%, #138c91);
+  border-radius: 24px; color: #fff; padding: 28px 30px; display: flex; align-items: center;
+  justify-content: space-between; gap: 26px; box-shadow: var(--shadow); overflow: hidden; position: relative;
+}
+.hero-panel::after { content: ""; position: absolute; width: 260px; height: 260px; border-radius: 50%; background: rgba(255,255,255,.08); left: -80px; top: -110px; }
+.hero-panel h2 { margin: 4px 0 8px; font-size: 28px; }
+.hero-panel p { margin: 0; max-width: 680px; color: rgba(255,255,255,.82); line-height: 1.6; }
+.hero-panel .eyebrow { font-size: 12px; font-weight: 800; letter-spacing: .2px; color: #94f1dd; }
+.hero-actions { display: flex; gap: 10px; z-index: 1; flex-wrap: wrap; }
+.hero-panel .btn-primary { background: #fff; color: var(--primary); }
+.hero-panel .btn-ghost { color: #fff; border-color: rgba(255,255,255,.28); }
+
+.kpi-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; margin: 18px 0; }
+.kpi-card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow); }
+.kpi-label { color: var(--muted); font-size: 12px; }
+.kpi-value { font-size: 29px; font-weight: 800; margin-top: 8px; }
+.kpi-note { margin-top: 7px; color: var(--muted); font-size: 11px; }
+.kpi-card.accent { background: var(--accent-soft); border-color: #c7ece4; }
+
+.dashboard-grid { display: grid; gap: 18px; margin-bottom: 18px; }
+.two-columns { grid-template-columns: 1.35fr 1fr; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); }
+.panel-head { display: flex; align-items: center; justify-content: space-between; gap: 15px; margin-bottom: 18px; }
+.panel h3 { margin: 0; font-size: 18px; }
+.panel p { margin: 5px 0 0; color: var(--muted); font-size: 12px; }
+
+.bar-list { display: grid; gap: 13px; }
+.bar-row { display: grid; grid-template-columns: 190px 1fr 58px; gap: 12px; align-items: center; }
+.bar-label { font-size: 12px; }
+.bar-track { height: 10px; background: #edf3f5; border-radius: 999px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--primary), var(--accent)); }
+.bar-value { font-weight: 800; font-size: 12px; text-align: left; }
+
+.day-load { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; align-items: end; min-height: 225px; }
+.day-column { display: flex; height: 205px; flex-direction: column; justify-content: end; align-items: stretch; gap: 8px; }
+.day-bar-wrap { flex: 1; display: flex; align-items: end; justify-content: center; background: linear-gradient(#f7fafb,#f2f7f8); border-radius: 12px; padding: 8px; }
+.day-bar { width: 72%; min-height: 4px; border-radius: 9px 9px 5px 5px; background: linear-gradient(180deg, var(--accent), var(--primary)); }
+.day-number { text-align: center; font-weight: 800; font-size: 12px; }
+.day-name { text-align: center; color: var(--muted); font-size: 12px; }
+
+.compact-table-wrap, .table-wrap { width: 100%; overflow: auto; }
+.data-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 12px; min-width: 980px; }
+.data-table th { background: #f5f9fa; color: #48656d; font-weight: 800; text-align: right; padding: 12px 11px; border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 1; }
+.data-table td { padding: 11px; border-bottom: 1px solid #edf2f3; vertical-align: middle; }
+.data-table tr:hover td { background: #fbfdfd; }
+.data-table.compact { min-width: 620px; }
+.hours-pill { display: inline-flex; min-width: 30px; justify-content: center; padding: 4px 8px; border-radius: 999px; font-weight: 800; background: var(--blue-soft); color: var(--primary); }
+.hours-pill.zero { color: #99a8ad; background: #f3f6f7; }
+
+.teacher-toolbar { margin-bottom: 16px; }
+.teacher-selector-block label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 7px; font-weight: 700; }
+.select-row { display: flex; gap: 10px; flex-wrap: wrap; }
+select, input[type="search"] { border: 1px solid var(--line); background: #fff; color: var(--ink); border-radius: 11px; min-height: 42px; padding: 0 12px; outline: 0; }
+select:focus, input[type="search"]:focus { border-color: #74b3c3; box-shadow: 0 0 0 3px rgba(11,92,116,.08); }
+#teacherSelect { min-width: 280px; }
+
+.teacher-sheet { background: #fff; border: 1px solid var(--line); border-radius: 20px; padding: 20px; box-shadow: var(--shadow); }
+.teacher-sheet-title { text-align: center; background: #f1f1f1; border: 1px solid #cfd6d8; border-radius: 12px 12px 0 0; padding: 14px; font-size: 22px; font-weight: 800; }
+.teacher-kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 14px 0; }
+.teacher-kpi { background: #f8fbfc; border: 1px solid var(--line); border-radius: 12px; padding: 12px; text-align: center; }
+.teacher-kpi .v { font-size: 23px; font-weight: 800; }
+.teacher-kpi .l { color: var(--muted); font-size: 11px; margin-top: 2px; }
+
+.schedule-wrap { overflow-x: auto; }
+.schedule-grid { width: 100%; border-collapse: collapse; min-width: 880px; table-layout: fixed; }
+.schedule-grid th, .schedule-grid td { border: 1px solid #cfd6d8; text-align: center; padding: 8px 6px; }
+.schedule-grid th { background: #eeeeee; font-weight: 800; }
+.schedule-grid th:first-child { width: 200px; text-align: right; }
+.schedule-grid td:first-child { text-align: right; font-weight: 700; background: #f8fafb; }
+.schedule-cell { min-height: 42px; display: flex; align-items: center; justify-content: center; }
+.schedule-value { display: inline-flex; align-items: center; gap: 5px; padding: 6px 9px; border-radius: 9px; font-weight: 800; background: var(--violet-soft); color: #5e458d; }
+.schedule-value.technoda { background: var(--blue-soft); color: #14677b; }
+.schedule-value.empty { background: transparent; color: #bdc8cc; font-weight: 400; }
+.schedule-total-row td { background: #f0f7f8 !important; font-weight: 800; }
+.schedule-total-row td:last-child { background: #fff0a8 !important; color: #574500; }
+.teacher-note { margin-top: 14px; padding: 11px 13px; background: #fff8df; border: 1px solid #f0e2a5; color: #705d13; border-radius: 10px; font-size: 11px; line-height: 1.55; }
+
+.table-controls-head { align-items: flex-end; }
+.table-controls { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.table-controls input { min-width: 185px; }
+.table-meta { color: var(--muted); font-size: 12px; margin: -6px 0 12px; }
+.teacher-link-button { color: var(--primary); background: transparent; border: 0; font-weight: 800; padding: 4px; }
+
+.source-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; margin-bottom: 18px; }
+.source-card { text-align: center; padding: 28px; }
+.source-icon { width: 48px; height: 48px; margin: 0 auto 12px; border-radius: 14px; background: var(--blue-soft); display: grid; place-items: center; color: var(--primary); font-size: 22px; }
+.source-name { font-size: 20px; font-weight: 800; margin-top: 12px; }
+.source-meta { color: var(--muted); font-size: 12px; margin-top: 6px; }
+.info-panel { line-height: 1.65; }
+.info-panel ol { margin: 14px 0; padding-right: 22px; }
+.notice { background: var(--warning-soft); border: 1px solid #f0e2a5; border-radius: 11px; padding: 13px 14px; font-size: 12px; }
+
+.toast { position: fixed; left: 24px; bottom: 24px; background: #123e4a; color: #fff; padding: 11px 15px; border-radius: 11px; opacity: 0; transform: translateY(12px); pointer-events: none; transition: .2s ease; box-shadow: var(--shadow); z-index: 50; font-size: 12px; }
+.toast.show { opacity: 1; transform: translateY(0); }
+
+@media (max-width: 1180px) {
+  .kpi-grid { grid-template-columns: repeat(3, 1fr); }
+  .two-columns { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 900px) {
+  .app-shell { display: block; }
+  .sidebar { position: fixed; right: 0; transform: translateX(105%); transition: .22s ease; width: 270px; box-shadow: -10px 0 30px rgba(0,0,0,.18); }
+  .sidebar.open { transform: translateX(0); }
+  .main-content { padding: 18px; }
+  .mobile-menu { display: inline-block; }
+  .topbar { justify-content: flex-start; flex-wrap: wrap; }
+  .topbar-actions { margin-right: auto; }
+  .hero-panel { align-items: flex-start; flex-direction: column; }
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  .source-grid { grid-template-columns: 1fr; }
+  .teacher-kpis { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 600px) {
+  .topbar-actions { width: 100%; justify-content: space-between; }
+  .last-sync { max-width: 55%; }
+  .kpi-grid { grid-template-columns: 1fr; }
+  .day-load { grid-template-columns: repeat(3, 1fr); min-height: auto; }
+  .day-column { height: 150px; }
+  .bar-row { grid-template-columns: 120px 1fr 42px; }
+  .select-row > * { width: 100%; }
+  #teacherSelect { min-width: 0; }
+  .teacher-kpis { grid-template-columns: 1fr 1fr; }
+}
+
+@media print {
+  body { background: #fff; }
+  .sidebar, .topbar, .teacher-toolbar, .status-banner, .toast { display: none !important; }
+  .app-shell { display: block; }
+  .main-content { padding: 0; }
+  .view { display: none !important; }
+  #view-teacher { display: block !important; }
+  .teacher-sheet { box-shadow: none; border: 0; padding: 0; }
+  .teacher-note { display: none; }
+  .schedule-grid { min-width: 0; font-size: 11px; }
+  .schedule-grid th, .schedule-grid td { padding: 5px 4px; }
+}
+
+</style>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-mark">T</div>
+        <div>
+          <div class="brand-name">טכנודע</div>
+          <div class="brand-sub">מערכות מורים תשפ״ז</div>
+        </div>
+      </div>
+
+      <nav class="nav-list" aria-label="ניווט ראשי">
+        <button class="nav-item active" data-view="overview">
+          <span class="nav-icon">◫</span><span>לוח בקרה</span>
+        </button>
+        <button class="nav-item" data-view="teacher">
+          <span class="nav-icon">▦</span><span>מערכת מורה</span>
+        </button>
+        <button class="nav-item" data-view="teachers">
+          <span class="nav-icon">☷</span><span>כל המורים</span>
+        </button>
+        <button class="nav-item" data-view="source">
+          <span class="nav-icon">↻</span><span>מקור וסנכרון</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="sync-chip" id="syncChip">
+          <span class="sync-dot"></span>
+          <span id="syncChipText">טוען נתונים…</span>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <button class="mobile-menu" id="mobileMenu" aria-label="פתיחת תפריט">☰</button>
+        <div>
+          <h1 id="pageTitle">לוח בקרה</h1>
+          <div class="page-subtitle" id="pageSubtitle">תמונת מצב עדכנית מתוך הקובץ הראשי בלבד</div>
+        </div>
+        <div class="topbar-actions">
+          <div class="last-sync" id="lastSync">עדכון אחרון: —</div>
+          <button class="btn btn-secondary" id="refreshBtn">רענון נתונים</button>
+        </div>
+      </header>
+
+      <div class="status-banner hidden" id="statusBanner"></div>
+
+      <section class="view active" id="view-overview">
+        <div class="hero-panel">
+          <div>
+            <div class="eyebrow">מקור אמת אחד</div>
+            <h2>כל מערכות המורים במקום אחד</h2>
+            <p>המערכת קוראת רק את הנתונים מתוך “מערכות באופקית תשפ״ז”, ומציגה אותם בצורה נוחה לניהול, בדיקה והדפסה.</p>
+          </div>
+          <div class="hero-actions">
+            <button class="btn btn-primary" data-jump="teacher">הצג מערכת מורה</button>
+            <button class="btn btn-ghost" data-jump="teachers">צפה בכלל המורים</button>
+          </div>
+        </div>
+
+        <div class="kpi-grid" id="overviewKpis"></div>
+
+        <div class="dashboard-grid two-columns">
+          <article class="panel">
+            <div class="panel-head">
+              <div>
+                <h3>חלוקת שעות לפי תכנית</h3>
+                <p>סיכום כל השעות המופיעות בקובץ הראשי</p>
+              </div>
+            </div>
+            <div id="programBars" class="bar-list"></div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-head">
+              <div>
+                <h3>עומס לפי יום</h3>
+                <p>סה״כ שעות של כלל המורים בכל יום</p>
+              </div>
+            </div>
+            <div id="dayLoad" class="day-load"></div>
+          </article>
+        </div>
+
+        <article class="panel">
+          <div class="panel-head">
+            <div>
+              <h3>המורים בעלי היקף השעות הגבוה ביותר</h3>
+              <p>מיון לפי סה״כ השעות בקובץ הראשי</p>
+            </div>
+          </div>
+          <div class="compact-table-wrap">
+            <table class="data-table compact">
+              <thead><tr><th>מורה</th><th>סה״כ</th><th>משה״ח</th><th>טכנודע</th><th>ימים פעילים</th></tr></thead>
+              <tbody id="topTeachersBody"></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+
+      <section class="view" id="view-teacher">
+        <article class="panel teacher-toolbar">
+          <div class="teacher-selector-block">
+            <label for="teacherSelect">בחירת מורה</label>
+            <div class="select-row">
+              <select id="teacherSelect"></select>
+              <button class="btn btn-secondary" id="copyTeacherLinkBtn">העתק קישור למורה</button>
+              <button class="btn btn-primary" id="printTeacherBtn">הדפס מערכת</button>
+            </div>
+          </div>
+        </article>
+
+        <div id="teacherOutput"></div>
+      </section>
+
+      <section class="view" id="view-teachers">
+        <article class="panel">
+          <div class="panel-head table-controls-head">
+            <div>
+              <h3>כל המורים</h3>
+              <p>חיפוש, סינון ומיון מתוך נתוני המקור</p>
+            </div>
+            <div class="table-controls">
+              <input type="search" id="teacherSearch" placeholder="חיפוש מורה…" />
+              <select id="programFilter"><option value="">כל התכניות</option></select>
+              <select id="sortTeachers">
+                <option value="total-desc">סה״כ שעות – מהגבוה לנמוך</option>
+                <option value="total-asc">סה״כ שעות – מהנמוך לגבוה</option>
+                <option value="name-asc">שם – א׳ עד ת׳</option>
+              </select>
+              <button class="btn btn-secondary" id="downloadCsvBtn">הורד CSV</button>
+            </div>
+          </div>
+          <div class="table-meta" id="teachersTableMeta"></div>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>שם המורה</th>
+                  <th>מחוננים בוקר</th>
+                  <th>תכנית בוקר</th>
+                  <th>מצטיינים משה״ח</th>
+                  <th>יח״ד</th>
+                  <th>מצטייני יישוב</th>
+                  <th>מצטיינים טכנודע</th>
+                  <th>מחוננים טכנודע</th>
+                  <th>סה״כ</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="teachersTableBody"></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+
+      <section class="view" id="view-source">
+        <div class="source-grid">
+          <article class="panel source-card">
+            <div class="source-icon">↻</div>
+            <h3>מקור הנתונים</h3>
+            <div class="source-name" id="sourceFileName">—</div>
+            <div class="source-meta" id="sourceSheetName">—</div>
+          </article>
+          <article class="panel source-card">
+            <div class="source-icon">●</div>
+            <h3>מצב חיבור</h3>
+            <div class="source-name" id="connectionMode">—</div>
+            <div class="source-meta" id="connectionDetails">—</div>
+          </article>
+        </div>
+
+        <article class="panel info-panel">
+          <h3>איך הסנכרון עובד?</h3>
+          <p>במצב חי, האתר קורא בכל טעינה את Google Sheet הראשי דרך Web App קטן של Google Apps Script. אין בסיס נתונים נוסף ואין הזנת נתונים ידנית באתר.</p>
+          <ol>
+            <li>משנים נתון בקובץ “מערכות באופקית תשפ״ז”.</li>
+            <li>לוחצים “רענון נתונים” באתר, או פותחים אותו מחדש.</li>
+            <li>המערכת מציגה את הנתון המעודכן.</li>
+          </ol>
+          <div class="notice">
+            הקובץ הראשי מכיל היקף שעות לפי יום ותכנית, אך אינו מכיל שעות התחלה/סיום, פרטני או שהייה. לכן האתר אינו ממציא נתונים כאלה.
+          </div>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+window.APP_CONFIG = {
+  API_URL: "https://script.google.com/macros/s/AKfycbx7R7lAntHXpSx_bnVaPSexqqXnkUbWgvw57YiSSuNh6EN8vJ6iEJFvQFYCuS8OdzIM/exec",
+  SOURCE_FILE_NAME: "מערכות באופקית תשפ״ז",
+  SOURCE_SHEET_NAME: "מערכת כללית תשפ״ז",
+  USE_DEMO_IF_API_MISSING: true,
+  APP_TITLE: "מערכת ניהול מערכות מורים – תשפ״ז"
+};
+
+</script>
+  <script>
+window.FALLBACK_DATA = {
+  "ok": true,
+  "mode": "snapshot",
+  "source": {
+    "fileName": "מערכות באופקית תשפ״ז",
+    "sheetName": "מערכת כללית תשפ\"ז",
+    "updatedAt": null
+  },
+  "days": [
+    "א׳",
+    "ב׳",
+    "ג׳",
+    "ד׳",
+    "ה׳",
+    "ו׳"
+  ],
+  "programDefinitions": [
+    {
+      "key": "gifted_moe",
+      "label": "מחוננים בוקר",
+      "funder": "משה״ח"
+    },
+    {
+      "key": "morning_moe",
+      "label": "תכנית בוקר",
+      "funder": "משה״ח"
+    },
+    {
+      "key": "excellence_moe",
+      "label": "מצטיינים אחה״צ",
+      "funder": "משה״ח"
+    },
+    {
+      "key": "yahad_moe",
+      "label": "יח״ד אחה״צ",
+      "funder": "משה״ח"
+    },
+    {
+      "key": "settlement_technoda",
+      "label": "מצטייני יישוב אחה״צ",
+      "funder": "טכנודע"
+    },
+    {
+      "key": "excellence_technoda",
+      "label": "מצטיינים אחה״צ",
+      "funder": "טכנודע"
+    },
+    {
+      "key": "gifted_technoda",
+      "label": "מחוננים בוקר",
+      "funder": "טכנודע"
+    }
+  ],
+  "teachers": [
+    {
+      "id": 1,
+      "name": "מריה מזוס",
+      "programs": {
+        "gifted_moe": {
+          "label": "מחוננים בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "morning_moe": {
+          "label": "תכנית בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_moe": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "yahad_moe": {
+          "label": "יח״ד אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "settlement_technoda": {
+          "label": "מצטייני יישוב אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_technoda": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "gifted_technoda": {
+          "label": "מחוננים בוקר",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        }
+      },
+      "dayTotals": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "activeDays": 0,
+      "totalMoE": 0,
+      "totalTechnoda": 0,
+      "total": 0
+    },
+    {
+      "id": 2,
+      "name": "יעלה לילך חדד",
+      "programs": {
+        "gifted_moe": {
+          "label": "מחוננים בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            6,
+            0,
+            0,
+            0,
+            6
+          ],
+          "total": 12
+        },
+        "morning_moe": {
+          "label": "תכנית בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_moe": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            2,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 2
+        },
+        "yahad_moe": {
+          "label": "יח״ד אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "settlement_technoda": {
+          "label": "מצטייני יישוב אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_technoda": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "gifted_technoda": {
+          "label": "מחוננים בוקר",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        }
+      },
+      "dayTotals": [
+        0,
+        8,
+        0,
+        0,
+        0,
+        6
+      ],
+      "activeDays": 2,
+      "totalMoE": 14,
+      "totalTechnoda": 0,
+      "total": 14
+    },
+    {
+      "id": 3,
+      "name": "קרן אולאברי",
+      "programs": {
+        "gifted_moe": {
+          "label": "מחוננים בוקר",
+          "funder": "משה״ח",
+          "days": [
+            6,
+            6,
+            6,
+            0,
+            0,
+            6
+          ],
+          "total": 24
+        },
+        "morning_moe": {
+          "label": "תכנית בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_moe": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "yahad_moe": {
+          "label": "יח״ד אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "settlement_technoda": {
+          "label": "מצטייני יישוב אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_technoda": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "gifted_technoda": {
+          "label": "מחוננים בוקר",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        }
+      },
+      "dayTotals": [
+        6,
+        6,
+        6,
+        0,
+        0,
+        6
+      ],
+      "activeDays": 4,
+      "totalMoE": 24,
+      "totalTechnoda": 0,
+      "total": 24
+    },
+    {
+      "id": 4,
+      "name": "אלון ירון",
+      "programs": {
+        "gifted_moe": {
+          "label": "מחוננים בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            4
+          ],
+          "total": 4
+        },
+        "morning_moe": {
+          "label": "תכנית בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_moe": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "yahad_moe": {
+          "label": "יח״ד אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "settlement_technoda": {
+          "label": "מצטייני יישוב אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_technoda": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "gifted_technoda": {
+          "label": "מחוננים בוקר",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        }
+      },
+      "dayTotals": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        4
+      ],
+      "activeDays": 1,
+      "totalMoE": 4,
+      "totalTechnoda": 0,
+      "total": 4
+    },
+    {
+      "id": 5,
+      "name": "ענת אספורטס",
+      "programs": {
+        "gifted_moe": {
+          "label": "מחוננים בוקר",
+          "funder": "משה״ח",
+          "days": [
+            5,
+            0,
+            0,
+            0,
+            0,
+            6
+          ],
+          "total": 11
+        },
+        "morning_moe": {
+          "label": "תכנית בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            6,
+            6,
+            0,
+            0
+          ],
+          "total": 12
+        },
+        "excellence_moe": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "yahad_moe": {
+          "label": "יח״ד אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "settlement_technoda": {
+          "label": "מצטייני יישוב אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_technoda": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "gifted_technoda": {
+          "label": "מחוננים בוקר",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        }
+      },
+      "dayTotals": [
+        5,
+        0,
+        6,
+        6,
+        0,
+        6
+      ],
+      "activeDays": 4,
+      "totalMoE": 23,
+      "totalTechnoda": 0,
+      "total": 23
+    },
+    {
+      "id": 6,
+      "name": "משה ברוקר",
+      "programs": {
+        "gifted_moe": {
+          "label": "מחוננים בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            6,
+            6,
+            0,
+            0,
+            3
+          ],
+          "total": 15
+        },
+        "morning_moe": {
+          "label": "תכנית בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_moe": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            2,
+            2,
+            0,
+            4,
+            0
+          ],
+          "total": 8
+        },
+        "yahad_moe": {
+          "label": "יח״ד אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "settlement_technoda": {
+          "label": "מצטייני יישוב אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_technoda": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "gifted_technoda": {
+          "label": "מחוננים בוקר",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        }
+      },
+      "dayTotals": [
+        0,
+        8,
+        8,
+        0,
+        4,
+        3
+      ],
+      "activeDays": 4,
+      "totalMoE": 23,
+      "totalTechnoda": 0,
+      "total": 23
+    },
+    {
+      "id": 7,
+      "name": "דוראני סיון",
+      "programs": {
+        "gifted_moe": {
+          "label": "מחוננים בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            6,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 6
+        },
+        "morning_moe": {
+          "label": "תכנית בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            6,
+            6,
+            0,
+            0
+          ],
+          "total": 12
+        },
+        "excellence_moe": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            2,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 2
+        },
+        "yahad_moe": {
+          "label": "יח״ד אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            4,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 4
+        },
+        "settlement_technoda": {
+          "label": "מצטייני יישוב אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_technoda": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "gifted_technoda": {
+          "label": "מחוננים בוקר",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        }
+      },
+      "dayTotals": [
+        6,
+        6,
+        6,
+        6,
+        0,
+        0
+      ],
+      "activeDays": 4,
+      "totalMoE": 24,
+      "totalTechnoda": 0,
+      "total": 24
+    },
+    {
+      "id": 8,
+      "name": "אמנון הלל",
+      "programs": {
+        "gifted_moe": {
+          "label": "מחוננים בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            4
+          ],
+          "total": 4
+        },
+        "morning_moe": {
+          "label": "תכנית בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_moe": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "yahad_moe": {
+          "label": "יח״ד אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "settlement_technoda": {
+          "label": "מצטייני יישוב אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_technoda": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "gifted_technoda": {
+          "label": "מחוננים בוקר",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        }
+      },
+      "dayTotals": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        4
+      ],
+      "activeDays": 1,
+      "totalMoE": 4,
+      "totalTechnoda": 0,
+      "total": 4
+    },
+    {
+      "id": 9,
+      "name": "וייס מור",
+      "programs": {
+        "gifted_moe": {
+          "label": "מחוננים בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "morning_moe": {
+          "label": "תכנית בוקר",
+          "funder": "משה״ח",
+          "days": [
+            6,
+            4,
+            4,
+            0,
+            4,
+            0
+          ],
+          "total": 18
+        },
+        "excellence_moe": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "yahad_moe": {
+          "label": "יח״ד אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "settlement_technoda": {
+          "label": "מצטייני יישוב אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_technoda": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "gifted_technoda": {
+          "label": "מחוננים בוקר",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        }
+      },
+      "dayTotals": [
+        6,
+        4,
+        4,
+        0,
+        4,
+        0
+      ],
+      "activeDays": 4,
+      "totalMoE": 18,
+      "totalTechnoda": 0,
+      "total": 18
+    },
+    {
+      "id": 10,
+      "name": "וייס רעות",
+      "programs": {
+        "gifted_moe": {
+          "label": "מחוננים בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            4
+          ],
+          "total": 4
+        },
+        "morning_moe": {
+          "label": "תכנית בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_moe": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "yahad_moe": {
+          "label": "יח״ד אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "settlement_technoda": {
+          "label": "מצטייני יישוב אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_technoda": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "gifted_technoda": {
+          "label": "מחוננים בוקר",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        }
+      },
+      "dayTotals": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        4
+      ],
+      "activeDays": 1,
+      "totalMoE": 4,
+      "totalTechnoda": 0,
+      "total": 4
+    },
+    {
+      "id": 11,
+      "name": "זריהן אלי",
+      "programs": {
+        "gifted_moe": {
+          "label": "מחוננים בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            6,
+            6,
+            0,
+            0,
+            7
+          ],
+          "total": 19
+        },
+        "morning_moe": {
+          "label": "תכנית בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            6,
+            0
+          ],
+          "total": 6
+        },
+        "excellence_moe": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "yahad_moe": {
+          "label": "יח״ד אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "settlement_technoda": {
+          "label": "מצטייני יישוב אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_technoda": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "gifted_technoda": {
+          "label": "מחוננים בוקר",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        }
+      },
+      "dayTotals": [
+        0,
+        6,
+        6,
+        0,
+        6,
+        7
+      ],
+      "activeDays": 4,
+      "totalMoE": 25,
+      "totalTechnoda": 0,
+      "total": 25
+    },
+    {
+      "id": 12,
+      "name": "שוש חפץ",
+      "programs": {
+        "gifted_moe": {
+          "label": "מחוננים בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "morning_moe": {
+          "label": "תכנית בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_moe": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "yahad_moe": {
+          "label": "יח״ד אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "settlement_technoda": {
+          "label": "מצטייני יישוב אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_technoda": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "gifted_technoda": {
+          "label": "מחוננים בוקר",
+          "funder": "טכנודע",
+          "days": [
+            6,
+            0,
+            6,
+            0,
+            0,
+            0
+          ],
+          "total": 12
+        }
+      },
+      "dayTotals": [
+        6,
+        0,
+        6,
+        0,
+        0,
+        0
+      ],
+      "activeDays": 2,
+      "totalMoE": 0,
+      "totalTechnoda": 12,
+      "total": 12
+    },
+    {
+      "id": 13,
+      "name": "ענת ידלין",
+      "programs": {
+        "gifted_moe": {
+          "label": "מחוננים בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            6,
+            0,
+            0,
+            0
+          ],
+          "total": 6
+        },
+        "morning_moe": {
+          "label": "תכנית בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            6,
+            6,
+            0
+          ],
+          "total": 12
+        },
+        "excellence_moe": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            4,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 4
+        },
+        "yahad_moe": {
+          "label": "יח״ד אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "settlement_technoda": {
+          "label": "מצטייני יישוב אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_technoda": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "gifted_technoda": {
+          "label": "מחוננים בוקר",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        }
+      },
+      "dayTotals": [
+        0,
+        4,
+        6,
+        6,
+        6,
+        0
+      ],
+      "activeDays": 4,
+      "totalMoE": 22,
+      "totalTechnoda": 0,
+      "total": 22
+    },
+    {
+      "id": 14,
+      "name": "נתי מנצור",
+      "programs": {
+        "gifted_moe": {
+          "label": "מחוננים בוקר",
+          "funder": "משה״ח",
+          "days": [
+            6,
+            6,
+            6,
+            0,
+            0,
+            6
+          ],
+          "total": 24
+        },
+        "morning_moe": {
+          "label": "תכנית בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_moe": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            2,
+            0
+          ],
+          "total": 2
+        },
+        "yahad_moe": {
+          "label": "יח״ד אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "settlement_technoda": {
+          "label": "מצטייני יישוב אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_technoda": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "gifted_technoda": {
+          "label": "מחוננים בוקר",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        }
+      },
+      "dayTotals": [
+        6,
+        6,
+        6,
+        0,
+        2,
+        6
+      ],
+      "activeDays": 5,
+      "totalMoE": 26,
+      "totalTechnoda": 0,
+      "total": 26
+    },
+    {
+      "id": 15,
+      "name": "שירה דגאי",
+      "programs": {
+        "gifted_moe": {
+          "label": "מחוננים בוקר",
+          "funder": "משה״ח",
+          "days": [
+            5,
+            5,
+            5,
+            0,
+            0,
+            5
+          ],
+          "total": 20
+        },
+        "morning_moe": {
+          "label": "תכנית בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_moe": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "yahad_moe": {
+          "label": "יח״ד אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            4,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 4
+        },
+        "settlement_technoda": {
+          "label": "מצטייני יישוב אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_technoda": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "gifted_technoda": {
+          "label": "מחוננים בוקר",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        }
+      },
+      "dayTotals": [
+        9,
+        5,
+        5,
+        0,
+        0,
+        5
+      ],
+      "activeDays": 4,
+      "totalMoE": 24,
+      "totalTechnoda": 0,
+      "total": 24
+    },
+    {
+      "id": 16,
+      "name": "מעין שפושניק",
+      "programs": {
+        "gifted_moe": {
+          "label": "מחוננים בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            6,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 6
+        },
+        "morning_moe": {
+          "label": "תכנית בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_moe": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            1,
+            2,
+            0,
+            0,
+            4,
+            0
+          ],
+          "total": 7
+        },
+        "yahad_moe": {
+          "label": "יח״ד אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "settlement_technoda": {
+          "label": "מצטייני יישוב אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_technoda": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "gifted_technoda": {
+          "label": "מחוננים בוקר",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        }
+      },
+      "dayTotals": [
+        1,
+        8,
+        0,
+        0,
+        4,
+        0
+      ],
+      "activeDays": 3,
+      "totalMoE": 13,
+      "totalTechnoda": 0,
+      "total": 13
+    },
+    {
+      "id": 17,
+      "name": "אסנת צפון",
+      "programs": {
+        "gifted_moe": {
+          "label": "מחוננים בוקר",
+          "funder": "משה״ח",
+          "days": [
+            2,
+            2,
+            1,
+            0,
+            0,
+            2
+          ],
+          "total": 7
+        },
+        "morning_moe": {
+          "label": "תכנית בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_moe": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "yahad_moe": {
+          "label": "יח״ד אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "settlement_technoda": {
+          "label": "מצטייני יישוב אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_technoda": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "gifted_technoda": {
+          "label": "מחוננים בוקר",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        }
+      },
+      "dayTotals": [
+        2,
+        2,
+        1,
+        0,
+        0,
+        2
+      ],
+      "activeDays": 4,
+      "totalMoE": 7,
+      "totalTechnoda": 0,
+      "total": 7
+    },
+    {
+      "id": 18,
+      "name": "טללית קונפורטי",
+      "programs": {
+        "gifted_moe": {
+          "label": "מחוננים בוקר",
+          "funder": "משה״ח",
+          "days": [
+            6,
+            6,
+            0,
+            0,
+            0,
+            5
+          ],
+          "total": 17
+        },
+        "morning_moe": {
+          "label": "תכנית בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_moe": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            2,
+            2,
+            2,
+            0,
+            0,
+            0
+          ],
+          "total": 6
+        },
+        "yahad_moe": {
+          "label": "יח״ד אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "settlement_technoda": {
+          "label": "מצטייני יישוב אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_technoda": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "gifted_technoda": {
+          "label": "מחוננים בוקר",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        }
+      },
+      "dayTotals": [
+        8,
+        8,
+        2,
+        0,
+        0,
+        5
+      ],
+      "activeDays": 4,
+      "totalMoE": 23,
+      "totalTechnoda": 0,
+      "total": 23
+    },
+    {
+      "id": 19,
+      "name": "קסלמן ילנה",
+      "programs": {
+        "gifted_moe": {
+          "label": "מחוננים בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            4
+          ],
+          "total": 4
+        },
+        "morning_moe": {
+          "label": "תכנית בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_moe": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "yahad_moe": {
+          "label": "יח״ד אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "settlement_technoda": {
+          "label": "מצטייני יישוב אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_technoda": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "gifted_technoda": {
+          "label": "מחוננים בוקר",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        }
+      },
+      "dayTotals": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        4
+      ],
+      "activeDays": 1,
+      "totalMoE": 4,
+      "totalTechnoda": 0,
+      "total": 4
+    },
+    {
+      "id": 20,
+      "name": "עזריאל שניידר",
+      "programs": {
+        "gifted_moe": {
+          "label": "מחוננים בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "morning_moe": {
+          "label": "תכנית בוקר",
+          "funder": "משה״ח",
+          "days": [
+            2,
+            2,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 4
+        },
+        "excellence_moe": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            4,
+            0
+          ],
+          "total": 4
+        },
+        "yahad_moe": {
+          "label": "יח״ד אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            4,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 4
+        },
+        "settlement_technoda": {
+          "label": "מצטייני יישוב אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_technoda": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "gifted_technoda": {
+          "label": "מחוננים בוקר",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        }
+      },
+      "dayTotals": [
+        6,
+        2,
+        0,
+        0,
+        4,
+        0
+      ],
+      "activeDays": 3,
+      "totalMoE": 12,
+      "totalTechnoda": 0,
+      "total": 12
+    },
+    {
+      "id": 21,
+      "name": "איציק חיים",
+      "programs": {
+        "gifted_moe": {
+          "label": "מחוננים בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "morning_moe": {
+          "label": "תכנית בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_moe": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "yahad_moe": {
+          "label": "יח״ד אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "settlement_technoda": {
+          "label": "מצטייני יישוב אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_technoda": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "gifted_technoda": {
+          "label": "מחוננים בוקר",
+          "funder": "טכנודע",
+          "days": [
+            6,
+            0,
+            6,
+            0,
+            0,
+            4
+          ],
+          "total": 16
+        }
+      },
+      "dayTotals": [
+        6,
+        0,
+        6,
+        0,
+        0,
+        4
+      ],
+      "activeDays": 3,
+      "totalMoE": 0,
+      "totalTechnoda": 16,
+      "total": 16
+    },
+    {
+      "id": 22,
+      "name": "שני מס לביא",
+      "programs": {
+        "gifted_moe": {
+          "label": "מחוננים בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            4
+          ],
+          "total": 4
+        },
+        "morning_moe": {
+          "label": "תכנית בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_moe": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "yahad_moe": {
+          "label": "יח״ד אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "settlement_technoda": {
+          "label": "מצטייני יישוב אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_technoda": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "gifted_technoda": {
+          "label": "מחוננים בוקר",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        }
+      },
+      "dayTotals": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        4
+      ],
+      "activeDays": 1,
+      "totalMoE": 4,
+      "totalTechnoda": 0,
+      "total": 4
+    },
+    {
+      "id": 23,
+      "name": "רונאל הרזס",
+      "programs": {
+        "gifted_moe": {
+          "label": "מחוננים בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "morning_moe": {
+          "label": "תכנית בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_moe": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "yahad_moe": {
+          "label": "יח״ד אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "settlement_technoda": {
+          "label": "מצטייני יישוב אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_technoda": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "gifted_technoda": {
+          "label": "מחוננים בוקר",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        }
+      },
+      "dayTotals": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "activeDays": 0,
+      "totalMoE": 0,
+      "totalTechnoda": 0,
+      "total": 0
+    },
+    {
+      "id": 24,
+      "name": "אלון פלומן",
+      "programs": {
+        "gifted_moe": {
+          "label": "מחוננים בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "morning_moe": {
+          "label": "תכנית בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_moe": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "yahad_moe": {
+          "label": "יח״ד אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "settlement_technoda": {
+          "label": "מצטייני יישוב אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_technoda": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "gifted_technoda": {
+          "label": "מחוננים בוקר",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        }
+      },
+      "dayTotals": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "activeDays": 0,
+      "totalMoE": 0,
+      "totalTechnoda": 0,
+      "total": 0
+    },
+    {
+      "id": 25,
+      "name": "אראל חכמון",
+      "programs": {
+        "gifted_moe": {
+          "label": "מחוננים בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "morning_moe": {
+          "label": "תכנית בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_moe": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "yahad_moe": {
+          "label": "יח״ד אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "settlement_technoda": {
+          "label": "מצטייני יישוב אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_technoda": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "gifted_technoda": {
+          "label": "מחוננים בוקר",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        }
+      },
+      "dayTotals": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "activeDays": 0,
+      "totalMoE": 0,
+      "totalTechnoda": 0,
+      "total": 0
+    },
+    {
+      "id": 26,
+      "name": "ד\"ר מעין שוורצר",
+      "programs": {
+        "gifted_moe": {
+          "label": "מחוננים בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "morning_moe": {
+          "label": "תכנית בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_moe": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "yahad_moe": {
+          "label": "יח״ד אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "settlement_technoda": {
+          "label": "מצטייני יישוב אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_technoda": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "gifted_technoda": {
+          "label": "מחוננים בוקר",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        }
+      },
+      "dayTotals": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "activeDays": 0,
+      "totalMoE": 0,
+      "totalTechnoda": 0,
+      "total": 0
+    },
+    {
+      "id": 27,
+      "name": "אלמוג מאיר",
+      "programs": {
+        "gifted_moe": {
+          "label": "מחוננים בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            6
+          ],
+          "total": 6
+        },
+        "morning_moe": {
+          "label": "תכנית בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_moe": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            2,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 2
+        },
+        "yahad_moe": {
+          "label": "יח״ד אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "settlement_technoda": {
+          "label": "מצטייני יישוב אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_technoda": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "gifted_technoda": {
+          "label": "מחוננים בוקר",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        }
+      },
+      "dayTotals": [
+        2,
+        0,
+        0,
+        0,
+        0,
+        6
+      ],
+      "activeDays": 2,
+      "totalMoE": 8,
+      "totalTechnoda": 0,
+      "total": 8
+    },
+    {
+      "id": 28,
+      "name": "אריה סנה",
+      "programs": {
+        "gifted_moe": {
+          "label": "מחוננים בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "morning_moe": {
+          "label": "תכנית בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_moe": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "yahad_moe": {
+          "label": "יח״ד אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "settlement_technoda": {
+          "label": "מצטייני יישוב אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_technoda": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "gifted_technoda": {
+          "label": "מחוננים בוקר",
+          "funder": "טכנודע",
+          "days": [
+            6,
+            6,
+            0,
+            0,
+            0,
+            6
+          ],
+          "total": 18
+        }
+      },
+      "dayTotals": [
+        6,
+        6,
+        0,
+        0,
+        0,
+        6
+      ],
+      "activeDays": 3,
+      "totalMoE": 0,
+      "totalTechnoda": 18,
+      "total": 18
+    },
+    {
+      "id": 29,
+      "name": "דוד אוחיון",
+      "programs": {
+        "gifted_moe": {
+          "label": "מחוננים בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "morning_moe": {
+          "label": "תכנית בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_moe": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "yahad_moe": {
+          "label": "יח״ד אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "settlement_technoda": {
+          "label": "מצטייני יישוב אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_technoda": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "gifted_technoda": {
+          "label": "מחוננים בוקר",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        }
+      },
+      "dayTotals": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "activeDays": 0,
+      "totalMoE": 0,
+      "totalTechnoda": 0,
+      "total": 0
+    },
+    {
+      "id": 30,
+      "name": "שוהם גיאת",
+      "programs": {
+        "gifted_moe": {
+          "label": "מחוננים בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "morning_moe": {
+          "label": "תכנית בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_moe": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "yahad_moe": {
+          "label": "יח״ד אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "settlement_technoda": {
+          "label": "מצטייני יישוב אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_technoda": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "gifted_technoda": {
+          "label": "מחוננים בוקר",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        }
+      },
+      "dayTotals": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "activeDays": 0,
+      "totalMoE": 0,
+      "totalTechnoda": 0,
+      "total": 0
+    },
+    {
+      "id": 31,
+      "name": "רוני פישר",
+      "programs": {
+        "gifted_moe": {
+          "label": "מחוננים בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "morning_moe": {
+          "label": "תכנית בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_moe": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "yahad_moe": {
+          "label": "יח״ד אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "settlement_technoda": {
+          "label": "מצטייני יישוב אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_technoda": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "gifted_technoda": {
+          "label": "מחוננים בוקר",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        }
+      },
+      "dayTotals": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "activeDays": 0,
+      "totalMoE": 0,
+      "totalTechnoda": 0,
+      "total": 0
+    },
+    {
+      "id": 32,
+      "name": "שי גלס",
+      "programs": {
+        "gifted_moe": {
+          "label": "מחוננים בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "morning_moe": {
+          "label": "תכנית בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_moe": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "yahad_moe": {
+          "label": "יח״ד אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "settlement_technoda": {
+          "label": "מצטייני יישוב אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_technoda": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "gifted_technoda": {
+          "label": "מחוננים בוקר",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        }
+      },
+      "dayTotals": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "activeDays": 0,
+      "totalMoE": 0,
+      "totalTechnoda": 0,
+      "total": 0
+    },
+    {
+      "id": 33,
+      "name": "תותי עינב וינהאוס",
+      "programs": {
+        "gifted_moe": {
+          "label": "מחוננים בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "morning_moe": {
+          "label": "תכנית בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_moe": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "yahad_moe": {
+          "label": "יח״ד אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "settlement_technoda": {
+          "label": "מצטייני יישוב אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_technoda": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "gifted_technoda": {
+          "label": "מחוננים בוקר",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        }
+      },
+      "dayTotals": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "activeDays": 0,
+      "totalMoE": 0,
+      "totalTechnoda": 0,
+      "total": 0
+    },
+    {
+      "id": 34,
+      "name": "סבטלנה רילסקי",
+      "programs": {
+        "gifted_moe": {
+          "label": "מחוננים בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            6
+          ],
+          "total": 6
+        },
+        "morning_moe": {
+          "label": "תכנית בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_moe": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "yahad_moe": {
+          "label": "יח״ד אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "settlement_technoda": {
+          "label": "מצטייני יישוב אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_technoda": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "gifted_technoda": {
+          "label": "מחוננים בוקר",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        }
+      },
+      "dayTotals": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        6
+      ],
+      "activeDays": 1,
+      "totalMoE": 6,
+      "totalTechnoda": 0,
+      "total": 6
+    },
+    {
+      "id": 35,
+      "name": "לינוי יעקב",
+      "programs": {
+        "gifted_moe": {
+          "label": "מחוננים בוקר",
+          "funder": "משה״ח",
+          "days": [
+            5,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 5
+        },
+        "morning_moe": {
+          "label": "תכנית בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_moe": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "yahad_moe": {
+          "label": "יח״ד אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            4,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 4
+        },
+        "settlement_technoda": {
+          "label": "מצטייני יישוב אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_technoda": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "gifted_technoda": {
+          "label": "מחוננים בוקר",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        }
+      },
+      "dayTotals": [
+        5,
+        4,
+        0,
+        0,
+        0,
+        0
+      ],
+      "activeDays": 2,
+      "totalMoE": 9,
+      "totalTechnoda": 0,
+      "total": 9
+    },
+    {
+      "id": 36,
+      "name": "מעיין כהן",
+      "programs": {
+        "gifted_moe": {
+          "label": "מחוננים בוקר",
+          "funder": "משה״ח",
+          "days": [
+            4,
+            6,
+            6,
+            0,
+            0,
+            3
+          ],
+          "total": 19
+        },
+        "morning_moe": {
+          "label": "תכנית בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_moe": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "total": 1
+        },
+        "yahad_moe": {
+          "label": "יח״ד אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "settlement_technoda": {
+          "label": "מצטייני יישוב אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_technoda": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "gifted_technoda": {
+          "label": "מחוננים בוקר",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        }
+      },
+      "dayTotals": [
+        4,
+        6,
+        6,
+        0,
+        1,
+        3
+      ],
+      "activeDays": 5,
+      "totalMoE": 20,
+      "totalTechnoda": 0,
+      "total": 20
+    },
+    {
+      "id": 37,
+      "name": "מרי דהן",
+      "programs": {
+        "gifted_moe": {
+          "label": "מחוננים בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "morning_moe": {
+          "label": "תכנית בוקר",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_moe": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "yahad_moe": {
+          "label": "יח״ד אחה״צ",
+          "funder": "משה״ח",
+          "days": [
+            2,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 2
+        },
+        "settlement_technoda": {
+          "label": "מצטייני יישוב אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "excellence_technoda": {
+          "label": "מצטיינים אחה״צ",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        },
+        "gifted_technoda": {
+          "label": "מחוננים בוקר",
+          "funder": "טכנודע",
+          "days": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "total": 0
+        }
+      },
+      "dayTotals": [
+        2,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "activeDays": 1,
+      "totalMoE": 2,
+      "totalTechnoda": 0,
+      "total": 2
+    }
+  ]
+};
+
+</script>
+  <script>
+(() => {
+  const PROGRAMS = [
+    { key: 'gifted_moe', label: 'מחוננים בוקר', funder: 'משה״ח', short: 'מחוננים משה״ח' },
+    { key: 'morning_moe', label: 'תכנית בוקר', funder: 'משה״ח', short: 'תכנית בוקר' },
+    { key: 'excellence_moe', label: 'מצטיינים אחה״צ', funder: 'משה״ח', short: 'מצטיינים משה״ח' },
+    { key: 'yahad_moe', label: 'יח״ד אחה״צ', funder: 'משה״ח', short: 'יח״ד' },
+    { key: 'settlement_technoda', label: 'מצטייני יישוב אחה״צ', funder: 'טכנודע', short: 'מצטייני יישוב' },
+    { key: 'excellence_technoda', label: 'מצטיינים אחה״צ', funder: 'טכנודע', short: 'מצטיינים טכנודע' },
+    { key: 'gifted_technoda', label: 'מחוננים בוקר', funder: 'טכנודע', short: 'מחוננים טכנודע' }
+  ];
+  const DAYS = ['א׳','ב׳','ג׳','ד׳','ה׳','ו׳'];
+
+  const state = {
+    data: null,
+    selectedTeacher: null,
+    currentView: 'overview',
+    loading: false
+  };
+
+  const $ = (id) => document.getElementById(id);
+  const fmt = (n) => Number(n || 0).toLocaleString('he-IL', { maximumFractionDigits: 1 });
+  const sum = arr => arr.reduce((a,b) => a + Number(b || 0), 0);
+
+  document.addEventListener('DOMContentLoaded', init);
+
+  function init() {
+    bindUI();
+    loadData();
+  }
+
+  function bindUI() {
+    document.querySelectorAll('.nav-item').forEach(btn => btn.addEventListener('click', () => setView(btn.dataset.view)));
+    document.querySelectorAll('[data-jump]').forEach(btn => btn.addEventListener('click', () => setView(btn.dataset.jump)));
+    $('refreshBtn').addEventListener('click', () => loadData(true));
+    $('teacherSelect').addEventListener('change', e => selectTeacher(e.target.value, true));
+    $('teacherSearch').addEventListener('input', renderTeachersTable);
+    $('programFilter').addEventListener('change', renderTeachersTable);
+    $('sortTeachers').addEventListener('change', renderTeachersTable);
+    $('downloadCsvBtn').addEventListener('click', downloadCsv);
+    $('printTeacherBtn').addEventListener('click', () => window.print());
+    $('copyTeacherLinkBtn').addEventListener('click', copyTeacherLink);
+    $('mobileMenu').addEventListener('click', () => $('sidebar').classList.toggle('open'));
+  }
+
+  function setView(view) {
+    state.currentView = view;
+    document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === `view-${view}`));
+    document.querySelectorAll('.nav-item').forEach(v => v.classList.toggle('active', v.dataset.view === view));
+    const meta = {
+      overview: ['לוח בקרה', 'תמונת מצב עדכנית מתוך הקובץ הראשי בלבד'],
+      teacher: ['מערכת מורה', 'בחירת מורה והפקת מערכת שבועית'],
+      teachers: ['כל המורים', 'חיפוש, סינון והשוואת היקפי שעות'],
+      source: ['מקור וסנכרון', 'מצב החיבור לקובץ “מערכות באופקית תשפ״ז”']
+    }[view];
+    $('pageTitle').textContent = meta[0];
+    $('pageSubtitle').textContent = meta[1];
+    $('sidebar').classList.remove('open');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function loadData(force = false) {
+    if (state.loading) return;
+    state.loading = true;
+    $('refreshBtn').disabled = true;
+    $('refreshBtn').textContent = 'מרענן…';
+    setSyncStatus('loading');
+
+    const apiUrl = (window.APP_CONFIG && window.APP_CONFIG.API_URL || '').trim();
+    if (apiUrl) {
+      loadJsonp(apiUrl)
+        .then(data => applyData(data, 'live'))
+        .catch(err => {
+          console.error(err);
+          if (window.APP_CONFIG.USE_DEMO_IF_API_MISSING && window.FALLBACK_DATA) {
+            applyData(window.FALLBACK_DATA, 'snapshot', 'החיבור החי לא הצליח, לכן מוצג צילום המצב המצורף לאתר.');
+          } else {
+            showError('לא ניתן לטעון נתונים מהמקור.');
+          }
+        })
+        .finally(doneLoading);
+    } else {
+      if (window.FALLBACK_DATA) {
+        applyData(window.FALLBACK_DATA, 'snapshot', 'האתר עדיין במצב הדגמה. כדי לקבל סנכרון חי, יש להדביק את כתובת ה־Apps Script בקובץ config.js.');
+      } else {
+        showError('לא הוגדר מקור נתונים.');
+      }
+      doneLoading();
+    }
+  }
+
+  function loadJsonp(baseUrl) {
+    return new Promise((resolve, reject) => {
+      const callbackName = `__schedule_cb_${Date.now()}_${Math.floor(Math.random()*100000)}`;
+      const timer = setTimeout(() => cleanup(new Error('timeout')), 15000);
+      const script = document.createElement('script');
+      const separator = baseUrl.includes('?') ? '&' : '?';
+      script.src = `${baseUrl}${separator}callback=${encodeURIComponent(callbackName)}&_=${Date.now()}`;
+      script.async = true;
+
+      window[callbackName] = (data) => {
+        cleanup();
+        resolve(data);
+      };
+      script.onerror = () => cleanup(new Error('jsonp error'));
+      document.head.appendChild(script);
+
+      function cleanup(error) {
+        clearTimeout(timer);
+        script.remove();
+        try { delete window[callbackName]; } catch (_) { window[callbackName] = undefined; }
+        if (error) reject(error);
+      }
+    });
+  }
+
+  function doneLoading() {
+    state.loading = false;
+    $('refreshBtn').disabled = false;
+    $('refreshBtn').textContent = 'רענון נתונים';
+  }
+
+  function applyData(data, mode, bannerText = '') {
+    if (!data || !Array.isArray(data.teachers)) throw new Error('Invalid data payload');
+    state.data = data;
+    state.data.mode = mode;
+    populateSelectors();
+    renderAll();
+    setSyncStatus(mode);
+
+    if (bannerText) {
+      $('statusBanner').textContent = bannerText;
+      $('statusBanner').classList.remove('hidden');
+    } else {
+      $('statusBanner').classList.add('hidden');
+    }
+
+    const updated = data.source && data.source.updatedAt ? new Date(data.source.updatedAt) : null;
+    $('lastSync').textContent = updated && !Number.isNaN(updated.getTime())
+      ? `עדכון מקור: ${updated.toLocaleString('he-IL')}`
+      : `נטען: ${new Date().toLocaleTimeString('he-IL', {hour:'2-digit', minute:'2-digit'})}`;
+
+    const requestedTeacher = new URLSearchParams(location.search).get('teacher');
+    const initial = state.selectedTeacher?.name || requestedTeacher || data.teachers[0]?.name || '';
+    selectTeacher(initial, false);
+  }
+
+  function setSyncStatus(mode) {
+    const chip = $('syncChip');
+    chip.classList.toggle('live', mode === 'live');
+    const txt = mode === 'live' ? 'מחובר למקור החי' : mode === 'snapshot' ? 'מצב צילום מצב' : 'טוען נתונים…';
+    $('syncChipText').textContent = txt;
+  }
+
+  function showError(message) {
+    $('statusBanner').textContent = message;
+    $('statusBanner').classList.remove('hidden');
+    setSyncStatus('snapshot');
+  }
+
+  function populateSelectors() {
+    const teachers = [...state.data.teachers].sort((a,b) => a.name.localeCompare(b.name, 'he'));
+    $('teacherSelect').innerHTML = teachers.map(t => `<option value="${escapeAttr(t.name)}">${escapeHtml(t.name)}</option>`).join('');
+    $('programFilter').innerHTML = '<option value="">כל התכניות</option>' + PROGRAMS.map(p => `<option value="${p.key}">${escapeHtml(p.short)}</option>`).join('');
+  }
+
+  function renderAll() {
+    renderOverview();
+    renderTeachersTable();
+    renderSource();
+    if (state.selectedTeacher) renderTeacher(state.selectedTeacher);
+  }
+
+  function renderOverview() {
+    const teachers = state.data.teachers;
+    const totalHours = sum(teachers.map(t => t.total));
+    const totalMoe = sum(teachers.map(t => t.totalMoE));
+    const totalTech = sum(teachers.map(t => t.totalTechnoda));
+    const activeTeachers = teachers.filter(t => t.total > 0).length;
+    const maxTeacher = [...teachers].sort((a,b) => b.total - a.total)[0];
+
+    $('overviewKpis').innerHTML = [
+      kpi('מורים בקובץ', teachers.length, `${activeTeachers} עם שעות משובצות`),
+      kpi('סה״כ שעות', fmt(totalHours), 'כלל התכניות'),
+      kpi('שעות משה״ח', fmt(totalMoe), `${pct(totalMoe,totalHours)}% מסך הכול`),
+      kpi('שעות טכנודע', fmt(totalTech), `${pct(totalTech,totalHours)}% מסך הכול`),
+      kpi('היקף מרבי למורה', fmt(maxTeacher?.total || 0), maxTeacher?.name || '—', true)
+    ].join('');
+
+    const totalsByProgram = PROGRAMS.map(p => ({...p, total: sum(teachers.map(t => t.programs[p.key]?.total || 0))}));
+    const maxProgram = Math.max(1, ...totalsByProgram.map(x => x.total));
+    $('programBars').innerHTML = totalsByProgram.map(p => `
+      <div class="bar-row">
+        <div class="bar-label">${escapeHtml(p.short)}</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${(p.total/maxProgram)*100}%"></div></div>
+        <div class="bar-value">${fmt(p.total)}</div>
+      </div>`).join('');
+
+    const dayTotals = DAYS.map((_,i) => sum(teachers.map(t => t.dayTotals[i] || 0)));
+    const maxDay = Math.max(1, ...dayTotals);
+    $('dayLoad').innerHTML = DAYS.map((day,i) => `
+      <div class="day-column">
+        <div class="day-number">${fmt(dayTotals[i])}</div>
+        <div class="day-bar-wrap"><div class="day-bar" style="height:${Math.max(3,(dayTotals[i]/maxDay)*100)}%"></div></div>
+        <div class="day-name">יום ${day}</div>
+      </div>`).join('');
+
+    const top = [...teachers].sort((a,b) => b.total-a.total).slice(0,8);
+    $('topTeachersBody').innerHTML = top.map(t => `
+      <tr>
+        <td><button class="teacher-link-button" data-teacher="${escapeAttr(t.name)}">${escapeHtml(t.name)}</button></td>
+        <td><span class="hours-pill">${fmt(t.total)}</span></td>
+        <td>${fmt(t.totalMoE)}</td><td>${fmt(t.totalTechnoda)}</td><td>${t.activeDays}</td>
+      </tr>`).join('');
+    bindTeacherLinks($('topTeachersBody'));
+  }
+
+  function kpi(label, value, note, accent=false) {
+    return `<div class="kpi-card ${accent ? 'accent' : ''}"><div class="kpi-label">${label}</div><div class="kpi-value">${value}</div><div class="kpi-note">${escapeHtml(note)}</div></div>`;
+  }
+
+  function selectTeacher(name, updateUrl) {
+    const teacher = state.data?.teachers.find(t => t.name === name) || state.data?.teachers[0];
+    if (!teacher) return;
+    state.selectedTeacher = teacher;
+    $('teacherSelect').value = teacher.name;
+    renderTeacher(teacher);
+    if (updateUrl) {
+      const url = new URL(location.href);
+      url.searchParams.set('teacher', teacher.name);
+      history.replaceState({}, '', url);
+    }
+  }
+
+  function renderTeacher(t) {
+    const tableRows = PROGRAMS.map(p => {
+      const row = t.programs[p.key] || {days:[0,0,0,0,0,0],total:0};
+      return `<tr>
+        <td>${escapeHtml(p.short)}</td>
+        ${row.days.map(v => `<td><div class="schedule-cell">${v ? `<span class="schedule-value ${p.funder === 'טכנודע' ? 'technoda' : ''}">${fmt(v)} ש׳</span>` : '<span class="schedule-value empty">—</span>'}</div></td>`).join('')}
+        <td><strong>${fmt(row.total)}</strong></td>
+      </tr>`;
+    }).join('');
+
+    $('teacherOutput').innerHTML = `
+      <article class="teacher-sheet" id="printableTeacherSheet">
+        <div class="teacher-sheet-title">מערכת שעות - ${escapeHtml(t.name)} - שנה״ל תשפ״ז</div>
+        <div class="teacher-kpis">
+          <div class="teacher-kpi"><div class="v">${fmt(t.total)}</div><div class="l">סה״כ שעות</div></div>
+          <div class="teacher-kpi"><div class="v">${fmt(t.totalMoE)}</div><div class="l">משה״ח</div></div>
+          <div class="teacher-kpi"><div class="v">${fmt(t.totalTechnoda)}</div><div class="l">טכנודע</div></div>
+          <div class="teacher-kpi"><div class="v">${t.activeDays}</div><div class="l">ימים פעילים</div></div>
+        </div>
+        <div class="schedule-wrap">
+          <table class="schedule-grid">
+            <thead><tr><th>מסגרת / יום</th>${DAYS.map(d => `<th>${d}</th>`).join('')}<th>סה״כ</th></tr></thead>
+            <tbody>
+              ${tableRows}
+              <tr class="schedule-total-row"><td>סה״כ ליום</td>${t.dayTotals.map(v => `<td>${fmt(v)}</td>`).join('')}<td>${fmt(t.total)}</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="teacher-note">
+          הפלט מבוסס רק על הקובץ הראשי. הקובץ מכיל היקף שעות לפי יום ותכנית, אך אינו מכיל שעות התחלה/סיום, פרטני או שהייה — ולכן נתונים אלה אינם מוצגים.
+        </div>
+      </article>`;
+  }
+
+  function renderTeachersTable() {
+    if (!state.data) return;
+    const q = $('teacherSearch').value.trim().toLowerCase();
+    const programKey = $('programFilter').value;
+    const sortMode = $('sortTeachers').value;
+    let rows = state.data.teachers.filter(t => !q || t.name.toLowerCase().includes(q));
+    if (programKey) rows = rows.filter(t => (t.programs[programKey]?.total || 0) > 0);
+    rows.sort((a,b) => {
+      if (sortMode === 'name-asc') return a.name.localeCompare(b.name, 'he');
+      if (sortMode === 'total-asc') return a.total - b.total || a.name.localeCompare(b.name,'he');
+      return b.total - a.total || a.name.localeCompare(b.name,'he');
+    });
+
+    $('teachersTableMeta').textContent = `${rows.length} מורים מוצגים מתוך ${state.data.teachers.length}`;
+    $('teachersTableBody').innerHTML = rows.map(t => `
+      <tr>
+        <td><strong>${escapeHtml(t.name)}</strong></td>
+        ${PROGRAMS.map(p => `<td><span class="hours-pill ${(t.programs[p.key]?.total||0)===0?'zero':''}">${fmt(t.programs[p.key]?.total || 0)}</span></td>`).join('')}
+        <td><strong>${fmt(t.total)}</strong></td>
+        <td><button class="btn btn-secondary btn-small" data-teacher="${escapeAttr(t.name)}">מערכת</button></td>
+      </tr>`).join('');
+    bindTeacherLinks($('teachersTableBody'));
+  }
+
+  function bindTeacherLinks(root) {
+    root.querySelectorAll('[data-teacher]').forEach(el => el.addEventListener('click', () => {
+      selectTeacher(el.dataset.teacher, true);
+      setView('teacher');
+    }));
+  }
+
+  function renderSource() {
+    if (!state.data) return;
+    const source = state.data.source || {};
+    $('sourceFileName').textContent = source.fileName || window.APP_CONFIG.SOURCE_FILE_NAME || '—';
+    $('sourceSheetName').textContent = source.sheetName ? `לשונית: ${source.sheetName}` : '—';
+    const live = state.data.mode === 'live';
+    $('connectionMode').textContent = live ? 'סנכרון חי פעיל' : 'צילום מצב מקומי';
+    $('connectionDetails').textContent = live
+      ? 'הנתונים נקראים ישירות מ־Google Sheets בכל טעינה.'
+      : 'האתר משתמש כרגע בנתונים שהופקו מהקובץ בזמן יצירת האתר.';
+  }
+
+  function copyTeacherLink() {
+    if (!state.selectedTeacher) return;
+    const url = new URL(location.href);
+    url.searchParams.set('teacher', state.selectedTeacher.name);
+    navigator.clipboard?.writeText(url.toString()).then(() => toast('הקישור הועתק')).catch(() => toast('לא ניתן להעתיק אוטומטית'));
+  }
+
+  function downloadCsv() {
+    if (!state.data) return;
+    const headers = ['שם מורה', ...PROGRAMS.map(p=>p.short), 'סה״כ משה״ח', 'סה״כ טכנודע', 'סה״כ כללי', 'ימים פעילים'];
+    const rows = state.data.teachers.map(t => [
+      t.name,
+      ...PROGRAMS.map(p => t.programs[p.key]?.total || 0),
+      t.totalMoE, t.totalTechnoda, t.total, t.activeDays
+    ]);
+    const csv = '\ufeff' + [headers, ...rows].map(r => r.map(csvCell).join(',')).join('\n');
+    const blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'דוח-מערכות-מורים-תשפז.csv';
+    document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(a.href);
+  }
+
+  function csvCell(v) { const s=String(v ?? ''); return /[",\n]/.test(s) ? `"${s.replace(/"/g,'""')}"` : s; }
+  function pct(a,b) { return b ? Math.round((a/b)*100) : 0; }
+
+  function toast(text) {
+    const el = $('toast'); el.textContent = text; el.classList.add('show');
+    clearTimeout(toast._t); toast._t = setTimeout(() => el.classList.remove('show'), 1800);
+  }
+
+  function escapeHtml(s) { return String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+  function escapeAttr(s) { return escapeHtml(s).replace(/'/g,'&#39;'); }
+})();
+
+</script>
+</body>
+</html>
