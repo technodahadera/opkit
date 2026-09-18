@@ -657,6 +657,27 @@ select:focus, input[type="search"]:focus {
 .absence-form-status { min-height: 18px; color: var(--muted); font-size: 12px; }
 .absence-form-status.error { color: #b43636; }
 .absence-form-status.success { color: #4d7d25; }
+
+.daily-replacements { grid-column: 1 / -1; border:1px solid #e4e8e8; border-radius:16px; background:#fbfcfc; padding:14px; display:grid; gap:10px; }
+.daily-replacements-head { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+.daily-replacements-head strong { font-size:13px; color:#4a4a49; }
+.daily-replacements-head span { display:block; margin-top:2px; color:var(--muted); font-size:10px; line-height:1.45; }
+.daily-replacement-list { display:grid; gap:8px; }
+.daily-replacement-row { display:grid; grid-template-columns:minmax(145px,.75fr) minmax(180px,1.5fr) auto; gap:9px; align-items:center; background:#fff; border:1px solid #ecebe7; border-radius:12px; padding:9px 10px; }
+.daily-replacement-date { font-weight:800; font-size:11px; color:#555550; }
+.daily-replacement-date small { display:block; margin-top:2px; color:#999992; font-weight:600; }
+.daily-replacement-input { width:100%; min-height:40px; border:1px solid #deded9; border-radius:11px; padding:0 11px; outline:0; }
+.daily-replacement-input:focus { border-color:#55a4d7; box-shadow:0 0 0 3px rgba(85,164,215,.09); }
+.daily-replacement-input:disabled { background:#f4f4f1; color:#aaa9a2; }
+.daily-replacement-na { display:flex; align-items:center; gap:6px; white-space:nowrap; font-size:10px; color:#777773; font-weight:700; }
+.daily-replacement-na input { width:16px; height:16px; }
+.daily-replacement-empty { color:var(--muted); font-size:11px; padding:8px 2px; }
+.replacement-summary { display:grid; gap:3px; min-width:180px; }
+.replacement-summary-line { font-size:10px; line-height:1.35; }
+.replacement-summary-line strong { color:#555550; }
+.replacement-summary-line.missing { color:#b43636; font-weight:800; }
+.replacement-summary-line.na { color:#8a8a84; }
+@media (max-width:700px) { .daily-replacement-row { grid-template-columns:1fr; } .daily-replacement-na { justify-content:flex-start; } }
 .absence-kpis { display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); gap: 12px; margin-bottom: 18px; }
 .absence-kpi { background: #fff; border: 1px solid #e9e8e3; border-radius: 18px; padding: 15px; box-shadow: 0 10px 25px rgba(74,74,73,.05); position: relative; overflow: hidden; }
 .absence-kpi::before { content:""; position:absolute; top:0; right:0; left:0; height:4px; background:#55a4d7; }
@@ -1001,9 +1022,16 @@ select:focus, input[type="search"]:focus {
                   <label for="absenceHours">שעות חסרות</label>
                   <input type="number" id="absenceHours" min="0" step="0.25" placeholder="למשל 3.5" />
                 </div>
-                <div class="form-field">
-                  <label for="absenceReplacement">ממלא/ת מקום</label>
-                  <input type="text" id="absenceReplacement" placeholder="אם שובץ ממלא מקום" />
+                <div class="daily-replacements" id="dailyReplacementsBlock">
+                  <div class="daily-replacements-head">
+                    <div>
+                      <strong>ממלא/ת מקום לפי יום</strong>
+                      <span>לכל יום היעדרות אפשר להזין מורה מחליף אחר. שבת אינה מוצגת.</span>
+                    </div>
+                    <button type="button" class="btn btn-secondary btn-small hidden" id="copyFirstReplacementBtn">העתק את הראשון לכל הימים</button>
+                  </div>
+                  <datalist id="replacementTeacherNames"></datalist>
+                  <div class="daily-replacement-list" id="dailyReplacementList"></div>
                 </div>
                 <div class="form-field full">
                   <label for="absenceFile">אישור מחלה / מסמך תומך</label>
@@ -5280,6 +5308,10 @@ window.FALLBACK_DATA = {
       if (option) setAbsenceTeacher(option.dataset.absenceTeacherOption);
     });
     $('changeAbsenceTeacherBtn').addEventListener('click', () => { setAbsenceTeacher(''); $('absenceTeacherSearch').focus(); renderAbsenceTeacherMenu(''); });
+    $('absenceStartDate').addEventListener('change', () => renderDailyReplacementRows());
+    $('absenceEndDate').addEventListener('change', () => renderDailyReplacementRows());
+    $('copyFirstReplacementBtn').addEventListener('click', copyFirstReplacementToAllDays);
+    $('dailyReplacementList').addEventListener('change', handleDailyReplacementToggle);
     document.addEventListener('click', e => {
       if (!e.target.closest('#absenceTeacherPicker')) closeAbsenceTeacherMenu();
     });
@@ -5783,6 +5815,7 @@ window.FALLBACK_DATA = {
     $('absenceTeacher').innerHTML = '<option value="">בחר/י מורה</option>' + options;
     if (!state.editingAbsenceId) setAbsenceTeacher('');
     $('absenceTeacherFilter').innerHTML = '<option value="">כל המורים</option>' + options;
+    $('replacementTeacherNames').innerHTML = absenceTeacherNames.map(name => `<option value="${escapeAttr(name)}"></option>`).join('');
     $('absenceTypeFilter').innerHTML = '<option value="">כל הסוגים</option>' + ABSENCE_TYPES.map(x => `<option value="${escapeAttr(x)}">${escapeHtml(x)}</option>`).join('');
 
     $('absenceMonthFilter').innerHTML = '<option value="">כל החודשים</option>' + HEB_MONTHS.map((m,i) => `<option value="${i+1}">${m}</option>`).join('');
@@ -5796,6 +5829,7 @@ window.FALLBACK_DATA = {
       $('absenceYearFilter').value = String(today.getFullYear());
       $('absenceMonthFilter').value = String(today.getMonth()+1);
     }
+    renderDailyReplacementRows();
   }
 
   function renderAbsenceTeacherMenu(query = '') {
@@ -5902,6 +5936,151 @@ window.FALLBACK_DATA = {
     }
   }
 
+  const DAILY_REPLACEMENT_PREFIX = '@@DAILY_REPLACEMENTS@@';
+
+  function getAbsenceWorkDates(startIso, endIso) {
+    const start = parseIsoLocal(startIso);
+    const end = parseIsoLocal(endIso || startIso);
+    if (!start || !end || end < start) return [];
+    const out = [];
+    for (let d = new Date(start); d <= end; d.setDate(d.getDate()+1)) {
+      if (d.getDay() === 6) continue;
+      out.push(localIsoDate(new Date(d)));
+    }
+    return out;
+  }
+
+  function weekdayHebrew(iso) {
+    const d = parseIsoLocal(iso);
+    return d ? new Intl.DateTimeFormat('he-IL',{weekday:'long'}).format(d) : '';
+  }
+
+  function parseReplacementPayload(raw, startDate, endDate) {
+    const dates = getAbsenceWorkDates(startDate, endDate);
+    const map = new Map();
+    dates.forEach(date => map.set(date,{name:'',notRequired:false}));
+    const value = String(raw || '').trim();
+    if (!value) return map;
+    if (value.startsWith(DAILY_REPLACEMENT_PREFIX)) {
+      try {
+        const obj = JSON.parse(value.slice(DAILY_REPLACEMENT_PREFIX.length));
+        (obj.days || []).forEach(x => {
+          if (map.has(x.date)) map.set(x.date,{name:String(x.name || '').trim(),notRequired:!!x.notRequired});
+        });
+        return map;
+      } catch (e) { console.warn('Invalid daily replacement payload', e); }
+    }
+    dates.forEach(date => map.set(date,{name:value,notRequired:false}));
+    return map;
+  }
+
+  function collectDailyReplacementMap() {
+    const map = new Map();
+    document.querySelectorAll('.daily-replacement-row[data-replacement-date]').forEach(row => {
+      const date = row.dataset.replacementDate;
+      const input = row.querySelector('[data-daily-replacement-input]');
+      const checkbox = row.querySelector('[data-daily-replacement-na]');
+      map.set(date,{name:String(input?.value || '').trim(),notRequired:!!checkbox?.checked});
+    });
+    return map;
+  }
+
+  function renderDailyReplacementRows(seedMap = null) {
+    const root = $('dailyReplacementList');
+    if (!root) return;
+    const startDate = $('absenceStartDate').value;
+    const endDate = $('absenceEndDate').value || startDate;
+    const dates = getAbsenceWorkDates(startDate, endDate);
+    const previous = seedMap instanceof Map ? seedMap : collectDailyReplacementMap();
+    if (!dates.length) {
+      root.innerHTML = '<div class="daily-replacement-empty">יש לבחור טווח תאריכים תקין כדי להזין ממלאי מקום.</div>';
+      $('copyFirstReplacementBtn').classList.add('hidden');
+      return;
+    }
+    root.innerHTML = dates.map(date => {
+      const item = previous.get(date) || {name:'',notRequired:false};
+      const disabled = item.notRequired ? ' disabled' : '';
+      const checked = item.notRequired ? ' checked' : '';
+      return `<div class="daily-replacement-row" data-replacement-date="${escapeAttr(date)}">
+        <div class="daily-replacement-date">${escapeHtml(formatIsraeliDate(date))}<small>${escapeHtml(weekdayHebrew(date))}</small></div>
+        <input class="daily-replacement-input" data-daily-replacement-input list="replacementTeacherNames" type="text" value="${escapeAttr(item.name || '')}" placeholder="מי החליף ביום זה?"${disabled} />
+        <label class="daily-replacement-na"><input type="checkbox" data-daily-replacement-na${checked} /> לא נדרש ממלא מקום</label>
+      </div>`;
+    }).join('');
+    $('copyFirstReplacementBtn').classList.toggle('hidden', dates.length < 2);
+  }
+
+  function handleDailyReplacementToggle(e) {
+    const checkbox = e.target.closest('[data-daily-replacement-na]');
+    if (!checkbox) return;
+    const row = checkbox.closest('.daily-replacement-row');
+    const input = row?.querySelector('[data-daily-replacement-input]');
+    if (!input) return;
+    input.disabled = checkbox.checked;
+    if (checkbox.checked) input.value = '';
+  }
+
+  function copyFirstReplacementToAllDays() {
+    const rows = [...document.querySelectorAll('.daily-replacement-row[data-replacement-date]')];
+    if (rows.length < 2) return;
+    const firstInput = rows[0].querySelector('[data-daily-replacement-input]');
+    const firstNa = rows[0].querySelector('[data-daily-replacement-na]');
+    const name = String(firstInput?.value || '').trim();
+    const notRequired = !!firstNa?.checked;
+    rows.slice(1).forEach(row => {
+      const input = row.querySelector('[data-daily-replacement-input]');
+      const cb = row.querySelector('[data-daily-replacement-na]');
+      if (cb) cb.checked = notRequired;
+      if (input) { input.disabled = notRequired; input.value = notRequired ? '' : name; }
+    });
+  }
+
+  function serializeDailyReplacements(startDate, endDate) {
+    const dates = getAbsenceWorkDates(startDate, endDate);
+    const current = collectDailyReplacementMap();
+    const days = dates.map(date => {
+      const item = current.get(date) || {name:'',notRequired:false};
+      return {date,name:String(item.name || '').trim(),notRequired:!!item.notRequired};
+    });
+    return DAILY_REPLACEMENT_PREFIX + JSON.stringify({v:1,days});
+  }
+
+  function replacementEntries(a) {
+    const map = parseReplacementPayload(a.replacement, a.startDate, a.endDate || a.startDate);
+    return getAbsenceWorkDates(a.startDate, a.endDate || a.startDate).map(date => ({date,...(map.get(date) || {name:'',notRequired:false})}));
+  }
+
+  function missingReplacementDates(a, year=0, month=0) {
+    return replacementEntries(a).filter(x => {
+      const d = parseIsoLocal(x.date);
+      if (!d) return false;
+      if (year && d.getFullYear() !== year) return false;
+      if (month && d.getMonth()+1 !== month) return false;
+      return !x.notRequired && !String(x.name || '').trim();
+    });
+  }
+
+  function replacementSearchText(a) {
+    return replacementEntries(a).map(x => x.notRequired ? 'לא נדרש ממלא מקום' : x.name).join(' ');
+  }
+
+  function replacementExportText(a) {
+    return replacementEntries(a).map(x => `${formatIsraeliDate(x.date)}: ${x.notRequired ? 'לא נדרש' : (x.name || 'לא הוזן')}`).join(' | ');
+  }
+
+  function replacementSummaryHtml(a, maxRows=5) {
+    const entries = replacementEntries(a);
+    if (!entries.length) return '—';
+    const visible = entries.slice(0,maxRows);
+    let html = `<div class="replacement-summary">${visible.map(x => {
+      const cls = x.notRequired ? 'na' : (!x.name ? 'missing' : '');
+      const value = x.notRequired ? 'לא נדרש' : (x.name || 'לא הוזן');
+      return `<div class="replacement-summary-line ${cls}"><strong>${escapeHtml(formatIsraeliDate(x.date))}</strong> · ${escapeHtml(value)}</div>`;
+    }).join('')}`;
+    if (entries.length > maxRows) html += `<div class="replacement-summary-line">+${entries.length-maxRows} ימים נוספים</div>`;
+    return html + '</div>';
+  }
+
   function normalizeAbsence(a) {
     return {
       id: String(a.id || ''), teacher: String(a.teacher || ''),
@@ -5938,7 +6117,8 @@ window.FALLBACK_DATA = {
 
     const current = state.absences.filter(a => contributionForPeriod(a, year, month).days > 0 || sameDatePeriod(a.startDate, year, month));
     const totals = summarizeAbsences(current, year, month);
-    const missingReplacement = current.filter(a => !String(a.replacement || '').trim());
+    const missingReplacement = current.map(a => ({a,dates:missingReplacementDates(a, year, month)})).filter(x => x.dates.length);
+    const missingReplacementDays = missingReplacement.reduce((s,x) => s + x.dates.length, 0);
     const missingDocs = current.filter(a => isSickType(a.type) && !a.fileUrl);
 
     let prevYear = year, prevMonth = month - 1;
@@ -5951,14 +6131,14 @@ window.FALLBACK_DATA = {
       overviewAbsenceKpi('אירועי היעדרות', current.length, deltaText),
       overviewAbsenceKpi('ימי היעדרות', fmt(totals.days), `${totals.teacherCount} מורים שונים`),
       overviewAbsenceKpi('מורים שנעדרו', totals.teacherCount, 'ייחודיים בחודש זה'),
-      overviewAbsenceKpi('ללא ממלא/ת מקום', missingReplacement.length, missingReplacement.length ? 'דורש בדיקה / השלמה' : 'הכול הוזן'),
+      overviewAbsenceKpi('ימים ללא ממלא/ת מקום', missingReplacementDays, missingReplacementDays ? `${missingReplacement.length} אירועי היעדרות דורשים השלמה` : 'הכול הוזן'),
       overviewAbsenceKpi('אישורי מחלה חסרים', missingDocs.length, missingDocs.length ? 'מחלה / מחלת ילד' : 'כל האישורים קיימים')
     ].join('');
 
     const taskMap = new Map();
-    missingReplacement.forEach(a => {
+    missingReplacement.forEach(({a,dates}) => {
       const x = taskMap.get(a.id) || {a, issues:[]};
-      x.issues.push({label:'ממלא מקום לא הוזן', cls:''});
+      x.issues.push({label:`חסר ממלא מקום: ${dates.map(d=>formatIsraeliDate(d.date)).join(', ')}`, cls:''});
       taskMap.set(a.id, x);
     });
     missingDocs.forEach(a => {
@@ -5983,7 +6163,7 @@ window.FALLBACK_DATA = {
     const upcoming = state.absences.filter(a => absenceOverlapsRange(a, today, until)).sort((a,b) => (a.startDate || '').localeCompare(b.startDate || '') || a.teacher.localeCompare(b.teacher,'he'));
     $('overviewUpcomingAbsences').innerHTML = upcoming.length ? upcoming.slice(0,6).map(a => `
       <div class="manager-upcoming-item">
-        <div><div class="manager-upcoming-name">${escapeHtml(a.teacher)}</div><div class="manager-upcoming-meta">${escapeHtml(a.type)}${a.replacement ? ` · מחליף/ה: ${escapeHtml(a.replacement)}` : ' · ללא ממלא/ת מקום'}</div></div>
+        <div><div class="manager-upcoming-name">${escapeHtml(a.teacher)}</div><div class="manager-upcoming-meta">${escapeHtml(a.type)} · ${escapeHtml(replacementExportText(a))}</div></div>
         <div class="manager-upcoming-date">${escapeHtml(formatAbsenceDateRange(a))}</div>
       </div>`).join('') : '<div class="manager-empty">אין היעדרויות מתוכננות ב־7 הימים הקרובים.</div>';
 
@@ -6053,7 +6233,7 @@ window.FALLBACK_DATA = {
         <td>${escapeHtml(a.scope || '—')}</td>
         <td>${fmt(days)}</td>
         <td>${a.hours ? fmt(contributionForPeriod(a, filter.year, filter.month).hours) : '—'}</td>
-        <td>${escapeHtml(a.replacement || '—')}</td>
+        <td>${replacementSummaryHtml(a)}</td>
         <td>${a.fileUrl ? `<a class="file-link" href="${escapeAttr(a.fileUrl)}" target="_blank" rel="noopener">${escapeHtml(a.fileName || 'פתח אישור')}</a>` : (needsDoc ? '<span class="missing-doc">חסר אישור</span>' : '—')}</td>
         <td title="${escapeAttr(a.notes)}">${escapeHtml(shortText(a.notes, 55) || '—')}</td>
         <td><div class="absence-actions"><button class="btn btn-secondary btn-small" data-absence-edit="${escapeAttr(a.id)}">עריכה</button><button class="btn btn-danger btn-small" data-absence-delete="${escapeAttr(a.id)}">מחיקה</button></div></td>
@@ -6088,7 +6268,7 @@ window.FALLBACK_DATA = {
     if (f.teacher && a.teacher !== f.teacher) return false;
     if (f.type && a.type !== f.type) return false;
     if (f.search) {
-      const hay = `${a.teacher} ${a.type} ${a.replacement} ${a.notes} ${a.fileName}`.toLowerCase();
+      const hay = `${a.teacher} ${a.type} ${replacementSearchText(a)} ${a.notes} ${a.fileName}`.toLowerCase();
       if (!hay.includes(f.search)) return false;
     }
     return contributionForPeriod(a, f.year, f.month).days > 0 || (sameDatePeriod(a.startDate, f.year, f.month) && a.scope === 'חלק מהיום');
@@ -6110,7 +6290,7 @@ window.FALLBACK_DATA = {
     const relevant = state.absences.filter(a => {
       if (filter.type && a.type !== filter.type) return false;
       if (filter.search) {
-        const hay = `${a.teacher} ${a.type} ${a.replacement} ${a.notes}`.toLowerCase();
+        const hay = `${a.teacher} ${a.type} ${replacementSearchText(a)} ${a.notes}`.toLowerCase();
         if (!hay.includes(filter.search)) return false;
       }
       return contributionForPeriod(a, filter.year, filter.month).days > 0 || sameDatePeriod(a.startDate, filter.year, filter.month);
@@ -6130,7 +6310,7 @@ window.FALLBACK_DATA = {
   }
 
   function renderAbsenceMonthlySummary(filter) {
-    const base = state.absences.filter(a => (!filter.teacher || a.teacher === filter.teacher) && (!filter.type || a.type === filter.type) && (!filter.search || `${a.teacher} ${a.type} ${a.replacement} ${a.notes}`.toLowerCase().includes(filter.search)));
+    const base = state.absences.filter(a => (!filter.teacher || a.teacher === filter.teacher) && (!filter.type || a.type === filter.type) && (!filter.search || `${a.teacher} ${a.type} ${replacementSearchText(a)} ${a.notes}`.toLowerCase().includes(filter.search)));
     const values = HEB_MONTHS.map((name,i) => {
       const month = i+1;
       let days = 0;
@@ -6158,7 +6338,7 @@ window.FALLBACK_DATA = {
     $('absenceType').value = ABSENCE_TYPES.includes(a.type) ? a.type : 'אחר';
     $('absenceScope').value = a.scope || 'יום מלא';
     $('absenceHours').value = a.hours || '';
-    $('absenceReplacement').value = a.replacement || '';
+    renderDailyReplacementRows(parseReplacementPayload(a.replacement, a.startDate, a.endDate || a.startDate));
     $('absenceNotes').value = a.notes || '';
     $('existingAbsenceFile').innerHTML = a.fileUrl ? `קובץ קיים: <a class="file-link" href="${escapeAttr(a.fileUrl)}" target="_blank" rel="noopener">${escapeHtml(a.fileName || 'פתח')}</a>. העלאת קובץ חדש תחליף אותו.` : '';
     $('absenceFormTitle').textContent = 'עריכת היעדרות';
@@ -6182,6 +6362,7 @@ window.FALLBACK_DATA = {
     $('absenceStartDate').value = today;
     $('absenceEndDate').value = today;
     $('absenceType').value = 'מחלה'; $('absenceScope').value = 'יום מלא';
+    renderDailyReplacementRows(new Map());
   }
 
   async function handleAbsenceSubmit(e) {
@@ -6203,7 +6384,7 @@ window.FALLBACK_DATA = {
     const record = {
       id: state.editingAbsenceId || '', teacher,
       startDate, endDate, type: $('absenceType').value, scope: $('absenceScope').value,
-      hours: Number($('absenceHours').value || 0), replacement: $('absenceReplacement').value.trim(), notes: $('absenceNotes').value.trim()
+      hours: Number($('absenceHours').value || 0), replacement: serializeDailyReplacements(startDate, endDate), notes: $('absenceNotes').value.trim()
     };
     const payload = { action: state.editingAbsenceId ? 'updateAbsence' : 'createAbsence', record };
     if (file) payload.file = { name:file.name, mimeType:file.type || 'application/octet-stream', base64: await fileToBase64(file) };
@@ -6326,7 +6507,7 @@ window.FALLBACK_DATA = {
     const f = getAbsenceFilter();
     const rows = state.absences.filter(a => matchesAbsenceFilter(a,f)).sort((a,b)=>b.startDate.localeCompare(a.startDate));
     const headers = ['מורה','מתאריך','עד תאריך','סוג','היקף','ימי היעדרות בתקופה','שעות חסרות בתקופה','ממלא מקום','הערות','שם קובץ','קישור לאישור'];
-    const data = rows.map(a => { const c=contributionForPeriod(a,f.year,f.month); return [a.teacher,a.startDate,a.endDate,a.type,a.scope,c.days,c.hours,a.replacement,a.notes,a.fileName,a.fileUrl]; });
+    const data = rows.map(a => { const c=contributionForPeriod(a,f.year,f.month); return [a.teacher,a.startDate,a.endDate,a.type,a.scope,c.days,c.hours,replacementExportText(a),a.notes,a.fileName,a.fileUrl]; });
     const csv = '\ufeff' + [headers,...data].map(r=>r.map(csvCell).join(',')).join('\n');
     const blob = new Blob([csv],{type:'text/csv;charset=utf-8'}); const link=document.createElement('a'); link.href=URL.createObjectURL(blob); link.download=`דוח-היעדרויות-${f.year}${f.month?'-'+String(f.month).padStart(2,'0'):''}.csv`; document.body.appendChild(link); link.click(); link.remove(); URL.revokeObjectURL(link.href);
   }
