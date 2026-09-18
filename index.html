@@ -604,7 +604,56 @@ select:focus, input[type="search"]:focus {
 .form-field textarea { min-height: 82px; resize: vertical; }
 .form-field input:focus, .form-field select:focus, .form-field textarea:focus { border-color: #55a4d7; box-shadow: 0 0 0 4px rgba(85,164,215,.10); }
 .form-help { color: #91918b; font-size: 11px; line-height: 1.45; }
+
+/* Improved teacher picker for absence entry */
+.teacher-picker-card {
+  background: linear-gradient(135deg,#f7fbfd,#fbfcf8);
+  border: 1px solid #dfe8e8;
+  border-radius: 18px;
+  padding: 14px;
+}
+.teacher-picker-title { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:9px; }
+.teacher-picker-title strong { font-size:13px; color:#4a4a49; }
+.teacher-picker-title span { font-size:10px; color:#91918b; }
+.teacher-picker-search { position:relative; }
+.teacher-picker-search::before {
+  content:'⌕'; position:absolute; right:14px; top:50%; transform:translateY(-50%);
+  font-size:20px; color:#50b1b8; pointer-events:none; font-weight:900;
+}
+.teacher-picker-search input {
+  min-height:50px !important; padding-right:44px !important; border-radius:15px !important;
+  font-size:14px; font-weight:700; background:#fff !important;
+}
+.teacher-picker-search input::placeholder { color:#9b9b95; font-weight:500; }
+.teacher-picker-search input.teacher-picker-invalid { border-color:#d96a6a !important; box-shadow:0 0 0 4px rgba(217,106,106,.10) !important; }
+.teacher-picker-menu {
+  position:absolute; right:0; left:0; top:calc(100% + 7px); z-index:60; background:#fff;
+  border:1px solid #deded9; border-radius:15px; box-shadow:0 18px 40px rgba(74,74,73,.14);
+  max-height:260px; overflow:auto; padding:6px;
+}
+.teacher-picker-option {
+  width:100%; border:0; background:transparent; color:#4a4a49; text-align:right; padding:11px 12px;
+  border-radius:11px; font-weight:700; display:flex; align-items:center; gap:10px;
+}
+.teacher-picker-option::before { content:'•'; color:#55a4d7; font-size:20px; line-height:1; }
+.teacher-picker-option:hover, .teacher-picker-option:focus { background:#eef7fb; outline:0; }
+.teacher-picker-empty { padding:14px; text-align:center; color:#8d8d87; font-size:12px; }
+.teacher-picker-selected {
+  margin-top:10px; border:1px solid #cfe4c9; background:#f5faef; border-radius:14px; padding:10px 12px;
+  display:flex; align-items:center; gap:10px;
+}
+.teacher-picker-selected .check {
+  width:32px; height:32px; border-radius:50%; display:grid; place-items:center; background:#8fc43a; color:#fff;
+  font-weight:900; flex:0 0 auto;
+}
+.teacher-picker-selected .teacher-picked-copy { flex:1; min-width:0; }
+.teacher-picker-selected small { display:block; color:#7d8b73; font-size:10px; font-weight:700; }
+.teacher-picker-selected strong { display:block; color:#4a4a49; font-size:14px; margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.teacher-picker-change { border:0; background:#fff; color:#3f82ad; border-radius:999px; padding:7px 10px; font-size:11px; font-weight:800; }
+.teacher-picker-change:hover { background:#eaf5fb; }
+.teacher-picker-native { display:none; }
 .absence-form-actions { display: flex; gap: 9px; flex-wrap: wrap; padding-top: 4px; }
+.absence-form-actions .btn-primary { flex:1; min-height:48px; font-size:14px; }
 .absence-form-status { min-height: 18px; color: var(--muted); font-size: 12px; }
 .absence-form-status.error { color: #b43636; }
 .absence-form-status.success { color: #4d7d25; }
@@ -899,8 +948,27 @@ select:focus, input[type="search"]:focus {
               <input type="hidden" id="absenceId" />
               <div class="form-grid">
                 <div class="form-field full">
-                  <label for="absenceTeacher">מורה</label>
-                  <select id="absenceTeacher" required></select>
+                  <label for="absenceTeacherSearch">מורה שנעדר/ה</label>
+                  <div class="teacher-picker-card" id="absenceTeacherPicker">
+                    <div class="teacher-picker-title">
+                      <strong>בחירת מורה</strong>
+                      <span>לא נבחר מורה אוטומטית</span>
+                    </div>
+                    <div class="teacher-picker-search">
+                      <input type="search" id="absenceTeacherSearch" autocomplete="off" placeholder="הקלד/י שם מורה ובחר/י מהרשימה…" aria-expanded="false" aria-controls="absenceTeacherMenu" />
+                      <div id="absenceTeacherMenu" class="teacher-picker-menu hidden" role="listbox"></div>
+                    </div>
+                    <select id="absenceTeacher" class="teacher-picker-native" aria-hidden="true" tabindex="-1"></select>
+                    <div id="absenceTeacherSelected" class="teacher-picker-selected hidden">
+                      <div class="check">✓</div>
+                      <div class="teacher-picked-copy">
+                        <small>המורה שנבחר/ה</small>
+                        <strong id="absenceTeacherSelectedName"></strong>
+                      </div>
+                      <button type="button" class="teacher-picker-change" id="changeAbsenceTeacherBtn">החלפה</button>
+                    </div>
+                  </div>
+                  <div class="form-help">יש לבחור מורה במפורש לפני השמירה כדי למנוע רישום בטעות על מורה אחר.</div>
                 </div>
                 <div class="form-field">
                   <label for="absenceStartDate">מתאריך</label>
@@ -5201,6 +5269,20 @@ window.FALLBACK_DATA = {
 
     $('absenceForm').addEventListener('submit', handleAbsenceSubmit);
     $('cancelAbsenceEditBtn').addEventListener('click', resetAbsenceForm);
+    $('absenceTeacherSearch').addEventListener('focus', () => renderAbsenceTeacherMenu($('absenceTeacherSearch').value));
+    $('absenceTeacherSearch').addEventListener('input', () => {
+      if ($('absenceTeacher').value) setAbsenceTeacher('');
+      renderAbsenceTeacherMenu($('absenceTeacherSearch').value);
+    });
+    $('absenceTeacherSearch').addEventListener('keydown', handleAbsenceTeacherKeydown);
+    $('absenceTeacherMenu').addEventListener('click', e => {
+      const option = e.target.closest('[data-absence-teacher-option]');
+      if (option) setAbsenceTeacher(option.dataset.absenceTeacherOption);
+    });
+    $('changeAbsenceTeacherBtn').addEventListener('click', () => { setAbsenceTeacher(''); $('absenceTeacherSearch').focus(); renderAbsenceTeacherMenu(''); });
+    document.addEventListener('click', e => {
+      if (!e.target.closest('#absenceTeacherPicker')) closeAbsenceTeacherMenu();
+    });
     $('absenceYearFilter').addEventListener('change', renderAbsences);
     $('absenceMonthFilter').addEventListener('change', renderAbsences);
     $('absenceTeacherFilter').addEventListener('change', renderAbsences);
@@ -5693,9 +5775,13 @@ window.FALLBACK_DATA = {
   const ABSENCE_TYPES = ['מחלה','מחלת ילד','חופשה','מילואים','השתלמות / יום עיון','הצהרה','אחר'];
   const HEB_MONTHS = ['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
 
+  let absenceTeacherNames = [];
+
   function populateAbsenceSelectors(teachers) {
-    const options = teachers.map(t => `<option value="${escapeAttr(t.name)}">${escapeHtml(t.name)}</option>`).join('');
-    $('absenceTeacher').innerHTML = options;
+    absenceTeacherNames = teachers.map(t => String(t.name || '').trim()).filter(Boolean).sort((a,b)=>a.localeCompare(b,'he'));
+    const options = absenceTeacherNames.map(name => `<option value="${escapeAttr(name)}">${escapeHtml(name)}</option>`).join('');
+    $('absenceTeacher').innerHTML = '<option value="">בחר/י מורה</option>' + options;
+    if (!state.editingAbsenceId) setAbsenceTeacher('');
     $('absenceTeacherFilter').innerHTML = '<option value="">כל המורים</option>' + options;
     $('absenceTypeFilter').innerHTML = '<option value="">כל הסוגים</option>' + ABSENCE_TYPES.map(x => `<option value="${escapeAttr(x)}">${escapeHtml(x)}</option>`).join('');
 
@@ -5709,6 +5795,65 @@ window.FALLBACK_DATA = {
       $('absenceEndDate').value = iso;
       $('absenceYearFilter').value = String(today.getFullYear());
       $('absenceMonthFilter').value = String(today.getMonth()+1);
+    }
+  }
+
+  function renderAbsenceTeacherMenu(query = '') {
+    const menu = $('absenceTeacherMenu');
+    const input = $('absenceTeacherSearch');
+    const q = String(query || '').trim().toLowerCase();
+    const matches = absenceTeacherNames.filter(name => !q || name.toLowerCase().includes(q)).slice(0, 12);
+    menu.innerHTML = matches.length
+      ? matches.map(name => `<button type="button" class="teacher-picker-option" role="option" data-absence-teacher-option="${escapeAttr(name)}">${escapeHtml(name)}</button>`).join('')
+      : '<div class="teacher-picker-empty">לא נמצא מורה בשם הזה</div>';
+    menu.classList.remove('hidden');
+    input.setAttribute('aria-expanded','true');
+  }
+
+  function closeAbsenceTeacherMenu() {
+    $('absenceTeacherMenu')?.classList.add('hidden');
+    $('absenceTeacherSearch')?.setAttribute('aria-expanded','false');
+  }
+
+  function setAbsenceTeacher(name = '') {
+    const value = String(name || '').trim();
+    const select = $('absenceTeacher');
+    const input = $('absenceTeacherSearch');
+    const selected = $('absenceTeacherSelected');
+    const selectedName = $('absenceTeacherSelectedName');
+    if (select) select.value = absenceTeacherNames.includes(value) ? value : '';
+    const actual = select?.value || '';
+    if (input) {
+      input.value = actual;
+      input.classList.remove('teacher-picker-invalid');
+    }
+    if (actual) {
+      selectedName.textContent = actual;
+      selected.classList.remove('hidden');
+      closeAbsenceTeacherMenu();
+    } else {
+      selectedName.textContent = '';
+      selected.classList.add('hidden');
+    }
+    updateAbsenceSaveButton();
+  }
+
+  function updateAbsenceSaveButton() {
+    const btn = $('saveAbsenceBtn');
+    if (!btn) return;
+    const teacher = $('absenceTeacher')?.value || '';
+    if (state.editingAbsenceId) btn.textContent = teacher ? `שמור שינויים – ${teacher}` : 'שמור שינויים';
+    else btn.textContent = teacher ? `שמור היעדרות – ${teacher}` : 'שמור היעדרות';
+  }
+
+  function handleAbsenceTeacherKeydown(e) {
+    if (e.key === 'Escape') { closeAbsenceTeacherMenu(); return; }
+    if (e.key === 'Enter') {
+      const first = $('absenceTeacherMenu')?.querySelector('[data-absence-teacher-option]');
+      if (first && !$('absenceTeacherMenu').classList.contains('hidden')) {
+        e.preventDefault();
+        setAbsenceTeacher(first.dataset.absenceTeacherOption);
+      }
     }
   }
 
@@ -6007,7 +6152,7 @@ window.FALLBACK_DATA = {
     if (!a) return;
     state.editingAbsenceId = id;
     $('absenceId').value = id;
-    $('absenceTeacher').value = a.teacher;
+    setAbsenceTeacher(a.teacher);
     $('absenceStartDate').value = a.startDate;
     $('absenceEndDate').value = a.endDate || a.startDate;
     $('absenceType').value = ABSENCE_TYPES.includes(a.type) ? a.type : 'אחר';
@@ -6017,7 +6162,7 @@ window.FALLBACK_DATA = {
     $('absenceNotes').value = a.notes || '';
     $('existingAbsenceFile').innerHTML = a.fileUrl ? `קובץ קיים: <a class="file-link" href="${escapeAttr(a.fileUrl)}" target="_blank" rel="noopener">${escapeHtml(a.fileName || 'פתח')}</a>. העלאת קובץ חדש תחליף אותו.` : '';
     $('absenceFormTitle').textContent = 'עריכת היעדרות';
-    $('saveAbsenceBtn').textContent = 'שמור שינויים';
+    updateAbsenceSaveButton();
     $('cancelAbsenceEditBtn').classList.remove('hidden');
     $('absenceFormStatus').textContent = '';
     document.querySelector('.absence-form-panel')?.scrollIntoView({behavior:'smooth',block:'start'});
@@ -6028,20 +6173,27 @@ window.FALLBACK_DATA = {
     $('absenceForm').reset();
     $('absenceId').value = '';
     $('absenceFormTitle').textContent = 'הוספת היעדרות';
-    $('saveAbsenceBtn').textContent = 'שמור היעדרות';
+    setAbsenceTeacher('');
+    updateAbsenceSaveButton();
     $('cancelAbsenceEditBtn').classList.add('hidden');
     $('existingAbsenceFile').textContent = '';
     $('absenceFormStatus').textContent = '';
     const today = localIsoDate(new Date());
     $('absenceStartDate').value = today;
     $('absenceEndDate').value = today;
-    if (state.data?.teachers?.[0]) $('absenceTeacher').value = state.data.teachers.slice().sort((a,b)=>a.name.localeCompare(b.name,'he'))[0].name;
     $('absenceType').value = 'מחלה'; $('absenceScope').value = 'יום מלא';
   }
 
   async function handleAbsenceSubmit(e) {
     e.preventDefault();
     if (!state.data) return;
+    const teacher = $('absenceTeacher').value;
+    if (!teacher) {
+      $('absenceTeacherSearch').classList.add('teacher-picker-invalid');
+      $('absenceTeacherSearch').focus();
+      renderAbsenceTeacherMenu($('absenceTeacherSearch').value);
+      return setAbsenceStatus('יש לבחור מורה לפני שמירת ההיעדרות.', 'error');
+    }
     const startDate = $('absenceStartDate').value;
     const endDate = $('absenceEndDate').value || startDate;
     if (!startDate || endDate < startDate) return setAbsenceStatus('יש לבדוק את טווח התאריכים.', 'error');
@@ -6049,7 +6201,7 @@ window.FALLBACK_DATA = {
     if (file && file.size > 8 * 1024 * 1024) return setAbsenceStatus('הקובץ גדול מ־8MB. יש לבחור קובץ קטן יותר.', 'error');
 
     const record = {
-      id: state.editingAbsenceId || '', teacher: $('absenceTeacher').value,
+      id: state.editingAbsenceId || '', teacher,
       startDate, endDate, type: $('absenceType').value, scope: $('absenceScope').value,
       hours: Number($('absenceHours').value || 0), replacement: $('absenceReplacement').value.trim(), notes: $('absenceNotes').value.trim()
     };
