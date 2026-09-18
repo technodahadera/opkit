@@ -982,6 +982,7 @@ select:focus, input[type="search"]:focus {
   <script>
 window.APP_CONFIG = {
   API_URL: "https://script.google.com/macros/s/AKfycbyQoKF6f9RoTHw9-cqMKlZBh-eAJ4Pon29IqyT2cOlLK7QaJOQrXS-MR7afha4rals/exec",
+  ABSENCE_API_URL: "https://script.google.com/macros/s/AKfycbxuar7RLwPIY-dQvRIV_VYo5gw0wTp8UcU4YqlE1XGK1chYzz7XvYE5rrgDXdwARN_n/exec",
   SOURCE_FILE_NAME: "מערכות באופקית תשפ״ז",
   SOURCE_SHEET_NAME: "מערכת כללית תשפ״ז",
   SOURCE_SPREADSHEET_ID: "1-VyMH84tm1kMS24_VibF1sTUoh2uwEBtG-VTBM8R5XI",
@@ -5659,7 +5660,7 @@ window.FALLBACK_DATA = {
       if (state.absencesLoaded) renderAbsences();
       return;
     }
-    const apiUrl = (window.APP_CONFIG?.API_URL || '').trim();
+    const apiUrl = (window.APP_CONFIG?.ABSENCE_API_URL || window.APP_CONFIG?.API_URL || '').trim();
     if (!apiUrl) return;
     state.absencesLoading = true;
     if ($('absenceTableMeta')) $('absenceTableMeta').textContent = 'טוען נתוני היעדרויות…';
@@ -5900,8 +5901,8 @@ window.FALLBACK_DATA = {
   }
 
   async function postAbsenceApi(payload) {
-    const apiUrl = (window.APP_CONFIG?.API_URL || '').trim();
-    if (!apiUrl) throw new Error('API URL missing');
+    const apiUrl = (window.APP_CONFIG?.ABSENCE_API_URL || window.APP_CONFIG?.API_URL || '').trim();
+    if (!apiUrl) throw new Error('Absence API URL missing');
     const response = await fetch(apiUrl, {method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify(payload), redirect:'follow'});
     const text = await response.text();
     try { return JSON.parse(text); } catch (_) { throw new Error(text || `HTTP ${response.status}`); }
