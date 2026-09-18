@@ -648,9 +648,44 @@ select:focus, input[type="search"]:focus {
 .teacher-absence-stat span { color:var(--muted); font-size:10px; }
 .teacher-absence-recent { margin-top:10px; font-size:11px; color:var(--muted); }
 .absence-loading { padding:18px; text-align:center; color:var(--muted); }
-@media (max-width: 1250px) { .absence-kpis { grid-template-columns: repeat(3,1fr); } .absence-layout { grid-template-columns:1fr; } .absence-form-panel { position:static; } }
-@media (max-width: 800px) { .absence-kpis { grid-template-columns: repeat(2,1fr); } .absence-summary-grid { grid-template-columns:1fr; } .form-grid { grid-template-columns:1fr; } .form-field.full { grid-column:auto; } .teacher-absence-stats { grid-template-columns:1fr 1fr 1fr; } }
-@media (max-width: 520px) { .absence-kpis { grid-template-columns:1fr; } .teacher-absence-stats { grid-template-columns:1fr; } }
+
+/* Dashboard absence management */
+.overview-absence-panel { margin-bottom: 18px; }
+.overview-absence-kpis { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:12px; margin-bottom:16px; }
+.overview-absence-kpi { position:relative; overflow:hidden; background:#fafaf7; border:1px solid #e8e7e2; border-radius:16px; padding:14px 15px; min-height:102px; }
+.overview-absence-kpi::before { content:""; position:absolute; top:0; right:0; left:0; height:4px; background:#55a4d7; }
+.overview-absence-kpi:nth-child(2)::before { background:#50b1b8; }
+.overview-absence-kpi:nth-child(3)::before { background:#8fc43a; }
+.overview-absence-kpi:nth-child(4)::before { background:#eb6c00; }
+.overview-absence-kpi:nth-child(5)::before { background:#e91b5c; }
+.overview-absence-kpi .v { font-size:26px; line-height:1; font-weight:900; color:#4a4a49; margin:8px 0 6px; }
+.overview-absence-kpi .l { font-size:11px; font-weight:800; color:#777773; }
+.overview-absence-kpi .n { font-size:10px; color:#9a9a94; line-height:1.35; }
+.overview-attention-layout { display:grid; grid-template-columns:1.15fr .85fr; gap:14px; }
+.overview-attention-box { border:1px solid #e9e8e3; border-radius:16px; background:#fff; padding:14px; min-width:0; }
+.overview-mini-head { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:10px; }
+.overview-mini-head h4 { margin:0; font-size:14px; color:#4a4a49; }
+.overview-mini-badge { display:inline-flex; align-items:center; justify-content:center; min-width:26px; min-height:24px; padding:3px 8px; border-radius:999px; background:#fff1f4; color:#b23d62; font-size:11px; font-weight:900; }
+.overview-mini-badge.neutral { background:#eaf5fb; color:#3f82ad; }
+.manager-task-list { display:grid; gap:8px; }
+.manager-task { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:10px; align-items:center; padding:10px 11px; border-radius:12px; background:#fffaf2; border:1px solid #f1e2bd; }
+.manager-task-main { min-width:0; }
+.manager-task-title { font-size:12px; font-weight:900; color:#4a4a49; }
+.manager-task-meta { margin-top:3px; font-size:10px; color:#85857f; }
+.manager-task-issues { display:flex; flex-wrap:wrap; gap:5px; margin-top:6px; }
+.manager-issue { display:inline-flex; padding:3px 7px; border-radius:999px; background:#fff0e5; color:#a85b12; font-size:9px; font-weight:900; }
+.manager-issue.doc { background:#fff1f4; color:#b23d62; }
+.manager-empty { padding:14px 10px; border-radius:12px; background:#f5faed; color:#58752d; font-size:11px; text-align:center; border:1px solid #dfeac6; }
+.manager-upcoming-list { display:grid; gap:7px; }
+.manager-upcoming-item { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; padding:9px 10px; border-radius:11px; background:#f8fbfc; border:1px solid #e4eef1; }
+.manager-upcoming-name { font-size:11px; font-weight:900; }
+.manager-upcoming-meta { color:#85857f; font-size:10px; margin-top:2px; }
+.manager-upcoming-date { color:#3f82ad; font-size:10px; font-weight:900; white-space:nowrap; }
+.overview-absence-loading { padding:18px; text-align:center; color:#85857f; font-size:12px; grid-column:1/-1; }
+.overview-absence-error { padding:14px; border-radius:12px; background:#fff8dc; border:1px solid #eedf9d; color:#6f612b; font-size:11px; grid-column:1/-1; }
+@media (max-width: 1250px) { .absence-kpis { grid-template-columns: repeat(3,1fr); } .absence-layout { grid-template-columns:1fr; } .absence-form-panel { position:static; } .overview-absence-kpis { grid-template-columns:repeat(3,1fr); } }
+@media (max-width: 800px) { .absence-kpis { grid-template-columns: repeat(2,1fr); } .absence-summary-grid { grid-template-columns:1fr; } .form-grid { grid-template-columns:1fr; } .form-field.full { grid-column:auto; } .teacher-absence-stats { grid-template-columns:1fr 1fr 1fr; } .overview-absence-kpis { grid-template-columns:repeat(2,1fr); } .overview-attention-layout { grid-template-columns:1fr; } }
+@media (max-width: 520px) { .absence-kpis { grid-template-columns:1fr; } .teacher-absence-stats { grid-template-columns:1fr; } .overview-absence-kpis { grid-template-columns:1fr; } .manager-task { grid-template-columns:1fr; } }
 
 </style>
 </head>
@@ -721,6 +756,39 @@ select:focus, input[type="search"]:focus {
         </div>
 
         <div class="kpi-grid" id="overviewKpis"></div>
+
+        <article class="panel overview-absence-panel" id="overviewAbsencePanel">
+          <div class="panel-head">
+            <div>
+              <h3>היעדרויות ומשימות להשלמה</h3>
+              <p id="overviewAbsenceSubtitle">טוען את נתוני ההיעדרויות של החודש הנוכחי…</p>
+            </div>
+            <button class="btn btn-secondary btn-small" id="openAbsencesBtn">לניהול ההיעדרויות</button>
+          </div>
+          <div class="overview-absence-kpis" id="overviewAbsenceKpis">
+            <div class="overview-absence-loading">טוען נתוני היעדרויות…</div>
+          </div>
+          <div class="overview-attention-layout">
+            <div class="overview-attention-box">
+              <div class="overview-mini-head">
+                <h4>משימות להשלמה</h4>
+                <span class="overview-mini-badge" id="overviewAttentionCount">—</span>
+              </div>
+              <div class="manager-task-list" id="overviewAbsenceAttentionList">
+                <div class="overview-absence-loading">טוען…</div>
+              </div>
+            </div>
+            <div class="overview-attention-box">
+              <div class="overview-mini-head">
+                <h4>היעדרויות קרובות</h4>
+                <span class="overview-mini-badge neutral">7 ימים</span>
+              </div>
+              <div class="manager-upcoming-list" id="overviewUpcomingAbsences">
+                <div class="overview-absence-loading">טוען…</div>
+              </div>
+            </div>
+          </div>
+        </article>
 
         <div class="dashboard-grid two-columns">
           <article class="panel">
@@ -5122,7 +5190,7 @@ window.FALLBACK_DATA = {
   function bindUI() {
     document.querySelectorAll('.nav-item').forEach(btn => btn.addEventListener('click', () => setView(btn.dataset.view)));
     document.querySelectorAll('[data-jump]').forEach(btn => btn.addEventListener('click', () => setView(btn.dataset.jump)));
-    $('refreshBtn').addEventListener('click', () => { loadData(true); if (state.absencesLoaded) ensureAbsencesLoaded(true); });
+    $('refreshBtn').addEventListener('click', () => { loadData(true); ensureAbsencesLoaded(true); });
     $('teacherSelect').addEventListener('change', e => selectTeacher(e.target.value, true));
     $('teacherSearch').addEventListener('input', renderTeachersTable);
     $('programFilter').addEventListener('change', renderTeachersTable);
@@ -5140,6 +5208,7 @@ window.FALLBACK_DATA = {
     $('absenceTypeFilter').addEventListener('change', renderAbsences);
     $('absenceSearch').addEventListener('input', renderAbsences);
     $('downloadAbsencesCsvBtn').addEventListener('click', downloadAbsencesCsv);
+    $('openAbsencesBtn').addEventListener('click', () => setView('absences'));
   }
 
   function setView(view) {
@@ -5156,7 +5225,7 @@ window.FALLBACK_DATA = {
     $('pageTitle').textContent = meta[0];
     $('pageSubtitle').textContent = meta[1];
     $('sidebar').classList.remove('open');
-    if (view === 'absences' || view === 'teacher') ensureAbsencesLoaded();
+    if (view === 'overview' || view === 'absences' || view === 'teacher') ensureAbsencesLoaded();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -5419,6 +5488,7 @@ window.FALLBACK_DATA = {
     const requestedTeacher = new URLSearchParams(location.search).get('teacher');
     const initial = state.selectedTeacher?.name || requestedTeacher || data.teachers[0]?.name || '';
     selectTeacher(initial, false);
+    ensureAbsencesLoaded();
   }
 
   function setSyncStatus(mode) {
@@ -5494,6 +5564,7 @@ window.FALLBACK_DATA = {
         <td>${fmt(t.totalMoE)}</td><td>${fmt(t.totalTechnoda)}</td><td>${t.activeDays}</td>
       </tr>`).join('');
     bindTeacherLinks($('topTeachersBody'));
+    renderOverviewAbsenceDashboard();
   }
 
   function kpi(label, value, note, accent=false) {
@@ -5672,6 +5743,7 @@ window.FALLBACK_DATA = {
       state.absencesLoaded = true;
       refreshAbsenceYearOptions();
       renderAbsences();
+      renderOverviewAbsenceDashboard();
       if (state.selectedTeacher) renderTeacherAbsenceSummary(state.selectedTeacher.name);
     } catch (err) {
       console.error('Absences load failed:', err);
@@ -5679,6 +5751,7 @@ window.FALLBACK_DATA = {
       if ($('absenceTableMeta')) $('absenceTableMeta').textContent = 'מודול ההיעדרויות טרם חובר ל־Apps Script. יש לעדכן את קוד השרת לפי הקובץ המצורף.';
       if ($('absenceTableBody')) $('absenceTableBody').innerHTML = '<tr><td colspan="10"><div class="absence-empty">לא ניתן לטעון כרגע נתוני היעדרויות.</div></td></tr>';
       if ($('absenceKpis')) $('absenceKpis').innerHTML = absenceKpi('סטטוס', '—', 'נדרש עדכון Apps Script');
+      renderOverviewAbsenceDashboard(true);
       if (state.selectedTeacher) renderTeacherAbsenceSummary(state.selectedTeacher.name);
     } finally {
       state.absencesLoading = false;
@@ -5694,6 +5767,120 @@ window.FALLBACK_DATA = {
       fileName: String(a.fileName || ''), fileId: String(a.fileId || ''), fileUrl: String(a.fileUrl || ''),
       createdAt: String(a.createdAt || ''), updatedAt: String(a.updatedAt || '')
     };
+  }
+
+  function renderOverviewAbsenceDashboard(loadError = false) {
+    if (!$('overviewAbsenceKpis')) return;
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth() + 1;
+    $('overviewAbsenceSubtitle').textContent = `${HEB_MONTHS[month-1]} ${year} · נתונים מהמודול הניהולי של ההיעדרויות`;
+
+    if (loadError) {
+      $('overviewAbsenceKpis').innerHTML = '<div class="overview-absence-error">לא ניתן כרגע לטעון את נתוני ההיעדרויות. כדאי לבדוק את חיבור ה־Apps Script.</div>';
+      $('overviewAttentionCount').textContent = '—';
+      $('overviewAbsenceAttentionList').innerHTML = '<div class="overview-absence-error">לא ניתן להציג כרגע משימות להשלמה.</div>';
+      $('overviewUpcomingAbsences').innerHTML = '<div class="overview-absence-error">לא ניתן להציג כרגע היעדרויות קרובות.</div>';
+      return;
+    }
+
+    if (!state.absencesLoaded) {
+      $('overviewAbsenceKpis').innerHTML = '<div class="overview-absence-loading">טוען נתוני היעדרויות…</div>';
+      $('overviewAttentionCount').textContent = '…';
+      $('overviewAbsenceAttentionList').innerHTML = '<div class="overview-absence-loading">טוען…</div>';
+      $('overviewUpcomingAbsences').innerHTML = '<div class="overview-absence-loading">טוען…</div>';
+      return;
+    }
+
+    const current = state.absences.filter(a => contributionForPeriod(a, year, month).days > 0 || sameDatePeriod(a.startDate, year, month));
+    const totals = summarizeAbsences(current, year, month);
+    const missingReplacement = current.filter(a => !String(a.replacement || '').trim());
+    const missingDocs = current.filter(a => isSickType(a.type) && !a.fileUrl);
+
+    let prevYear = year, prevMonth = month - 1;
+    if (!prevMonth) { prevMonth = 12; prevYear--; }
+    const previous = state.absences.filter(a => contributionForPeriod(a, prevYear, prevMonth).days > 0 || sameDatePeriod(a.startDate, prevYear, prevMonth));
+    const delta = current.length - previous.length;
+    const deltaText = delta === 0 ? 'כמו בחודש הקודם' : delta > 0 ? `${delta}+ לעומת חודש קודם` : `${Math.abs(delta)}- לעומת חודש קודם`;
+
+    $('overviewAbsenceKpis').innerHTML = [
+      overviewAbsenceKpi('אירועי היעדרות', current.length, deltaText),
+      overviewAbsenceKpi('ימי היעדרות', fmt(totals.days), `${totals.teacherCount} מורים שונים`),
+      overviewAbsenceKpi('מורים שנעדרו', totals.teacherCount, 'ייחודיים בחודש זה'),
+      overviewAbsenceKpi('ללא ממלא/ת מקום', missingReplacement.length, missingReplacement.length ? 'דורש בדיקה / השלמה' : 'הכול הוזן'),
+      overviewAbsenceKpi('אישורי מחלה חסרים', missingDocs.length, missingDocs.length ? 'מחלה / מחלת ילד' : 'כל האישורים קיימים')
+    ].join('');
+
+    const taskMap = new Map();
+    missingReplacement.forEach(a => {
+      const x = taskMap.get(a.id) || {a, issues:[]};
+      x.issues.push({label:'ממלא מקום לא הוזן', cls:''});
+      taskMap.set(a.id, x);
+    });
+    missingDocs.forEach(a => {
+      const x = taskMap.get(a.id) || {a, issues:[]};
+      x.issues.push({label:'חסר אישור מחלה', cls:'doc'});
+      taskMap.set(a.id, x);
+    });
+    const tasks = [...taskMap.values()].sort((x,y) => (y.a.startDate || '').localeCompare(x.a.startDate || '') || x.a.teacher.localeCompare(y.a.teacher,'he'));
+    $('overviewAttentionCount').textContent = String(tasks.length);
+    $('overviewAbsenceAttentionList').innerHTML = tasks.length ? tasks.slice(0,8).map(({a,issues}) => `
+      <div class="manager-task">
+        <div class="manager-task-main">
+          <div class="manager-task-title">${escapeHtml(a.teacher)}</div>
+          <div class="manager-task-meta">${escapeHtml(formatAbsenceDateRange(a))} · ${escapeHtml(a.type)}</div>
+          <div class="manager-task-issues">${issues.map(i => `<span class="manager-issue ${i.cls}">${escapeHtml(i.label)}</span>`).join('')}</div>
+        </div>
+        <button class="btn btn-secondary btn-small" data-dashboard-absence-edit="${escapeAttr(a.id)}">השלמה</button>
+      </div>`).join('') + (tasks.length > 8 ? `<button class="btn btn-ghost btn-small" data-dashboard-all-absences>הצג עוד ${tasks.length-8} משימות</button>` : '') : '<div class="manager-empty">אין כרגע נתונים חסרים להשלמה בחודש זה.</div>';
+
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 12);
+    const until = new Date(today); until.setDate(until.getDate() + 7);
+    const upcoming = state.absences.filter(a => absenceOverlapsRange(a, today, until)).sort((a,b) => (a.startDate || '').localeCompare(b.startDate || '') || a.teacher.localeCompare(b.teacher,'he'));
+    $('overviewUpcomingAbsences').innerHTML = upcoming.length ? upcoming.slice(0,6).map(a => `
+      <div class="manager-upcoming-item">
+        <div><div class="manager-upcoming-name">${escapeHtml(a.teacher)}</div><div class="manager-upcoming-meta">${escapeHtml(a.type)}${a.replacement ? ` · מחליף/ה: ${escapeHtml(a.replacement)}` : ' · ללא ממלא/ת מקום'}</div></div>
+        <div class="manager-upcoming-date">${escapeHtml(formatAbsenceDateRange(a))}</div>
+      </div>`).join('') : '<div class="manager-empty">אין היעדרויות מתוכננות ב־7 הימים הקרובים.</div>';
+
+    bindOverviewAbsenceActions();
+  }
+
+  function overviewAbsenceKpi(label, value, note) {
+    return `<div class="overview-absence-kpi"><div class="l">${escapeHtml(label)}</div><div class="v">${escapeHtml(String(value))}</div><div class="n">${escapeHtml(note)}</div></div>`;
+  }
+
+  function bindOverviewAbsenceActions() {
+    document.querySelectorAll('[data-dashboard-absence-edit]').forEach(btn => btn.addEventListener('click', () => {
+      const id = btn.dataset.dashboardAbsenceEdit;
+      const a = state.absences.find(x => x.id === id);
+      if (!a) return;
+      const d = parseIsoLocal(a.startDate);
+      setView('absences');
+      if (d) {
+        $('absenceYearFilter').value = String(d.getFullYear());
+        $('absenceMonthFilter').value = String(d.getMonth()+1);
+        $('absenceTeacherFilter').value = a.teacher;
+        renderAbsences();
+      }
+      editAbsence(id);
+    }));
+    document.querySelectorAll('[data-dashboard-all-absences]').forEach(btn => btn.addEventListener('click', () => {
+      setView('absences');
+      const now = new Date();
+      $('absenceYearFilter').value = String(now.getFullYear());
+      $('absenceMonthFilter').value = String(now.getMonth()+1);
+      $('absenceTeacherFilter').value = '';
+      $('absenceTypeFilter').value = '';
+      $('absenceSearch').value = '';
+      renderAbsences();
+    }));
+  }
+
+  function absenceOverlapsRange(a, rangeStart, rangeEnd) {
+    const start = parseIsoLocal(a.startDate);
+    const end = parseIsoLocal(a.endDate || a.startDate);
+    return !!start && !!end && end >= rangeStart && start <= rangeEnd;
   }
 
   function renderAbsences() {
