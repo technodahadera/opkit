@@ -585,6 +585,73 @@ select:focus, input[type="search"]:focus {
   .main-content { padding: 16px; }
 }
 
+
+
+/* =========================================================
+   ABSENCES / TEACHER ATTENDANCE MODULE
+   ========================================================= */
+.absence-layout { display: grid; grid-template-columns: minmax(320px,.82fr) minmax(0,1.45fr); gap: 18px; align-items: start; }
+.absence-form-panel { position: sticky; top: 18px; }
+.absence-form { display: grid; gap: 13px; }
+.form-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
+.form-field { display: grid; gap: 6px; }
+.form-field.full { grid-column: 1 / -1; }
+.form-field label { color: var(--muted); font-size: 12px; font-weight: 800; }
+.form-field input, .form-field select, .form-field textarea {
+  width: 100%; border: 1px solid #deded9; background: #fff; color: var(--ink); border-radius: 14px;
+  min-height: 42px; padding: 9px 12px; outline: 0; font: inherit;
+}
+.form-field textarea { min-height: 82px; resize: vertical; }
+.form-field input:focus, .form-field select:focus, .form-field textarea:focus { border-color: #55a4d7; box-shadow: 0 0 0 4px rgba(85,164,215,.10); }
+.form-help { color: #91918b; font-size: 11px; line-height: 1.45; }
+.absence-form-actions { display: flex; gap: 9px; flex-wrap: wrap; padding-top: 4px; }
+.absence-form-status { min-height: 18px; color: var(--muted); font-size: 12px; }
+.absence-form-status.error { color: #b43636; }
+.absence-form-status.success { color: #4d7d25; }
+.absence-kpis { display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); gap: 12px; margin-bottom: 18px; }
+.absence-kpi { background: #fff; border: 1px solid #e9e8e3; border-radius: 18px; padding: 15px; box-shadow: 0 10px 25px rgba(74,74,73,.05); position: relative; overflow: hidden; }
+.absence-kpi::before { content:""; position:absolute; top:0; right:0; left:0; height:4px; background:#55a4d7; }
+.absence-kpi:nth-child(2)::before { background:#50b1b8; }
+.absence-kpi:nth-child(3)::before { background:#8fc43a; }
+.absence-kpi:nth-child(4)::before { background:#f9ca13; }
+.absence-kpi:nth-child(5)::before { background:#e91b5c; }
+.absence-kpi .v { font-size: 25px; font-weight: 900; margin-top: 5px; }
+.absence-kpi .l { color: var(--muted); font-size: 11px; margin-top: 2px; }
+.absence-filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: end; }
+.absence-filters .filter-block { display: grid; gap: 5px; min-width: 125px; }
+.absence-filters .filter-block.wide { min-width: 185px; flex: 1; }
+.absence-filters label { font-size: 10px; color: var(--muted); font-weight: 800; }
+.absence-filters input, .absence-filters select { min-height: 40px; }
+.absence-tag { display: inline-flex; align-items: center; padding: 4px 8px; border-radius: 999px; font-weight: 800; font-size: 11px; background:#eaf5fb; color:#3f82ad; white-space: nowrap; }
+.absence-tag.sick { background:#fff1f4; color:#b23d62; }
+.absence-tag.military { background:#eef5e5; color:#5f7a2f; }
+.absence-tag.vacation { background:#fff6dc; color:#876a12; }
+.absence-tag.training { background:#f1edf8; color:#6e5797; }
+.file-link { font-weight: 800; color:#3f82ad; text-decoration: none; }
+.file-link:hover { text-decoration: underline; }
+.missing-doc { color:#b43636; font-weight: 800; font-size: 11px; }
+.absence-actions { display:flex; gap:6px; white-space:nowrap; }
+.btn-danger { background:#fff; color:#b43636; border-color:#edcccc; }
+.btn-danger:hover { background:#fff4f4; }
+.absence-empty { padding: 34px 18px; text-align:center; color:var(--muted); }
+.absence-summary-grid { display:grid; grid-template-columns: 1fr 1fr; gap:18px; margin-top:18px; }
+.absence-mini-bars { display:grid; gap:10px; }
+.absence-mini-row { display:grid; grid-template-columns: 150px 1fr 45px; gap:10px; align-items:center; font-size:12px; }
+.absence-mini-track { height:9px; background:#f0efeb; border-radius:99px; overflow:hidden; }
+.absence-mini-fill { height:100%; border-radius:99px; background:linear-gradient(90deg,#55a4d7,#50b1b8); }
+.teacher-absence-summary { margin-top: 18px; border-top:1px solid #ecebe7; padding-top:18px; }
+.teacher-absence-head { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:10px; }
+.teacher-absence-head h3 { margin:0; font-size:16px; }
+.teacher-absence-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:9px; }
+.teacher-absence-stat { background:#fafaf7; border:1px solid #e8e7e2; border-radius:12px; padding:10px; text-align:center; }
+.teacher-absence-stat strong { display:block; font-size:20px; }
+.teacher-absence-stat span { color:var(--muted); font-size:10px; }
+.teacher-absence-recent { margin-top:10px; font-size:11px; color:var(--muted); }
+.absence-loading { padding:18px; text-align:center; color:var(--muted); }
+@media (max-width: 1250px) { .absence-kpis { grid-template-columns: repeat(3,1fr); } .absence-layout { grid-template-columns:1fr; } .absence-form-panel { position:static; } }
+@media (max-width: 800px) { .absence-kpis { grid-template-columns: repeat(2,1fr); } .absence-summary-grid { grid-template-columns:1fr; } .form-grid { grid-template-columns:1fr; } .form-field.full { grid-column:auto; } .teacher-absence-stats { grid-template-columns:1fr 1fr 1fr; } }
+@media (max-width: 520px) { .absence-kpis { grid-template-columns:1fr; } .teacher-absence-stats { grid-template-columns:1fr; } }
+
 </style>
 </head>
 <body>
@@ -604,6 +671,9 @@ select:focus, input[type="search"]:focus {
         </button>
         <button class="nav-item" data-view="teachers">
           <span class="nav-icon">☷</span><span>כל המורים</span>
+        </button>
+        <button class="nav-item" data-view="absences">
+          <span class="nav-icon">◷</span><span>היעדרויות מורים</span>
         </button>
         <button class="nav-item" data-view="source">
           <span class="nav-icon">↻</span><span>מקור וסנכרון</span>
@@ -746,6 +816,135 @@ select:focus, input[type="search"]:focus {
         </article>
       </section>
 
+
+      <section class="view" id="view-absences">
+        <div class="absence-kpis" id="absenceKpis"></div>
+
+        <div class="absence-layout">
+          <article class="panel absence-form-panel">
+            <div class="panel-head">
+              <div>
+                <h3 id="absenceFormTitle">הוספת היעדרות</h3>
+                <p>רישום היעדרות או חיסור ושיוך מסמך תומך ל־Google Drive</p>
+              </div>
+            </div>
+            <form id="absenceForm" class="absence-form">
+              <input type="hidden" id="absenceId" />
+              <div class="form-grid">
+                <div class="form-field full">
+                  <label for="absenceTeacher">מורה</label>
+                  <select id="absenceTeacher" required></select>
+                </div>
+                <div class="form-field">
+                  <label for="absenceStartDate">מתאריך</label>
+                  <input type="date" id="absenceStartDate" required />
+                </div>
+                <div class="form-field">
+                  <label for="absenceEndDate">עד תאריך</label>
+                  <input type="date" id="absenceEndDate" />
+                </div>
+                <div class="form-field">
+                  <label for="absenceType">סוג היעדרות</label>
+                  <select id="absenceType" required>
+                    <option value="מחלה">מחלה</option>
+                    <option value="מחלת ילד">מחלת ילד</option>
+                    <option value="חופשה">חופשה</option>
+                    <option value="מילואים">מילואים</option>
+                    <option value="השתלמות / יום עיון">השתלמות / יום עיון</option>
+                    <option value="הצהרה">הצהרה</option>
+                    <option value="אחר">אחר</option>
+                  </select>
+                </div>
+                <div class="form-field">
+                  <label for="absenceScope">היקף</label>
+                  <select id="absenceScope">
+                    <option value="יום מלא">יום מלא</option>
+                    <option value="חלק מהיום">חלק מהיום</option>
+                  </select>
+                </div>
+                <div class="form-field">
+                  <label for="absenceHours">שעות חסרות</label>
+                  <input type="number" id="absenceHours" min="0" step="0.25" placeholder="למשל 3.5" />
+                </div>
+                <div class="form-field">
+                  <label for="absenceReplacement">ממלא/ת מקום</label>
+                  <input type="text" id="absenceReplacement" placeholder="אם שובץ ממלא מקום" />
+                </div>
+                <div class="form-field full">
+                  <label for="absenceFile">אישור מחלה / מסמך תומך</label>
+                  <input type="file" id="absenceFile" accept=".pdf,.jpg,.jpeg,.png,.webp,.doc,.docx" />
+                  <div class="form-help">הקובץ יישמר אוטומטית בתיקיית ההיעדרויות ב־Drive. עד 8MB לקובץ.</div>
+                  <div class="form-help" id="existingAbsenceFile"></div>
+                </div>
+                <div class="form-field full">
+                  <label for="absenceNotes">הערות</label>
+                  <textarea id="absenceNotes" placeholder="פרטים חשובים, תיאום מול המורה, סיבה נוספת וכד׳"></textarea>
+                </div>
+              </div>
+              <div class="absence-form-actions">
+                <button type="submit" class="btn btn-primary" id="saveAbsenceBtn">שמור היעדרות</button>
+                <button type="button" class="btn btn-secondary hidden" id="cancelAbsenceEditBtn">ביטול עריכה</button>
+              </div>
+              <div id="absenceFormStatus" class="absence-form-status"></div>
+            </form>
+          </article>
+
+          <div>
+            <article class="panel">
+              <div class="panel-head table-controls-head">
+                <div>
+                  <h3>היעדרויות וחיסורים</h3>
+                  <p>סינון לפי חודש, שנה, מורה וסוג היעדרות</p>
+                </div>
+                <div class="absence-filters">
+                  <div class="filter-block">
+                    <label for="absenceYearFilter">שנה</label>
+                    <select id="absenceYearFilter"></select>
+                  </div>
+                  <div class="filter-block">
+                    <label for="absenceMonthFilter">חודש</label>
+                    <select id="absenceMonthFilter"></select>
+                  </div>
+                  <div class="filter-block wide">
+                    <label for="absenceTeacherFilter">מורה</label>
+                    <select id="absenceTeacherFilter"></select>
+                  </div>
+                  <div class="filter-block">
+                    <label for="absenceTypeFilter">סוג</label>
+                    <select id="absenceTypeFilter"><option value="">כל הסוגים</option></select>
+                  </div>
+                  <div class="filter-block wide">
+                    <label for="absenceSearch">חיפוש</label>
+                    <input type="search" id="absenceSearch" placeholder="הערה / ממלא מקום…" />
+                  </div>
+                  <button class="btn btn-secondary btn-small" id="downloadAbsencesCsvBtn" type="button">הורד CSV</button>
+                </div>
+              </div>
+              <div class="table-meta" id="absenceTableMeta">טוען…</div>
+              <div class="table-wrap">
+                <table class="data-table" style="min-width:1120px">
+                  <thead>
+                    <tr><th>מורה</th><th>תאריך</th><th>סוג</th><th>היקף</th><th>ימים</th><th>שעות חסרות</th><th>ממלא מקום</th><th>אישור</th><th>הערות</th><th></th></tr>
+                  </thead>
+                  <tbody id="absenceTableBody"></tbody>
+                </table>
+              </div>
+            </article>
+
+            <div class="absence-summary-grid">
+              <article class="panel">
+                <div class="panel-head"><div><h3>סיכום לפי מורה</h3><p id="absenceTeacherSummarySubtitle">לפי הסינון הנוכחי</p></div></div>
+                <div id="absenceTeacherBars" class="absence-mini-bars"></div>
+              </article>
+              <article class="panel">
+                <div class="panel-head"><div><h3>סיכום חודשי</h3><p id="absenceMonthlySummarySubtitle">12 חודשי השנה</p></div></div>
+                <div id="absenceMonthBars" class="absence-mini-bars"></div>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section class="view" id="view-source">
         <div class="source-grid">
           <article class="panel source-card">
@@ -787,6 +986,7 @@ window.APP_CONFIG = {
   SOURCE_SHEET_NAME: "מערכת כללית תשפ״ז",
   SOURCE_SPREADSHEET_ID: "1-VyMH84tm1kMS24_VibF1sTUoh2uwEBtG-VTBM8R5XI",
   AUX_SHEET_NAME: "שהייה ופרטני",
+  ABSENCE_SHEET_NAME: "היעדרויות",
   USE_DEMO_IF_API_MISSING: true,
   APP_TITLE: "מערכת ניהול מערכות מורים – תשפ״ז"
 };
@@ -4900,7 +5100,11 @@ window.FALLBACK_DATA = {
     data: null,
     selectedTeacher: null,
     currentView: 'overview',
-    loading: false
+    loading: false,
+    absences: [],
+    absencesLoaded: false,
+    absencesLoading: false,
+    editingAbsenceId: null
   };
 
   const $ = (id) => document.getElementById(id);
@@ -4917,7 +5121,7 @@ window.FALLBACK_DATA = {
   function bindUI() {
     document.querySelectorAll('.nav-item').forEach(btn => btn.addEventListener('click', () => setView(btn.dataset.view)));
     document.querySelectorAll('[data-jump]').forEach(btn => btn.addEventListener('click', () => setView(btn.dataset.jump)));
-    $('refreshBtn').addEventListener('click', () => loadData(true));
+    $('refreshBtn').addEventListener('click', () => { loadData(true); if (state.absencesLoaded) ensureAbsencesLoaded(true); });
     $('teacherSelect').addEventListener('change', e => selectTeacher(e.target.value, true));
     $('teacherSearch').addEventListener('input', renderTeachersTable);
     $('programFilter').addEventListener('change', renderTeachersTable);
@@ -4926,6 +5130,15 @@ window.FALLBACK_DATA = {
     $('printTeacherBtn').addEventListener('click', () => window.print());
     $('copyTeacherLinkBtn').addEventListener('click', copyTeacherLink);
     $('mobileMenu').addEventListener('click', () => $('sidebar').classList.toggle('open'));
+
+    $('absenceForm').addEventListener('submit', handleAbsenceSubmit);
+    $('cancelAbsenceEditBtn').addEventListener('click', resetAbsenceForm);
+    $('absenceYearFilter').addEventListener('change', renderAbsences);
+    $('absenceMonthFilter').addEventListener('change', renderAbsences);
+    $('absenceTeacherFilter').addEventListener('change', renderAbsences);
+    $('absenceTypeFilter').addEventListener('change', renderAbsences);
+    $('absenceSearch').addEventListener('input', renderAbsences);
+    $('downloadAbsencesCsvBtn').addEventListener('click', downloadAbsencesCsv);
   }
 
   function setView(view) {
@@ -4936,11 +5149,13 @@ window.FALLBACK_DATA = {
       overview: ['לוח בקרה', 'תמונת מצב עדכנית מתוך קובץ המקור'],
       teacher: ['מערכת מורה', 'בחירת מורה והפקת מערכת שבועית'],
       teachers: ['כל המורים', 'חיפוש, סינון והשוואת היקפי שעות'],
+      absences: ['היעדרויות מורים', 'רישום, אישורים, חיסורים וסיכומים חודשיים'],
       source: ['מקור וסנכרון', 'מצב החיבור לקובץ “מערכות באופקית תשפ״ז”']
     }[view];
     $('pageTitle').textContent = meta[0];
     $('pageSubtitle').textContent = meta[1];
     $('sidebar').classList.remove('open');
+    if (view === 'absences' || view === 'teacher') ensureAbsencesLoaded();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -5222,6 +5437,7 @@ window.FALLBACK_DATA = {
     const teachers = [...state.data.teachers].sort((a,b) => a.name.localeCompare(b.name, 'he'));
     $('teacherSelect').innerHTML = teachers.map(t => `<option value="${escapeAttr(t.name)}">${escapeHtml(t.name)}</option>`).join('');
     $('programFilter').innerHTML = '<option value="">כל התכניות</option>' + PROGRAMS.map(p => `<option value="${p.key}">${escapeHtml(p.short)}</option>`).join('');
+    populateAbsenceSelectors(teachers);
   }
 
   function renderAll() {
@@ -5334,7 +5550,9 @@ window.FALLBACK_DATA = {
             </tbody>
           </table>
         </div>
+        <div id="teacherAbsenceSummary" class="teacher-absence-summary"></div>
       </article>`;
+    renderTeacherAbsenceSummary(t.name);
   }
 
   function normalizeSixDays(values) {
@@ -5399,6 +5617,381 @@ window.FALLBACK_DATA = {
     url.searchParams.set('teacher', state.selectedTeacher.name);
     navigator.clipboard?.writeText(url.toString()).then(() => toast('הקישור הועתק')).catch(() => toast('לא ניתן להעתיק אוטומטית'));
   }
+
+
+  const ABSENCE_TYPES = ['מחלה','מחלת ילד','חופשה','מילואים','השתלמות / יום עיון','הצהרה','אחר'];
+  const HEB_MONTHS = ['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
+
+  function populateAbsenceSelectors(teachers) {
+    const options = teachers.map(t => `<option value="${escapeAttr(t.name)}">${escapeHtml(t.name)}</option>`).join('');
+    $('absenceTeacher').innerHTML = options;
+    $('absenceTeacherFilter').innerHTML = '<option value="">כל המורים</option>' + options;
+    $('absenceTypeFilter').innerHTML = '<option value="">כל הסוגים</option>' + ABSENCE_TYPES.map(x => `<option value="${escapeAttr(x)}">${escapeHtml(x)}</option>`).join('');
+
+    $('absenceMonthFilter').innerHTML = '<option value="">כל החודשים</option>' + HEB_MONTHS.map((m,i) => `<option value="${i+1}">${m}</option>`).join('');
+    refreshAbsenceYearOptions();
+
+    if (!$('absenceStartDate').value) {
+      const today = new Date();
+      const iso = localIsoDate(today);
+      $('absenceStartDate').value = iso;
+      $('absenceEndDate').value = iso;
+      $('absenceYearFilter').value = String(today.getFullYear());
+      $('absenceMonthFilter').value = String(today.getMonth()+1);
+    }
+  }
+
+  function refreshAbsenceYearOptions() {
+    const current = new Date().getFullYear();
+    const years = new Set([current-1,current,current+1]);
+    state.absences.forEach(a => {
+      const y1 = Number(String(a.startDate || '').slice(0,4));
+      const y2 = Number(String(a.endDate || a.startDate || '').slice(0,4));
+      if (y1) years.add(y1); if (y2) years.add(y2);
+    });
+    const previous = $('absenceYearFilter')?.value || String(current);
+    $('absenceYearFilter').innerHTML = [...years].sort((a,b)=>b-a).map(y => `<option value="${y}">${y}</option>`).join('');
+    $('absenceYearFilter').value = [...years].map(String).includes(previous) ? previous : String(current);
+  }
+
+  async function ensureAbsencesLoaded(force = false) {
+    if (state.absencesLoading || (state.absencesLoaded && !force)) {
+      if (state.absencesLoaded) renderAbsences();
+      return;
+    }
+    const apiUrl = (window.APP_CONFIG?.API_URL || '').trim();
+    if (!apiUrl) return;
+    state.absencesLoading = true;
+    if ($('absenceTableMeta')) $('absenceTableMeta').textContent = 'טוען נתוני היעדרויות…';
+    try {
+      const separator = apiUrl.includes('?') ? '&' : '?';
+      const payload = await loadJsonp(`${apiUrl}${separator}action=absences`);
+      if (!payload || payload.ok === false || !Array.isArray(payload.absences)) throw new Error(payload?.error || 'absence api unavailable');
+      state.absences = payload.absences.map(normalizeAbsence);
+      state.absencesLoaded = true;
+      refreshAbsenceYearOptions();
+      renderAbsences();
+      if (state.selectedTeacher) renderTeacherAbsenceSummary(state.selectedTeacher.name);
+    } catch (err) {
+      console.error('Absences load failed:', err);
+      state.absencesLoaded = false;
+      if ($('absenceTableMeta')) $('absenceTableMeta').textContent = 'מודול ההיעדרויות טרם חובר ל־Apps Script. יש לעדכן את קוד השרת לפי הקובץ המצורף.';
+      if ($('absenceTableBody')) $('absenceTableBody').innerHTML = '<tr><td colspan="10"><div class="absence-empty">לא ניתן לטעון כרגע נתוני היעדרויות.</div></td></tr>';
+      if ($('absenceKpis')) $('absenceKpis').innerHTML = absenceKpi('סטטוס', '—', 'נדרש עדכון Apps Script');
+      if (state.selectedTeacher) renderTeacherAbsenceSummary(state.selectedTeacher.name);
+    } finally {
+      state.absencesLoading = false;
+    }
+  }
+
+  function normalizeAbsence(a) {
+    return {
+      id: String(a.id || ''), teacher: String(a.teacher || ''),
+      startDate: String(a.startDate || ''), endDate: String(a.endDate || a.startDate || ''),
+      type: String(a.type || 'אחר'), scope: String(a.scope || 'יום מלא'),
+      hours: Number(a.hours || 0), replacement: String(a.replacement || ''), notes: String(a.notes || ''),
+      fileName: String(a.fileName || ''), fileId: String(a.fileId || ''), fileUrl: String(a.fileUrl || ''),
+      createdAt: String(a.createdAt || ''), updatedAt: String(a.updatedAt || '')
+    };
+  }
+
+  function renderAbsences() {
+    if (!state.data) return;
+    if (!state.absencesLoaded) return;
+    const filter = getAbsenceFilter();
+    const rows = state.absences.filter(a => matchesAbsenceFilter(a, filter)).sort((a,b) => (b.startDate || '').localeCompare(a.startDate || '') || a.teacher.localeCompare(b.teacher,'he'));
+    const totals = summarizeAbsences(rows, filter.year, filter.month);
+
+    $('absenceKpis').innerHTML = [
+      absenceKpi('אירועי היעדרות', rows.length, absenceFilterLabel(filter)),
+      absenceKpi('ימי היעדרות', fmt(totals.days), 'א׳–ו׳, לפי טווחי התאריכים'),
+      absenceKpi('שעות חסרות', fmt(totals.hours), 'כפי שהוזנו ברשומות'),
+      absenceKpi('מורים שנעדרו', totals.teacherCount, 'מורים ייחודיים'),
+      absenceKpi('אישורי מחלה חסרים', totals.missingSickDocs, 'מחלה / מחלת ילד ללא מסמך')
+    ].join('');
+
+    $('absenceTableMeta').textContent = `${rows.length} רשומות מוצגות מתוך ${state.absences.length}`;
+    $('absenceTableBody').innerHTML = rows.length ? rows.map(a => {
+      const days = contributionForPeriod(a, filter.year, filter.month).days;
+      const needsDoc = isSickType(a.type) && !a.fileUrl;
+      return `<tr>
+        <td><strong>${escapeHtml(a.teacher)}</strong></td>
+        <td>${escapeHtml(formatAbsenceDateRange(a))}</td>
+        <td><span class="absence-tag ${absenceTypeClass(a.type)}">${escapeHtml(a.type)}</span></td>
+        <td>${escapeHtml(a.scope || '—')}</td>
+        <td>${fmt(days)}</td>
+        <td>${a.hours ? fmt(contributionForPeriod(a, filter.year, filter.month).hours) : '—'}</td>
+        <td>${escapeHtml(a.replacement || '—')}</td>
+        <td>${a.fileUrl ? `<a class="file-link" href="${escapeAttr(a.fileUrl)}" target="_blank" rel="noopener">${escapeHtml(a.fileName || 'פתח אישור')}</a>` : (needsDoc ? '<span class="missing-doc">חסר אישור</span>' : '—')}</td>
+        <td title="${escapeAttr(a.notes)}">${escapeHtml(shortText(a.notes, 55) || '—')}</td>
+        <td><div class="absence-actions"><button class="btn btn-secondary btn-small" data-absence-edit="${escapeAttr(a.id)}">עריכה</button><button class="btn btn-danger btn-small" data-absence-delete="${escapeAttr(a.id)}">מחיקה</button></div></td>
+      </tr>`;
+    }).join('') : '<tr><td colspan="10"><div class="absence-empty">אין היעדרויות התואמות לסינון.</div></td></tr>';
+
+    bindAbsenceRowActions();
+    renderAbsenceTeacherSummary(filter);
+    renderAbsenceMonthlySummary(filter);
+  }
+
+  function absenceKpi(label, value, note) {
+    return `<div class="absence-kpi"><div class="v">${escapeHtml(String(value))}</div><div class="l">${escapeHtml(label)}</div><div class="kpi-note">${escapeHtml(note)}</div></div>`;
+  }
+
+  function getAbsenceFilter() {
+    return {
+      year: Number($('absenceYearFilter').value || new Date().getFullYear()),
+      month: Number($('absenceMonthFilter').value || 0),
+      teacher: $('absenceTeacherFilter').value,
+      type: $('absenceTypeFilter').value,
+      search: $('absenceSearch').value.trim().toLowerCase()
+    };
+  }
+
+  function absenceFilterLabel(f) {
+    const period = f.month ? `${HEB_MONTHS[f.month-1]} ${f.year}` : `שנת ${f.year}`;
+    return f.teacher ? `${period} · ${f.teacher}` : period;
+  }
+
+  function matchesAbsenceFilter(a, f) {
+    if (f.teacher && a.teacher !== f.teacher) return false;
+    if (f.type && a.type !== f.type) return false;
+    if (f.search) {
+      const hay = `${a.teacher} ${a.type} ${a.replacement} ${a.notes} ${a.fileName}`.toLowerCase();
+      if (!hay.includes(f.search)) return false;
+    }
+    return contributionForPeriod(a, f.year, f.month).days > 0 || (sameDatePeriod(a.startDate, f.year, f.month) && a.scope === 'חלק מהיום');
+  }
+
+  function summarizeAbsences(rows, year, month) {
+    let days = 0, hours = 0, missingSickDocs = 0;
+    const teachers = new Set();
+    rows.forEach(a => {
+      const c = contributionForPeriod(a, year, month);
+      days += c.days; hours += c.hours;
+      teachers.add(a.teacher);
+      if (isSickType(a.type) && !a.fileUrl) missingSickDocs++;
+    });
+    return { days, hours, teacherCount: teachers.size, missingSickDocs };
+  }
+
+  function renderAbsenceTeacherSummary(filter) {
+    const relevant = state.absences.filter(a => {
+      if (filter.type && a.type !== filter.type) return false;
+      if (filter.search) {
+        const hay = `${a.teacher} ${a.type} ${a.replacement} ${a.notes}`.toLowerCase();
+        if (!hay.includes(filter.search)) return false;
+      }
+      return contributionForPeriod(a, filter.year, filter.month).days > 0 || sameDatePeriod(a.startDate, filter.year, filter.month);
+    });
+    const map = new Map();
+    relevant.forEach(a => {
+      const c = contributionForPeriod(a, filter.year, filter.month);
+      const x = map.get(a.teacher) || {days:0,hours:0,count:0};
+      x.days += c.days; x.hours += c.hours; x.count++; map.set(a.teacher,x);
+    });
+    let arr = [...map].map(([name,v]) => ({name,...v}));
+    if (filter.teacher) arr = arr.filter(x => x.name === filter.teacher);
+    arr.sort((a,b) => b.days-a.days || b.count-a.count || a.name.localeCompare(b.name,'he'));
+    const max = Math.max(1,...arr.map(x=>x.days || x.count));
+    $('absenceTeacherSummarySubtitle').textContent = absenceFilterLabel(filter);
+    $('absenceTeacherBars').innerHTML = arr.length ? arr.slice(0,12).map(x => `<div class="absence-mini-row"><div>${escapeHtml(x.name)}</div><div class="absence-mini-track"><div class="absence-mini-fill" style="width:${Math.max(3,((x.days||x.count)/max)*100)}%"></div></div><div><strong>${fmt(x.days)}</strong></div></div>`).join('') : '<div class="absence-empty">אין נתונים לסיכום.</div>';
+  }
+
+  function renderAbsenceMonthlySummary(filter) {
+    const base = state.absences.filter(a => (!filter.teacher || a.teacher === filter.teacher) && (!filter.type || a.type === filter.type) && (!filter.search || `${a.teacher} ${a.type} ${a.replacement} ${a.notes}`.toLowerCase().includes(filter.search)));
+    const values = HEB_MONTHS.map((name,i) => {
+      const month = i+1;
+      let days = 0;
+      base.forEach(a => days += contributionForPeriod(a, filter.year, month).days);
+      return {name, days};
+    });
+    const max = Math.max(1,...values.map(x=>x.days));
+    $('absenceMonthlySummarySubtitle').textContent = `שנת ${filter.year}${filter.teacher ? ` · ${filter.teacher}` : ''}`;
+    $('absenceMonthBars').innerHTML = values.map(x => `<div class="absence-mini-row"><div>${x.name}</div><div class="absence-mini-track"><div class="absence-mini-fill" style="width:${x.days ? Math.max(3,(x.days/max)*100) : 0}%"></div></div><div><strong>${fmt(x.days)}</strong></div></div>`).join('');
+  }
+
+  function bindAbsenceRowActions() {
+    document.querySelectorAll('[data-absence-edit]').forEach(btn => btn.addEventListener('click', () => editAbsence(btn.dataset.absenceEdit)));
+    document.querySelectorAll('[data-absence-delete]').forEach(btn => btn.addEventListener('click', () => deleteAbsence(btn.dataset.absenceDelete)));
+  }
+
+  function editAbsence(id) {
+    const a = state.absences.find(x => x.id === id);
+    if (!a) return;
+    state.editingAbsenceId = id;
+    $('absenceId').value = id;
+    $('absenceTeacher').value = a.teacher;
+    $('absenceStartDate').value = a.startDate;
+    $('absenceEndDate').value = a.endDate || a.startDate;
+    $('absenceType').value = ABSENCE_TYPES.includes(a.type) ? a.type : 'אחר';
+    $('absenceScope').value = a.scope || 'יום מלא';
+    $('absenceHours').value = a.hours || '';
+    $('absenceReplacement').value = a.replacement || '';
+    $('absenceNotes').value = a.notes || '';
+    $('existingAbsenceFile').innerHTML = a.fileUrl ? `קובץ קיים: <a class="file-link" href="${escapeAttr(a.fileUrl)}" target="_blank" rel="noopener">${escapeHtml(a.fileName || 'פתח')}</a>. העלאת קובץ חדש תחליף אותו.` : '';
+    $('absenceFormTitle').textContent = 'עריכת היעדרות';
+    $('saveAbsenceBtn').textContent = 'שמור שינויים';
+    $('cancelAbsenceEditBtn').classList.remove('hidden');
+    $('absenceFormStatus').textContent = '';
+    document.querySelector('.absence-form-panel')?.scrollIntoView({behavior:'smooth',block:'start'});
+  }
+
+  function resetAbsenceForm() {
+    state.editingAbsenceId = null;
+    $('absenceForm').reset();
+    $('absenceId').value = '';
+    $('absenceFormTitle').textContent = 'הוספת היעדרות';
+    $('saveAbsenceBtn').textContent = 'שמור היעדרות';
+    $('cancelAbsenceEditBtn').classList.add('hidden');
+    $('existingAbsenceFile').textContent = '';
+    $('absenceFormStatus').textContent = '';
+    const today = localIsoDate(new Date());
+    $('absenceStartDate').value = today;
+    $('absenceEndDate').value = today;
+    if (state.data?.teachers?.[0]) $('absenceTeacher').value = state.data.teachers.slice().sort((a,b)=>a.name.localeCompare(b.name,'he'))[0].name;
+    $('absenceType').value = 'מחלה'; $('absenceScope').value = 'יום מלא';
+  }
+
+  async function handleAbsenceSubmit(e) {
+    e.preventDefault();
+    if (!state.data) return;
+    const startDate = $('absenceStartDate').value;
+    const endDate = $('absenceEndDate').value || startDate;
+    if (!startDate || endDate < startDate) return setAbsenceStatus('יש לבדוק את טווח התאריכים.', 'error');
+    const file = $('absenceFile').files?.[0] || null;
+    if (file && file.size > 8 * 1024 * 1024) return setAbsenceStatus('הקובץ גדול מ־8MB. יש לבחור קובץ קטן יותר.', 'error');
+
+    const record = {
+      id: state.editingAbsenceId || '', teacher: $('absenceTeacher').value,
+      startDate, endDate, type: $('absenceType').value, scope: $('absenceScope').value,
+      hours: Number($('absenceHours').value || 0), replacement: $('absenceReplacement').value.trim(), notes: $('absenceNotes').value.trim()
+    };
+    const payload = { action: state.editingAbsenceId ? 'updateAbsence' : 'createAbsence', record };
+    if (file) payload.file = { name:file.name, mimeType:file.type || 'application/octet-stream', base64: await fileToBase64(file) };
+
+    $('saveAbsenceBtn').disabled = true;
+    setAbsenceStatus('שומר ומעלה את המסמך ל־Drive…');
+    try {
+      const response = await postAbsenceApi(payload);
+      if (!response?.ok) throw new Error(response?.error || 'save failed');
+      resetAbsenceForm();
+      setAbsenceStatus('ההיעדרות נשמרה בהצלחה.', 'success');
+      await ensureAbsencesLoaded(true);
+      toast('ההיעדרות נשמרה');
+    } catch (err) {
+      console.error(err);
+      setAbsenceStatus('השמירה נכשלה. יש לוודא שקוד Apps Script עודכן ופורסם מחדש.', 'error');
+    } finally {
+      $('saveAbsenceBtn').disabled = false;
+    }
+  }
+
+  async function deleteAbsence(id) {
+    const a = state.absences.find(x => x.id === id);
+    if (!a || !confirm(`למחוק את ההיעדרות של ${a.teacher} מתאריך ${formatIsraeliDate(a.startDate)}?`)) return;
+    try {
+      const response = await postAbsenceApi({action:'deleteAbsence', id});
+      if (!response?.ok) throw new Error(response?.error || 'delete failed');
+      await ensureAbsencesLoaded(true);
+      toast('ההיעדרות נמחקה');
+    } catch (err) {
+      console.error(err); toast('מחיקת ההיעדרות נכשלה');
+    }
+  }
+
+  async function postAbsenceApi(payload) {
+    const apiUrl = (window.APP_CONFIG?.API_URL || '').trim();
+    if (!apiUrl) throw new Error('API URL missing');
+    const response = await fetch(apiUrl, {method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify(payload), redirect:'follow'});
+    const text = await response.text();
+    try { return JSON.parse(text); } catch (_) { throw new Error(text || `HTTP ${response.status}`); }
+  }
+
+  function fileToBase64(file) {
+    return new Promise((resolve,reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result || '').split(',').pop() || '');
+      reader.onerror = () => reject(reader.error || new Error('file read failed'));
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function setAbsenceStatus(text, mode='') {
+    const el = $('absenceFormStatus'); el.textContent = text; el.className = `absence-form-status ${mode}`.trim();
+  }
+
+  function contributionForPeriod(a, year, month=0) {
+    const start = parseIsoLocal(a.startDate); const end = parseIsoLocal(a.endDate || a.startDate);
+    if (!start || !end) return {days:0,hours:0};
+    let totalDays = 0, periodDays = 0;
+    for (let d = new Date(start); d <= end; d.setDate(d.getDate()+1)) {
+      if (d.getDay() === 6) continue;
+      totalDays++;
+      if (d.getFullYear() === year && (!month || d.getMonth()+1 === month)) periodDays++;
+    }
+    if (!totalDays && sameDatePeriod(a.startDate, year, month)) periodDays = 1;
+    const hours = Number(a.hours || 0) * (totalDays ? periodDays / totalDays : (periodDays ? 1 : 0));
+    return {days:periodDays, hours};
+  }
+
+  function sameDatePeriod(iso, year, month=0) {
+    const d = parseIsoLocal(iso); return !!d && d.getFullYear() === year && (!month || d.getMonth()+1 === month);
+  }
+
+  function parseIsoLocal(iso) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(String(iso || ''))) return null;
+    const [y,m,d] = iso.split('-').map(Number); return new Date(y,m-1,d,12,0,0,0);
+  }
+
+  function localIsoDate(d) {
+    const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0'), day=String(d.getDate()).padStart(2,'0');
+    return `${y}-${m}-${day}`;
+  }
+
+  function formatIsraeliDate(iso) {
+    const d = parseIsoLocal(iso); return d ? d.toLocaleDateString('he-IL') : iso || '—';
+  }
+
+  function formatAbsenceDateRange(a) {
+    const s = formatIsraeliDate(a.startDate), e = formatIsraeliDate(a.endDate || a.startDate);
+    return a.endDate && a.endDate !== a.startDate ? `${s}–${e}` : s;
+  }
+
+  function isSickType(type) { return type === 'מחלה' || type === 'מחלת ילד'; }
+  function absenceTypeClass(type) {
+    if (isSickType(type)) return 'sick'; if (type === 'מילואים') return 'military'; if (type === 'חופשה') return 'vacation'; if (type.includes('השתלמות')) return 'training'; return '';
+  }
+  function shortText(s,n) { s=String(s||''); return s.length > n ? s.slice(0,n-1)+'…' : s; }
+
+  function renderTeacherAbsenceSummary(teacherName) {
+    const root = $('teacherAbsenceSummary');
+    if (!root) return;
+    if (!state.absencesLoaded) {
+      root.innerHTML = '<div class="absence-loading">נתוני היעדרויות ייטענו בעת פתיחת המודול.</div>';
+      return;
+    }
+    const now = new Date(), year = now.getFullYear();
+    const rows = state.absences.filter(a => a.teacher === teacherName && contributionForPeriod(a, year, 0).days > 0);
+    let days=0,hours=0; rows.forEach(a => { const c=contributionForPeriod(a,year,0); days+=c.days; hours+=c.hours; });
+    const recent = rows.slice().sort((a,b)=>b.startDate.localeCompare(a.startDate)).slice(0,3);
+    root.innerHTML = `<div class="teacher-absence-head"><h3>היעדרויות בשנת ${year}</h3><button class="btn btn-secondary btn-small" type="button" id="openTeacherAbsencesBtn">למודול היעדרויות</button></div>
+      <div class="teacher-absence-stats"><div class="teacher-absence-stat"><strong>${rows.length}</strong><span>אירועי היעדרות</span></div><div class="teacher-absence-stat"><strong>${fmt(days)}</strong><span>ימי היעדרות</span></div><div class="teacher-absence-stat"><strong>${fmt(hours)}</strong><span>שעות חסרות</span></div></div>
+      <div class="teacher-absence-recent">${recent.length ? `אחרונות: ${recent.map(a=>`${formatIsraeliDate(a.startDate)} · ${escapeHtml(a.type)}`).join(' | ')}` : 'לא נרשמו היעדרויות בשנה זו.'}</div>`;
+    $('openTeacherAbsencesBtn')?.addEventListener('click', () => {
+      setView('absences'); $('absenceTeacherFilter').value = teacherName; $('absenceYearFilter').value = String(year); $('absenceMonthFilter').value=''; renderAbsences();
+    });
+  }
+
+  function downloadAbsencesCsv() {
+    if (!state.absencesLoaded) return;
+    const f = getAbsenceFilter();
+    const rows = state.absences.filter(a => matchesAbsenceFilter(a,f)).sort((a,b)=>b.startDate.localeCompare(a.startDate));
+    const headers = ['מורה','מתאריך','עד תאריך','סוג','היקף','ימי היעדרות בתקופה','שעות חסרות בתקופה','ממלא מקום','הערות','שם קובץ','קישור לאישור'];
+    const data = rows.map(a => { const c=contributionForPeriod(a,f.year,f.month); return [a.teacher,a.startDate,a.endDate,a.type,a.scope,c.days,c.hours,a.replacement,a.notes,a.fileName,a.fileUrl]; });
+    const csv = '\ufeff' + [headers,...data].map(r=>r.map(csvCell).join(',')).join('\n');
+    const blob = new Blob([csv],{type:'text/csv;charset=utf-8'}); const link=document.createElement('a'); link.href=URL.createObjectURL(blob); link.download=`דוח-היעדרויות-${f.year}${f.month?'-'+String(f.month).padStart(2,'0'):''}.csv`; document.body.appendChild(link); link.click(); link.remove(); URL.revokeObjectURL(link.href);
+  }
+
 
   function downloadCsv() {
     if (!state.data) return;
