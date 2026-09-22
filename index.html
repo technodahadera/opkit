@@ -757,6 +757,60 @@ select:focus, input[type="search"]:focus {
 @media (max-width: 800px) { .absence-kpis { grid-template-columns: repeat(2,1fr); } .absence-summary-grid { grid-template-columns:1fr; } .form-grid { grid-template-columns:1fr; } .form-field.full { grid-column:auto; } .teacher-absence-stats { grid-template-columns:1fr 1fr 1fr; } .overview-absence-kpis { grid-template-columns:repeat(2,1fr); } .overview-attention-layout { grid-template-columns:1fr; } }
 @media (max-width: 520px) { .absence-kpis { grid-template-columns:1fr; } .teacher-absence-stats { grid-template-columns:1fr; } .overview-absence-kpis { grid-template-columns:1fr; } .manager-task { grid-template-columns:1fr; } }
 
+
+/* =========================================================
+   CONTENT & PEDAGOGY / FRIDAY COURSES
+   ========================================================= */
+.nav-section-label {
+  margin: 17px 12px 5px;
+  color: #9a9a94;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .2px;
+}
+.nav-item.nav-subitem { padding-right: 19px; }
+
+.friday-toolbar { margin-bottom: 18px; }
+.friday-toolbar-row { display:flex; gap:12px; align-items:end; justify-content:space-between; flex-wrap:wrap; }
+.friday-toolbar-copy h3 { margin:0; }
+.friday-toolbar-copy p { margin:5px 0 0; color:var(--muted); font-size:12px; }
+.friday-filter-block { display:grid; gap:5px; min-width:220px; }
+.friday-filter-block label { color:var(--muted); font-size:10px; font-weight:900; }
+.friday-filter-block select { width:100%; }
+.friday-source-status { margin-top:10px; color:#7f7f79; font-size:11px; }
+.friday-kpis { grid-template-columns:repeat(4,minmax(0,1fr)); }
+.friday-strips { display:grid; gap:18px; margin-bottom:18px; }
+.friday-strip-panel { position:relative; overflow:hidden; }
+.friday-strip-panel::before { content:""; position:absolute; top:0; right:0; bottom:0; width:6px; background:#55a4d7; }
+.friday-strip-panel:nth-child(2)::before { background:#8fc43a; }
+.friday-strip-panel:nth-child(3)::before { background:#e91b5c; }
+.friday-strip-heading { display:flex; align-items:center; gap:11px; }
+.friday-strip-number { width:34px; height:34px; border-radius:50%; display:grid; place-items:center; background:#eaf5fb; color:#3f82ad; font-weight:900; flex:0 0 auto; }
+.friday-strip-panel:nth-child(2) .friday-strip-number { background:#f0f7df; color:#638d23; }
+.friday-strip-panel:nth-child(3) .friday-strip-number { background:#fff0f5; color:#bd2355; }
+.friday-course-table { min-width:880px; }
+.friday-count { display:inline-flex; align-items:center; justify-content:center; min-width:38px; padding:5px 9px; border-radius:999px; background:#eaf5fb; color:#3f82ad; font-weight:900; }
+.friday-students details { min-width:260px; }
+.friday-students summary { cursor:pointer; color:#3f82ad; font-weight:800; }
+.friday-student-list { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+.friday-student-chip { display:inline-flex; padding:5px 8px; border-radius:999px; background:#f5f5f2; border:1px solid #e7e6e2; color:#5f5f5b; font-size:10px; }
+.friday-ranking-grid { display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:18px; }
+.friday-ranking-list { display:grid; gap:10px; }
+.friday-rank-row { display:grid; grid-template-columns:28px minmax(130px,210px) 1fr 48px; gap:9px; align-items:center; font-size:11px; }
+.friday-rank-no { width:26px; height:26px; border-radius:50%; display:grid; place-items:center; background:#f5f5f2; border:1px solid #e7e6e2; font-weight:900; }
+.friday-rank-name { font-weight:800; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.friday-rank-track { height:8px; background:#f0efeb; border-radius:999px; overflow:hidden; }
+.friday-rank-fill { height:100%; border-radius:999px; background:linear-gradient(90deg,#55a4d7,#50b1b8); }
+.friday-rank-value { font-weight:900; text-align:left; }
+.friday-insights { display:grid; gap:9px; }
+.friday-insight { border:1px solid #e8e7e2; border-radius:13px; background:#fafaf7; padding:11px 13px; font-size:12px; line-height:1.55; }
+.friday-insight strong { color:#4a4a49; }
+.friday-empty { padding:34px 18px; text-align:center; color:var(--muted); }
+.friday-loading { padding:30px 18px; text-align:center; color:var(--muted); }
+.friday-error { padding:14px; border-radius:13px; background:#fff8dc; border:1px solid #eedf9d; color:#6f612b; font-size:12px; }
+@media (max-width:1000px) { .friday-kpis { grid-template-columns:repeat(2,1fr); } .friday-ranking-grid { grid-template-columns:1fr; } }
+@media (max-width:600px) { .friday-kpis { grid-template-columns:1fr; } .friday-filter-block { min-width:0; width:100%; } .friday-rank-row { grid-template-columns:28px minmax(100px,1fr) 70px; } .friday-rank-track { display:none; } }
+
 </style>
 </head>
 <body>
@@ -779,6 +833,10 @@ select:focus, input[type="search"]:focus {
         </button>
         <button class="nav-item" data-view="absences">
           <span class="nav-icon">◷</span><span>היעדרויות מורים</span>
+        </button>
+        <div class="nav-section-label">תוכן ופדגוגיה</div>
+        <button class="nav-item nav-subitem" data-view="friday-courses">
+          <span class="nav-icon">▤</span><span>קורסים ימי שישי</span>
         </button>
         <button class="nav-item" data-view="source">
           <span class="nav-icon">↻</span><span>מקור וסנכרון</span>
@@ -1108,6 +1166,31 @@ select:focus, input[type="search"]:focus {
         </div>
       </section>
 
+
+      <section class="view" id="view-friday-courses">
+        <article class="panel friday-toolbar">
+          <div class="friday-toolbar-row">
+            <div class="friday-toolbar-copy">
+              <h3>קורסים ימי שישי</h3>
+              <p>ניתוח בחירות התלמידים לפי שלוש רצועות הזמן, כולל קורסים, מורים, כמות נרשמים ושמות התלמידים.</p>
+            </div>
+            <div class="friday-filter-block">
+              <label for="fridayGradeFilter">סינון לפי שכבה</label>
+              <select id="fridayGradeFilter">
+                <option value="">כל התלמידים</option>
+                <option value="grade6">כיתה ו׳</option>
+                <option value="middle">חטיבת ביניים</option>
+              </select>
+            </div>
+          </div>
+          <div class="friday-source-status" id="fridaySourceStatus">הנתונים ייטענו בלחיצה על המסך.</div>
+        </article>
+
+        <div id="fridayCoursesContent">
+          <div class="friday-loading">טוען את נתוני קורסי יום שישי…</div>
+        </div>
+      </section>
+
       <section class="view" id="view-source">
         <div class="source-grid">
           <article class="panel source-card">
@@ -1126,14 +1209,14 @@ select:focus, input[type="search"]:focus {
 
         <article class="panel info-panel">
           <h3>איך הסנכרון עובד?</h3>
-          <p>במצב חי, האתר קורא בכל טעינה את Google Sheet הראשי דרך Web App קטן של Google Apps Script, ובנוסף קורא את לשונית “שהייה ופרטני” מאותו קובץ. אין בסיס נתונים נוסף ואין הזנת נתונים ידנית באתר.</p>
+          <p>במצב חי, האתר קורא בכל טעינה את Google Sheet הראשי דרך Web App קטן של Google Apps Script, ובנוסף קורא את הלשוניות “שהייה ופרטני” ו“קורסים ימי שישי” מאותו קובץ. אין בסיס נתונים נוסף ואין הזנת נתונים ידנית באתר.</p>
           <ol>
             <li>משנים נתון בקובץ “מערכות באופקית תשפ״ז”.</li>
             <li>לוחצים “רענון נתונים” באתר, או פותחים אותו מחדש.</li>
             <li>המערכת מציגה את הנתון המעודכן.</li>
           </ol>
           <div class="notice">
-            שעות התכניות נקראות מהלשונית “מערכת כללית תשפ״ז”, ושעות השהייה והפרטני נקראות מהלשונית “שהייה ופרטני”. שעות התחלה/סיום אינן קיימות במקור ולכן אינן מוצגות.
+            שעות התכניות נקראות מהלשונית “מערכת כללית תשפ״ז”, שעות השהייה והפרטני מהלשונית “שהייה ופרטני”, וניתוח קורסי יום שישי מהלשונית “קורסים ימי שישי”. שעות התחלה/סיום אינן קיימות במקור ולכן אינן מוצגות.
           </div>
         </article>
       </section>
@@ -1150,6 +1233,7 @@ window.APP_CONFIG = {
   SOURCE_SHEET_NAME: "מערכת כללית תשפ״ז",
   SOURCE_SPREADSHEET_ID: "1-VyMH84tm1kMS24_VibF1sTUoh2uwEBtG-VTBM8R5XI",
   AUX_SHEET_NAME: "שהייה ופרטני",
+  FRIDAY_SHEET_NAME: "קורסים ימי שישי",
   ABSENCE_SHEET_NAME: "היעדרויות",
   USE_DEMO_IF_API_MISSING: true,
   APP_TITLE: "מערכת ניהול מערכות מורים – תשפ״ז"
@@ -5268,7 +5352,10 @@ window.FALLBACK_DATA = {
     absences: [],
     absencesLoaded: false,
     absencesLoading: false,
-    editingAbsenceId: null
+    editingAbsenceId: null,
+    fridayCourses: null,
+    fridayCoursesLoaded: false,
+    fridayCoursesLoading: false
   };
 
   const $ = (id) => document.getElementById(id);
@@ -5285,7 +5372,7 @@ window.FALLBACK_DATA = {
   function bindUI() {
     document.querySelectorAll('.nav-item').forEach(btn => btn.addEventListener('click', () => setView(btn.dataset.view)));
     document.querySelectorAll('[data-jump]').forEach(btn => btn.addEventListener('click', () => setView(btn.dataset.jump)));
-    $('refreshBtn').addEventListener('click', () => { loadData(true); ensureAbsencesLoaded(true); });
+    $('refreshBtn').addEventListener('click', () => { loadData(true); ensureAbsencesLoaded(true); if (state.currentView === 'friday-courses' || state.fridayCoursesLoaded) ensureFridayCoursesLoaded(true); });
     $('teacherSelect').addEventListener('change', e => selectTeacher(e.target.value, true));
     $('teacherSearch').addEventListener('input', renderTeachersTable);
     $('programFilter').addEventListener('change', renderTeachersTable);
@@ -5322,6 +5409,7 @@ window.FALLBACK_DATA = {
     $('absenceSearch').addEventListener('input', renderAbsences);
     $('downloadAbsencesCsvBtn').addEventListener('click', downloadAbsencesCsv);
     $('openAbsencesBtn').addEventListener('click', () => setView('absences'));
+    $('fridayGradeFilter').addEventListener('change', renderFridayCourses);
   }
 
   function setView(view) {
@@ -5333,12 +5421,14 @@ window.FALLBACK_DATA = {
       teacher: ['מערכת מורה', 'בחירת מורה והפקת מערכת שבועית'],
       teachers: ['כל המורים', 'חיפוש, סינון והשוואת היקפי שעות'],
       absences: ['היעדרויות מורים', 'רישום, אישורים, חיסורים וסיכומים חודשיים'],
+      'friday-courses': ['קורסים ימי שישי', 'בחירות תלמידים, רצועות זמן ותובנות פדגוגיות'],
       source: ['מקור וסנכרון', 'מצב החיבור לקובץ “מערכות באופקית תשפ״ז”']
     }[view];
     $('pageTitle').textContent = meta[0];
     $('pageSubtitle').textContent = meta[1];
     $('sidebar').classList.remove('open');
     if (view === 'overview' || view === 'absences' || view === 'teacher') ensureAbsencesLoaded();
+    if (view === 'friday-courses') ensureFridayCoursesLoaded();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -5628,6 +5718,7 @@ window.FALLBACK_DATA = {
     renderOverview();
     renderTeachersTable();
     renderSource();
+    if (state.fridayCoursesLoaded) renderFridayCourses();
     if (state.selectedTeacher) renderTeacher(state.selectedTeacher);
   }
 
@@ -5783,11 +5874,360 @@ window.FALLBACK_DATA = {
     }));
   }
 
+  /* =========================================================
+     Friday courses / content & pedagogy
+     ========================================================= */
+  async function ensureFridayCoursesLoaded(force = false) {
+    if (state.fridayCoursesLoading) return;
+    if (state.fridayCoursesLoaded && !force) {
+      renderFridayCourses();
+      return;
+    }
+
+    state.fridayCoursesLoading = true;
+    const target = $('fridayCoursesContent');
+    if (target) target.innerHTML = '<div class="friday-loading">טוען את נתוני קורסי יום שישי…</div>';
+    $('fridaySourceStatus').textContent = 'טוען נתונים מהלשונית “קורסים ימי שישי”…';
+
+    try {
+      const spreadsheetId = (window.APP_CONFIG && window.APP_CONFIG.SOURCE_SPREADSHEET_ID || '').trim();
+      const sheetName = (window.APP_CONFIG && window.APP_CONFIG.FRIDAY_SHEET_NAME || 'קורסים ימי שישי').trim();
+      if (!spreadsheetId || !sheetName) throw new Error('Friday courses source is not configured');
+      const payload = await loadGvizSheet(spreadsheetId, sheetName);
+      state.fridayCourses = parseFridayCoursesSheet(payload);
+      state.fridayCoursesLoaded = true;
+      renderFridayCourses();
+    } catch (err) {
+      console.error('Friday courses load failed:', err);
+      state.fridayCoursesLoaded = false;
+      if (target) target.innerHTML = '<div class="friday-error">לא ניתן היה לטעון כרגע את נתוני “קורסים ימי שישי”. יש לוודא שהלשונית זמינה לצפייה ולנסות שוב באמצעות “רענון נתונים”.</div>';
+      $('fridaySourceStatus').textContent = 'טעינת נתוני קורסי יום שישי נכשלה.';
+    } finally {
+      state.fridayCoursesLoading = false;
+    }
+  }
+
+  function gvizText(cell) {
+    const value = cell?.f ?? cell?.v ?? '';
+    if (value instanceof Date) return value.toISOString();
+    return String(value).replace(/\s+/g, ' ').trim();
+  }
+
+  function parseFridayCoursesSheet(payload) {
+    const sourceRows = payload?.table?.rows || [];
+    const submissions = [];
+
+    sourceRows.forEach((row, index) => {
+      const cells = row?.c || [];
+      const lastName = gvizText(cells[1]);
+      const firstName = gvizText(cells[2]);
+      const grade = gvizText(cells[3]);
+      if (!firstName && !lastName) return;
+      if (/שם משפחה/.test(lastName) || /שם פרטי/.test(firstName)) return;
+
+      const firstSet = [4,5,6].map(i => gvizText(cells[i]));
+      const secondSet = [8,9,10].map(i => gvizText(cells[i]));
+      const firstCount = firstSet.filter(Boolean).length;
+      const secondCount = secondSet.filter(Boolean).length;
+      let choices;
+      let notes;
+      if (firstCount > secondCount) {
+        choices = firstSet;
+        notes = gvizText(cells[7]);
+      } else if (secondCount > firstCount) {
+        choices = secondSet;
+        notes = gvizText(cells[11]);
+      } else if (gradeGroupOf(grade) === 'middle') {
+        choices = secondSet;
+        notes = gvizText(cells[11]);
+      } else {
+        choices = firstSet;
+        notes = gvizText(cells[7]);
+      }
+
+      const timestamp = gvizText(cells[0]);
+      submissions.push({
+        index,
+        timestamp,
+        timeValue: parseFridayTimestamp(timestamp, index),
+        firstName,
+        lastName,
+        name: [firstName,lastName].filter(Boolean).join(' ').replace(/\s+/g,' ').trim(),
+        grade,
+        gradeGroup: gradeGroupOf(grade),
+        choices,
+        notes
+      });
+    });
+
+    const latestByStudent = new Map();
+    submissions.forEach(item => {
+      const key = fridayStudentKey(item);
+      const previous = latestByStudent.get(key);
+      if (!previous || item.timeValue >= previous.timeValue) latestByStudent.set(key, item);
+    });
+
+    const records = [...latestByStudent.values()].sort((a,b) => a.name.localeCompare(b.name, 'he'));
+    return {
+      records,
+      submissionCount: submissions.length,
+      duplicateCount: Math.max(0, submissions.length - records.length),
+      loadedAt: new Date()
+    };
+  }
+
+  function fridayStudentKey(item) {
+    return [item.firstName, item.lastName, item.grade]
+      .map(v => String(v || '').trim().toLowerCase().replace(/["״׳'`.,()\-]/g,' ').replace(/\s+/g,' '))
+      .join('|');
+  }
+
+  function parseFridayTimestamp(value, fallbackIndex = 0) {
+    const s = String(value || '').trim();
+    const m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?/);
+    if (m) {
+      return new Date(Number(m[3]), Number(m[2])-1, Number(m[1]), Number(m[4]||0), Number(m[5]||0), Number(m[6]||0)).getTime();
+    }
+    const parsed = Date.parse(s);
+    return Number.isFinite(parsed) ? parsed : fallbackIndex;
+  }
+
+  function gradeGroupOf(grade) {
+    const g = String(grade || '').replace(/\s+/g,' ').trim();
+    if (/חט["״']?ב|ז['׳]?|ח['׳]?|ט['׳]?/.test(g)) return 'middle';
+    if (/ו['׳]?|כיתה\s*ו/.test(g)) return 'grade6';
+    return 'other';
+  }
+
+  const FRIDAY_COURSE_ALIASES = {
+    'פעימה גולרית': 'פעימת גורלית',
+    'פעימה גורלית': 'פעימת גורלית'
+  };
+  const FRIDAY_TEACHER_ALIASES = {
+    'שני מס לביר': 'שני מס לביא',
+    'טללית קונפרטי': 'טללית קונפורטי'
+  };
+
+  function parseFridayChoice(rawChoice) {
+    let text = String(rawChoice || '').replace(/\s+/g,' ').trim();
+    if (!text) return null;
+
+    let course = text;
+    let teacherPart = '';
+    const dashIndex = text.indexOf(' - ');
+    if (dashIndex > -1) {
+      course = text.slice(0, dashIndex).trim();
+      teacherPart = text.slice(dashIndex + 3).trim();
+    } else {
+      const mathMatch = text.match(/^(למה\s*Math\?)\s+(.+)$/i);
+      if (mathMatch) {
+        course = mathMatch[1].replace(/\s+/g,' ').trim();
+        teacherPart = mathMatch[2].trim();
+      }
+    }
+
+    course = FRIDAY_COURSE_ALIASES[course] || course;
+    teacherPart = teacherPart
+      .replace(/\s*\([^)]*\)\s*/g,' ')
+      .replace(/\s+(?:לכיתות|רק\s+כיתות|חובה\s+לכיתות).*$/,'')
+      .replace(/\s+/g,' ')
+      .trim();
+
+    if (course === 'מנהיגות' || /^מעבדה\s*\d+/i.test(teacherPart) || /^חובה\b/.test(teacherPart)) teacherPart = '';
+
+    let teachers = [];
+    if (teacherPart.includes('+')) {
+      teachers = teacherPart.split('+').map(x => x.trim()).filter(Boolean);
+    } else {
+      const twoFirstNames = teacherPart.match(/^(\S+)\s+ו(\S+)$/);
+      teachers = twoFirstNames ? [twoFirstNames[1], twoFirstNames[2]] : (teacherPart ? [teacherPart] : []);
+    }
+    teachers = teachers.map(name => FRIDAY_TEACHER_ALIASES[name] || name);
+
+    return {
+      raw: text,
+      course,
+      courseKey: course.toLowerCase().replace(/["״׳'`.,()]/g,'').replace(/\s+/g,' ').trim(),
+      teachers
+    };
+  }
+
+  function filteredFridayRecords() {
+    const records = state.fridayCourses?.records || [];
+    const filter = $('fridayGradeFilter')?.value || '';
+    return filter ? records.filter(r => r.gradeGroup === filter) : records;
+  }
+
+  function buildFridayAnalytics(records) {
+    const strips = [new Map(), new Map(), new Map()];
+    const courses = new Map();
+    const teachers = new Map();
+    let selections = 0;
+
+    records.forEach(student => {
+      student.choices.forEach((choice, stripIndex) => {
+        const parsed = parseFridayChoice(choice);
+        if (!parsed) return;
+        selections += 1;
+
+        const stripMap = strips[stripIndex];
+        if (!stripMap.has(parsed.courseKey)) stripMap.set(parsed.courseKey, {course:parsed.course, teachers:new Set(), count:0, students:[]});
+        const stripEntry = stripMap.get(parsed.courseKey);
+        stripEntry.count += 1;
+        parsed.teachers.forEach(t => stripEntry.teachers.add(t));
+        stripEntry.students.push(student);
+
+        if (!courses.has(parsed.courseKey)) courses.set(parsed.courseKey, {course:parsed.course, teachers:new Set(), count:0, strips:new Set()});
+        const courseEntry = courses.get(parsed.courseKey);
+        courseEntry.count += 1;
+        courseEntry.strips.add(stripIndex + 1);
+        parsed.teachers.forEach(t => courseEntry.teachers.add(t));
+
+        [...new Set(parsed.teachers)].forEach(teacher => teachers.set(teacher, (teachers.get(teacher) || 0) + 1));
+      });
+    });
+
+    const stripRows = strips.map(map => [...map.values()].sort((a,b) => b.count - a.count || a.course.localeCompare(b.course,'he')));
+    const courseRows = [...courses.values()].sort((a,b) => b.count - a.count || a.course.localeCompare(b.course,'he'));
+    const teacherRows = [...teachers.entries()].map(([name,count]) => ({name,count})).sort((a,b) => b.count - a.count || a.name.localeCompare(b.name,'he'));
+    return {strips: stripRows, courses: courseRows, teachers: teacherRows, selections};
+  }
+
+  function renderFridayCourses() {
+    const target = $('fridayCoursesContent');
+    if (!target) return;
+    if (!state.fridayCoursesLoaded || !state.fridayCourses) {
+      if (!state.fridayCoursesLoading) target.innerHTML = '<div class="friday-loading">נתוני קורסי יום שישי טרם נטענו.</div>';
+      return;
+    }
+
+    const records = filteredFridayRecords();
+    const analytics = buildFridayAnalytics(records);
+    const source = state.fridayCourses;
+    const filter = $('fridayGradeFilter')?.value || '';
+    const filterLabel = filter === 'grade6' ? 'כיתה ו׳' : filter === 'middle' ? 'חטיבת ביניים' : 'כל התלמידים';
+
+    $('fridaySourceStatus').textContent = `מקור: “${window.APP_CONFIG.FRIDAY_SHEET_NAME || 'קורסים ימי שישי'}” · ${source.submissionCount} שליחות בטופס · ${source.duplicateCount} שליחות כפולות הוסרו · תצוגה: ${filterLabel}`;
+
+    if (!records.length) {
+      target.innerHTML = '<div class="friday-empty">אין נתונים להצגה בסינון שנבחר.</div>';
+      return;
+    }
+
+    const uniqueCourses = analytics.courses.length;
+    const teacherCount = analytics.teachers.length;
+    const avgSelections = records.length ? analytics.selections / records.length : 0;
+
+    target.innerHTML = `
+      <div class="kpi-grid friday-kpis">
+        ${kpi('תלמידים', records.length, 'לאחר איחוד שליחות כפולות')}
+        ${kpi('בחירות קורס', analytics.selections, `${fmt(avgSelections)} בחירות בממוצע לתלמיד`)}
+        ${kpi('קורסים שונים', uniqueCourses, 'בשלוש רצועות הזמן')}
+        ${kpi('מורים מזוהים', teacherCount, 'לפי שמות המורים המופיעים בבחירות')}
+      </div>
+
+      <div class="friday-strips">
+        ${analytics.strips.map((rows, index) => fridayStripHtml(rows, index + 1, records.length)).join('')}
+      </div>
+
+      <div class="friday-ranking-grid">
+        <article class="panel">
+          <div class="panel-head"><div><h3>הקורסים המבוקשים ביותר</h3><p>דירוג כולל לפי מספר הבחירות בכל שלוש הרצועות</p></div></div>
+          ${fridayRankingHtml(analytics.courses.slice(0,10).map(x => ({name:x.course,count:x.count})), analytics.courses[0]?.count || 1)}
+        </article>
+        <article class="panel">
+          <div class="panel-head"><div><h3>המורים המבוקשים ביותר</h3><p>מספר בחירות בקורסים שבהם שם המורה מופיע; בקורס משותף הבחירה נספרת לכל מורה</p></div></div>
+          ${fridayRankingHtml(analytics.teachers.slice(0,10), analytics.teachers[0]?.count || 1)}
+        </article>
+      </div>
+
+      <article class="panel">
+        <div class="panel-head"><div><h3>תובנות ניהוליות</h3><p>תמונת העדפות מתוך הבחירות שנקלטו בטופס</p></div></div>
+        <div class="friday-insights">${fridayInsightsHtml(records, analytics, source)}</div>
+      </article>`;
+  }
+
+  function fridayStripHtml(rows, stripNumber, totalStudents) {
+    const totalInStrip = sum(rows.map(r => r.count));
+    return `
+      <article class="panel friday-strip-panel">
+        <div class="panel-head">
+          <div class="friday-strip-heading">
+            <div class="friday-strip-number">${stripNumber}</div>
+            <div><h3>רצועת זמן ${stripNumber}</h3><p>${totalInStrip} בחירות מתוך ${totalStudents} תלמידים בתצוגה הנוכחית</p></div>
+          </div>
+        </div>
+        ${rows.length ? `
+          <div class="table-wrap">
+            <table class="data-table friday-course-table">
+              <thead><tr><th>קורס</th><th>מורה / מורים</th><th>נרשמו</th><th>אחוז מהרצועה</th><th>שמות התלמידים</th></tr></thead>
+              <tbody>${rows.map(row => `
+                <tr>
+                  <td><strong>${escapeHtml(row.course)}</strong></td>
+                  <td>${row.teachers.size ? escapeHtml([...row.teachers].join(', ')) : '<span class="kpi-note">לא צוין בגיליון</span>'}</td>
+                  <td><span class="friday-count">${row.count}</span></td>
+                  <td>${pct(row.count,totalInStrip)}%</td>
+                  <td class="friday-students">${fridayStudentDetails(row.students)}</td>
+                </tr>`).join('')}</tbody>
+            </table>
+          </div>` : '<div class="friday-empty">אין בחירות ברצועה זו.</div>'}
+      </article>`;
+  }
+
+  function fridayStudentDetails(students) {
+    const sorted = [...students].sort((a,b) => a.name.localeCompare(b.name,'he'));
+    return `<details><summary>הצג ${sorted.length} תלמידים</summary><div class="friday-student-list">${sorted.map(s => `<span class="friday-student-chip">${escapeHtml(s.name)} · ${escapeHtml(s.grade || 'ללא כיתה')}</span>`).join('')}</div></details>`;
+  }
+
+  function fridayRankingHtml(rows, maxValue) {
+    if (!rows.length) return '<div class="friday-empty">אין נתונים לדירוג.</div>';
+    return `<div class="friday-ranking-list">${rows.map((row,index) => `
+      <div class="friday-rank-row">
+        <div class="friday-rank-no">${index+1}</div>
+        <div class="friday-rank-name" title="${escapeAttr(row.name)}">${escapeHtml(row.name)}</div>
+        <div class="friday-rank-track"><div class="friday-rank-fill" style="width:${Math.max(4,(row.count/maxValue)*100)}%"></div></div>
+        <div class="friday-rank-value">${row.count}</div>
+      </div>`).join('')}</div>`;
+  }
+
+  function fridayInsightsHtml(records, analytics, source) {
+    const insights = [];
+    const topCourse = analytics.courses[0];
+    if (topCourse) insights.push(`<strong>העדפה כוללת:</strong> הקורס “${escapeHtml(topCourse.course)}” מוביל עם ${topCourse.count} בחירות.`);
+
+    analytics.strips.forEach((rows,index) => {
+      const top = rows[0];
+      if (top) insights.push(`<strong>רצועה ${index+1}:</strong> “${escapeHtml(top.course)}” הוא הקורס המבוקש ביותר ברצועה עם ${top.count} תלמידים.`);
+    });
+
+    const topTeacher = analytics.teachers[0];
+    if (topTeacher) insights.push(`<strong>ביקוש לפי מורה:</strong> ${escapeHtml(topTeacher.name)} מופיע/ה במספר הבחירות הגבוה ביותר — ${topTeacher.count} בחירות בקורסים המשויכים אליו/אליה.`);
+
+    const topThree = sum(analytics.courses.slice(0,3).map(x => x.count));
+    if (analytics.selections) insights.push(`<strong>ריכוז ביקוש:</strong> שלושת הקורסים המובילים מרכזים ${pct(topThree,analytics.selections)}% מכלל בחירות הקורסים בתצוגה.`);
+
+    if (($('fridayGradeFilter')?.value || '') === '') {
+      ['grade6','middle'].forEach(group => {
+        const groupRecords = records.filter(r => r.gradeGroup === group);
+        if (!groupRecords.length) return;
+        const groupAnalytics = buildFridayAnalytics(groupRecords);
+        const top = groupAnalytics.courses[0];
+        const label = group === 'grade6' ? 'כיתה ו׳' : 'חטיבת ביניים';
+        if (top) insights.push(`<strong>${label}:</strong> הקורס בעל מספר הבחירות הגבוה ביותר הוא “${escapeHtml(top.course)}” עם ${top.count} בחירות.`);
+      });
+    }
+
+    if (source.duplicateCount) insights.push(`<strong>איכות נתונים:</strong> זוהו ${source.duplicateCount} שליחות כפולות; לצורך הניתוח נשמרה לכל תלמיד השליחה המאוחרת ביותר לפי שם פרטי, שם משפחה וכיתה.`);
+    insights.push('<strong>הערת דירוג מורים:</strong> אם קורס נלמד במשותף, אותה בחירת תלמיד נספרת לכל אחד מהמורים המופיעים בשם הקורס. קורסים שבהם לא מופיע שם מורה אינם נכללים בדירוג המורים.');
+    return insights.map(text => `<div class="friday-insight">${text}</div>`).join('');
+  }
+
+
   function renderSource() {
     if (!state.data) return;
     const source = state.data.source || {};
     $('sourceFileName').textContent = source.fileName || window.APP_CONFIG.SOURCE_FILE_NAME || '—';
-    const sheetNames = [source.sheetName || window.APP_CONFIG.SOURCE_SHEET_NAME, source.auxSheetName || window.APP_CONFIG.AUX_SHEET_NAME].filter(Boolean);
+    const sheetNames = [source.sheetName || window.APP_CONFIG.SOURCE_SHEET_NAME, source.auxSheetName || window.APP_CONFIG.AUX_SHEET_NAME, window.APP_CONFIG.FRIDAY_SHEET_NAME].filter(Boolean);
     $('sourceSheetName').textContent = sheetNames.length ? `לשוניות: ${sheetNames.join(' + ')}` : '—';
     const live = state.data.mode === 'live';
     $('connectionMode').textContent = live ? 'סנכרון חי פעיל' : 'צילום מצב מקומי';
