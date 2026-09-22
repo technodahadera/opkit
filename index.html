@@ -761,14 +761,53 @@ select:focus, input[type="search"]:focus {
 /* =========================================================
    CONTENT & PEDAGOGY / FRIDAY COURSES
    ========================================================= */
-.nav-section-label {
-  margin: 17px 12px 5px;
-  color: #9a9a94;
-  font-size: 10px;
-  font-weight: 900;
-  letter-spacing: .2px;
+.nav-section-toggle {
+  width: 100%;
+  margin-top: 10px;
+  border: 0;
+  color: #63635f;
+  background: transparent;
+  padding: 13px 14px;
+  border-radius: 14px;
+  font: inherit;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: right;
+  cursor: pointer;
+  transition: .18s ease;
 }
-.nav-item.nav-subitem { padding-right: 19px; }
+.nav-section-toggle:hover {
+  background: #f6f6f4;
+  color: #3f3f3d;
+}
+.nav-section-toggle .nav-section-caret {
+  margin-right: auto;
+  font-size: 13px;
+  color: #8d8d87;
+  transition: transform .2s ease;
+}
+.nav-section-toggle[aria-expanded="true"] {
+  background: #f7fafb;
+  color: #3e769b;
+}
+.nav-section-toggle[aria-expanded="true"] .nav-section-caret { transform: rotate(90deg); }
+.nav-submenu {
+  display: grid;
+  gap: 6px;
+  margin-top: 4px;
+  overflow: hidden;
+}
+.nav-submenu[hidden] { display: none !important; }
+.nav-item.nav-subitem {
+  margin-right: 12px;
+  padding-right: 19px;
+  width: calc(100% - 12px);
+  background: #fafaf7;
+  border-color: #ecebe6;
+}
+.nav-item.nav-subitem:hover { background: #f2f7f9; }
 
 .friday-toolbar { margin-bottom: 18px; }
 .friday-toolbar-row { display:flex; gap:12px; align-items:end; justify-content:space-between; flex-wrap:wrap; }
@@ -777,6 +816,33 @@ select:focus, input[type="search"]:focus {
 .friday-filter-block { display:grid; gap:5px; min-width:220px; }
 .friday-filter-block label { color:var(--muted); font-size:10px; font-weight:900; }
 .friday-filter-block select { width:100%; }
+.friday-toolbar-controls { display:flex; gap:12px; align-items:end; flex-wrap:wrap; }
+.friday-student-search { display:grid; gap:5px; min-width:310px; position:relative; }
+.friday-student-search > label { color:var(--muted); font-size:10px; font-weight:900; }
+.friday-student-search-wrap { position:relative; }
+.friday-student-search input { width:100%; min-height:42px; padding-left:38px; }
+.friday-student-clear { position:absolute; left:7px; top:50%; transform:translateY(-50%); width:28px; height:28px; border:0; border-radius:50%; background:#f2f2ef; color:#777773; font-size:17px; line-height:1; display:none; }
+.friday-student-search.has-value .friday-student-clear { display:grid; place-items:center; }
+.friday-student-clear:hover { background:#e7f2f7; color:#3f82ad; }
+.friday-student-menu { position:absolute; z-index:75; top:calc(100% + 6px); right:0; left:0; max-height:310px; overflow:auto; padding:6px; border:1px solid #deded9; border-radius:15px; background:#fff; box-shadow:0 18px 40px rgba(74,74,73,.15); }
+.friday-student-option { width:100%; border:0; background:transparent; color:#4a4a49; text-align:right; padding:10px 11px; border-radius:11px; display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.friday-student-option:hover, .friday-student-option.active { background:#eef7fb; }
+.friday-student-option strong { font-size:12px; }
+.friday-student-option span { color:#85857f; font-size:10px; white-space:nowrap; }
+.friday-student-menu-empty { padding:13px; color:#8b8b86; font-size:11px; text-align:center; }
+.friday-student-result { margin:0 0 18px; border:1px solid #dce9ee; background:linear-gradient(135deg,#ffffff,#f8fbfc); }
+.friday-student-result-head { display:flex; align-items:flex-start; justify-content:space-between; gap:14px; margin-bottom:14px; }
+.friday-student-result-name { font-size:20px; font-weight:900; color:#4a4a49; }
+.friday-student-result-meta { margin-top:3px; color:#85857f; font-size:11px; }
+.friday-student-choice-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; }
+.friday-student-choice { min-height:108px; border:1px solid #e8e7e2; border-radius:15px; padding:12px 13px; background:#fff; position:relative; overflow:hidden; }
+.friday-student-choice::before { content:""; position:absolute; top:0; right:0; left:0; height:4px; background:#55a4d7; }
+.friday-student-choice:nth-child(2)::before { background:#8fc43a; }
+.friday-student-choice:nth-child(3)::before { background:#e91b5c; }
+.friday-student-choice-strip { color:#8b8b86; font-size:10px; font-weight:900; }
+.friday-student-choice-course { margin-top:8px; font-size:14px; font-weight:900; color:#4a4a49; line-height:1.4; }
+.friday-student-choice-teacher { margin-top:5px; color:#70706b; font-size:11px; }
+.friday-student-choice-empty { color:#aaa9a2; font-weight:700; }
 .friday-source-status { margin-top:10px; color:#7f7f79; font-size:11px; }
 .friday-kpis { grid-template-columns:repeat(4,minmax(0,1fr)); }
 .friday-strips { display:grid; gap:18px; margin-bottom:18px; }
@@ -809,7 +875,7 @@ select:focus, input[type="search"]:focus {
 .friday-loading { padding:30px 18px; text-align:center; color:var(--muted); }
 .friday-error { padding:14px; border-radius:13px; background:#fff8dc; border:1px solid #eedf9d; color:#6f612b; font-size:12px; }
 @media (max-width:1000px) { .friday-kpis { grid-template-columns:repeat(2,1fr); } .friday-ranking-grid { grid-template-columns:1fr; } }
-@media (max-width:600px) { .friday-kpis { grid-template-columns:1fr; } .friday-filter-block { min-width:0; width:100%; } .friday-rank-row { grid-template-columns:28px minmax(100px,1fr) 70px; } .friday-rank-track { display:none; } }
+@media (max-width:600px) { .friday-kpis { grid-template-columns:1fr; } .friday-filter-block, .friday-student-search { min-width:0; width:100%; } .friday-toolbar-controls { width:100%; } .friday-student-choice-grid { grid-template-columns:1fr; } .friday-rank-row { grid-template-columns:28px minmax(100px,1fr) 70px; } .friday-rank-track { display:none; } }
 
 </style>
 </head>
@@ -834,10 +900,14 @@ select:focus, input[type="search"]:focus {
         <button class="nav-item" data-view="absences">
           <span class="nav-icon">◷</span><span>היעדרויות מורים</span>
         </button>
-        <div class="nav-section-label">תוכן ופדגוגיה</div>
-        <button class="nav-item nav-subitem" data-view="friday-courses">
-          <span class="nav-icon">▤</span><span>קורסים ימי שישי</span>
+        <button class="nav-section-toggle" id="contentPedagogyToggle" type="button" aria-expanded="false" aria-controls="contentPedagogyMenu">
+          <span class="nav-icon">▧</span><span>תוכן ופדגוגיה</span><span class="nav-section-caret" aria-hidden="true">◀</span>
         </button>
+        <div class="nav-submenu" id="contentPedagogyMenu" hidden>
+          <button class="nav-item nav-subitem" data-view="friday-courses">
+            <span class="nav-icon">▤</span><span>קורסים ימי שישי</span>
+          </button>
+        </div>
         <button class="nav-item" data-view="source">
           <span class="nav-icon">↻</span><span>מקור וסנכרון</span>
         </button>
@@ -1174,17 +1244,29 @@ select:focus, input[type="search"]:focus {
               <h3>קורסים ימי שישי</h3>
               <p>ניתוח בחירות התלמידים לפי שלוש רצועות הזמן, כולל קורסים, מורים, כמות נרשמים ושמות התלמידים.</p>
             </div>
-            <div class="friday-filter-block">
-              <label for="fridayGradeFilter">סינון לפי שכבה</label>
-              <select id="fridayGradeFilter">
-                <option value="">כל התלמידים</option>
-                <option value="grade6">כיתה ו׳</option>
-                <option value="middle">חטיבת ביניים</option>
-              </select>
+            <div class="friday-toolbar-controls">
+              <div class="friday-student-search" id="fridayStudentSearchBlock">
+                <label for="fridayStudentSearch">איתור תלמיד ובחירותיו</label>
+                <div class="friday-student-search-wrap">
+                  <input type="search" id="fridayStudentSearch" placeholder="הקלד שם תלמיד או חלק ממנו…" autocomplete="off" aria-autocomplete="list" aria-expanded="false" aria-controls="fridayStudentMenu">
+                  <button type="button" class="friday-student-clear" id="fridayStudentClearBtn" aria-label="נקה חיפוש">×</button>
+                  <div class="friday-student-menu hidden" id="fridayStudentMenu" role="listbox"></div>
+                </div>
+              </div>
+              <div class="friday-filter-block">
+                <label for="fridayGradeFilter">סינון לפי שכבה</label>
+                <select id="fridayGradeFilter">
+                  <option value="">כל התלמידים</option>
+                  <option value="grade6">כיתה ו׳</option>
+                  <option value="middle">חטיבת ביניים</option>
+                </select>
+              </div>
             </div>
           </div>
           <div class="friday-source-status" id="fridaySourceStatus">הנתונים ייטענו בלחיצה על המסך.</div>
         </article>
+
+        <div id="fridayStudentResult" class="hidden"></div>
 
         <div id="fridayCoursesContent">
           <div class="friday-loading">טוען את נתוני קורסי יום שישי…</div>
@@ -5355,7 +5437,8 @@ window.FALLBACK_DATA = {
     editingAbsenceId: null,
     fridayCourses: null,
     fridayCoursesLoaded: false,
-    fridayCoursesLoading: false
+    fridayCoursesLoading: false,
+    selectedFridayStudentKey: ''
   };
 
   const $ = (id) => document.getElementById(id);
@@ -5371,6 +5454,7 @@ window.FALLBACK_DATA = {
 
   function bindUI() {
     document.querySelectorAll('.nav-item').forEach(btn => btn.addEventListener('click', () => setView(btn.dataset.view)));
+    $('contentPedagogyToggle').addEventListener('click', toggleContentPedagogyMenu);
     document.querySelectorAll('[data-jump]').forEach(btn => btn.addEventListener('click', () => setView(btn.dataset.jump)));
     $('refreshBtn').addEventListener('click', () => { loadData(true); ensureAbsencesLoaded(true); if (state.currentView === 'friday-courses' || state.fridayCoursesLoaded) ensureFridayCoursesLoaded(true); });
     $('teacherSelect').addEventListener('change', e => selectTeacher(e.target.value, true));
@@ -5410,6 +5494,25 @@ window.FALLBACK_DATA = {
     $('downloadAbsencesCsvBtn').addEventListener('click', downloadAbsencesCsv);
     $('openAbsencesBtn').addEventListener('click', () => setView('absences'));
     $('fridayGradeFilter').addEventListener('change', renderFridayCourses);
+    $('fridayStudentSearch').addEventListener('input', handleFridayStudentSearchInput);
+    $('fridayStudentSearch').addEventListener('focus', () => renderFridayStudentMenu($('fridayStudentSearch').value));
+    $('fridayStudentSearch').addEventListener('keydown', handleFridayStudentSearchKeydown);
+    $('fridayStudentMenu').addEventListener('click', e => {
+      const option = e.target.closest('[data-friday-student-key]');
+      if (option) selectFridayStudent(option.dataset.fridayStudentKey);
+    });
+    $('fridayStudentClearBtn').addEventListener('click', clearFridayStudentSearch);
+    document.addEventListener('click', e => {
+      if (!e.target.closest('#fridayStudentSearchBlock')) closeFridayStudentMenu();
+    });
+  }
+
+  function toggleContentPedagogyMenu() {
+    const toggle = $('contentPedagogyToggle');
+    const menu = $('contentPedagogyMenu');
+    const open = toggle.getAttribute('aria-expanded') === 'true';
+    toggle.setAttribute('aria-expanded', String(!open));
+    menu.hidden = open;
   }
 
   function setView(view) {
@@ -5897,6 +6000,10 @@ window.FALLBACK_DATA = {
       state.fridayCourses = parseFridayCoursesSheet(payload);
       state.fridayCoursesLoaded = true;
       renderFridayCourses();
+      if (state.selectedFridayStudentKey) {
+        const selectedStudent = state.fridayCourses.records.find(r => fridayStudentRecordKey(r) === state.selectedFridayStudentKey);
+        renderFridayStudentResult(selectedStudent || null);
+      }
     } catch (err) {
       console.error('Friday courses load failed:', err);
       state.fridayCoursesLoaded = false;
@@ -6050,6 +6157,144 @@ window.FALLBACK_DATA = {
       courseKey: course.toLowerCase().replace(/["״׳'`.,()]/g,'').replace(/\s+/g,' ').trim(),
       teachers
     };
+  }
+
+  function normalizeFridaySearchText(value) {
+    return String(value || '')
+      .normalize('NFKD')
+      .replace(/[\u0591-\u05C7]/g,'')
+      .replace(/["״׳'`.,()\-]/g,' ')
+      .replace(/\s+/g,' ')
+      .trim()
+      .toLowerCase();
+  }
+
+  function fridayStudentMatches(student, query) {
+    const q = normalizeFridaySearchText(query);
+    if (!q) return true;
+    const full = normalizeFridaySearchText(`${student.firstName} ${student.lastName}`);
+    const reverse = normalizeFridaySearchText(`${student.lastName} ${student.firstName}`);
+    const grade = normalizeFridaySearchText(student.grade);
+    const tokens = q.split(' ').filter(Boolean);
+    return tokens.every(token => full.includes(token) || reverse.includes(token) || grade.includes(token));
+  }
+
+  function fridayStudentRecordKey(student) {
+    return fridayStudentKey(student);
+  }
+
+  function handleFridayStudentSearchInput() {
+    const input = $('fridayStudentSearch');
+    $('fridayStudentSearchBlock')?.classList.toggle('has-value', !!input.value.trim());
+    state.selectedFridayStudentKey = '';
+    renderFridayStudentResult(null);
+    renderFridayStudentMenu(input.value);
+  }
+
+  function renderFridayStudentMenu(query = '') {
+    const menu = $('fridayStudentMenu');
+    const input = $('fridayStudentSearch');
+    if (!menu || !input) return;
+    if (!state.fridayCoursesLoaded || !state.fridayCourses) {
+      menu.innerHTML = '<div class="friday-student-menu-empty">הנתונים עדיין נטענים…</div>';
+      menu.classList.remove('hidden');
+      input.setAttribute('aria-expanded','true');
+      return;
+    }
+
+    const q = String(query || '').trim();
+    if (!q) {
+      closeFridayStudentMenu();
+      return;
+    }
+
+    const matches = state.fridayCourses.records
+      .filter(student => fridayStudentMatches(student, q))
+      .slice(0, 12);
+
+    menu.innerHTML = matches.length
+      ? matches.map((student,index) => `<button type="button" class="friday-student-option${index === 0 ? ' active' : ''}" role="option" data-friday-student-key="${escapeAttr(fridayStudentRecordKey(student))}"><strong>${escapeHtml(student.name)}</strong><span>${escapeHtml(student.grade || 'ללא כיתה')}</span></button>`).join('')
+      : '<div class="friday-student-menu-empty">לא נמצא תלמיד בשם הזה</div>';
+    menu.classList.remove('hidden');
+    input.setAttribute('aria-expanded','true');
+  }
+
+  function closeFridayStudentMenu() {
+    $('fridayStudentMenu')?.classList.add('hidden');
+    $('fridayStudentSearch')?.setAttribute('aria-expanded','false');
+  }
+
+  function handleFridayStudentSearchKeydown(e) {
+    if (e.key === 'Escape') {
+      closeFridayStudentMenu();
+      return;
+    }
+    if (e.key !== 'Enter') return;
+    e.preventDefault();
+    const menu = $('fridayStudentMenu');
+    const first = menu?.querySelector('[data-friday-student-key]');
+    if (first) selectFridayStudent(first.dataset.fridayStudentKey);
+  }
+
+  function selectFridayStudent(key) {
+    const records = state.fridayCourses?.records || [];
+    const student = records.find(r => fridayStudentRecordKey(r) === key);
+    if (!student) return;
+    state.selectedFridayStudentKey = key;
+    const input = $('fridayStudentSearch');
+    input.value = student.name;
+    $('fridayStudentSearchBlock')?.classList.add('has-value');
+    closeFridayStudentMenu();
+    renderFridayStudentResult(student);
+  }
+
+  function clearFridayStudentSearch() {
+    state.selectedFridayStudentKey = '';
+    const input = $('fridayStudentSearch');
+    if (input) input.value = '';
+    $('fridayStudentSearchBlock')?.classList.remove('has-value');
+    closeFridayStudentMenu();
+    renderFridayStudentResult(null);
+    input?.focus();
+  }
+
+  function renderFridayStudentResult(student) {
+    const target = $('fridayStudentResult');
+    if (!target) return;
+    if (!student) {
+      target.innerHTML = '';
+      target.classList.add('hidden');
+      return;
+    }
+
+    const choices = [0,1,2].map(index => {
+      const parsed = parseFridayChoice(student.choices[index]);
+      if (!parsed) return `
+        <div class="friday-student-choice">
+          <div class="friday-student-choice-strip">רצועת זמן ${index + 1}</div>
+          <div class="friday-student-choice-course friday-student-choice-empty">לא נבחר קורס</div>
+        </div>`;
+      return `
+        <div class="friday-student-choice">
+          <div class="friday-student-choice-strip">רצועת זמן ${index + 1}</div>
+          <div class="friday-student-choice-course">${escapeHtml(parsed.course)}</div>
+          <div class="friday-student-choice-teacher">${parsed.teachers.length ? `מורה: ${escapeHtml(parsed.teachers.join(', '))}` : 'מורה לא צוין בשם הבחירה'}</div>
+        </div>`;
+    }).join('');
+
+    target.innerHTML = `
+      <article class="panel friday-student-result">
+        <div class="friday-student-result-head">
+          <div>
+            <div class="friday-student-result-name">${escapeHtml(student.name)}</div>
+            <div class="friday-student-result-meta">${escapeHtml(student.grade || 'ללא כיתה')} · הבחירה האחרונה שנקלטה בטופס</div>
+          </div>
+          <button type="button" class="btn btn-secondary btn-small" id="fridayStudentResultCloseBtn">סגור</button>
+        </div>
+        <div class="friday-student-choice-grid">${choices}</div>
+      </article>`;
+    target.classList.remove('hidden');
+    $('fridayStudentResultCloseBtn')?.addEventListener('click', clearFridayStudentSearch);
   }
 
   function filteredFridayRecords() {
