@@ -5983,6 +5983,61 @@ window.FALLBACK_DATA = {
     });
   }
 
+
+  function loadGvizRange(spreadsheetId, sheetName, range) {
+    return new Promise((resolve, reject) => {
+      const callbackName = `__gviz_range_cb_${Date.now()}_${Math.floor(Math.random()*100000)}`;
+      const timer = setTimeout(() => cleanup(new Error(`Google Sheets timeout (${range})`)), 25000);
+      const script = document.createElement('script');
+      const tqx = `out:json;responseHandler:${callbackName}`;
+      script.src = `https://docs.google.com/spreadsheets/d/${encodeURIComponent(spreadsheetId)}/gviz/tq?sheet=${encodeURIComponent(sheetName)}&range=${encodeURIComponent(range)}&tqx=${encodeURIComponent(tqx)}&_=${Date.now()}`;
+      script.async = true;
+
+      window[callbackName] = (payload) => {
+        if (payload && payload.status === 'error') {
+          const details = payload.errors?.map(e => e?.detailed_message || e?.message).filter(Boolean).join(' | ');
+          cleanup(new Error(`Google Sheets returned an error (${range})${details ? ': ' + details : ''}`));
+          return;
+        }
+        cleanup();
+        resolve(payload);
+      };
+      script.onerror = () => cleanup(new Error(`Google Sheets JSONP error (${range})`));
+      document.head.appendChild(script);
+
+      function cleanup(error) {
+        clearTimeout(timer);
+        script.remove();
+        try { delete window[callbackName]; } catch (_) { window[callbackName] = undefined; }
+        if (error) reject(error);
+      }
+    });
+  }
+
+  function mergeGvizPayloadsByRow(leftPayload, rightPayload) {
+    const leftTable = leftPayload?.table || {};
+    const rightTable = rightPayload?.table || {};
+    const leftRows = leftTable.rows || [];
+    const rightRows = rightTable.rows || [];
+    const rowCount = Math.max(leftRows.length, rightRows.length);
+    const rows = [];
+    for (let i = 0; i < rowCount; i++) {
+      rows.push({
+        c: [
+          ...((leftRows[i]?.c) || []),
+          ...((rightRows[i]?.c) || [])
+        ]
+      });
+    }
+    return {
+      status: 'ok',
+      table: {
+        cols: [...(leftTable.cols || []), ...(rightTable.cols || [])],
+        rows
+      }
+    };
+  }
+
   function parseStayIndividualSheet(payload) {
     const rows = payload?.table?.rows || [];
     const entries = [];
@@ -6640,12 +6695,15 @@ window.FALLBACK_DATA = {
       const spreadsheetId = (window.APP_CONFIG && window.APP_CONFIG.SOURCE_SPREADSHEET_ID || '').trim();
       const sheetName = (window.APP_CONFIG && window.APP_CONFIG.ATTENDANCE_SHEET_NAME || 'נוכחות').trim();
       if (!spreadsheetId || !sheetName) throw new Error('Attendance source is not configured');
-      // The attendance sheet contains a very large historical-notes column (P).
-      // It is not needed for the daily attendance calculation and can make the
-      // Google Visualization response too large/slow. Load only the columns
-      // required by the attendance screen and student history.
-      const attendanceQuery = 'select A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,Q,R,S,T,U,V';
-      const payload = await loadGvizSheet(spreadsheetId, sheetName, attendanceQuery);
+      // Column P ("הערות נוכחות") can be very large. Avoid Google Visualization
+      // query syntax here: some published/permission configurations reject tq=select
+      // even though a normal range read works. Read two plain ranges and merge them
+      // row-by-row, skipping only column P.
+      const [leftPayload, rightPayload] = await Promise.all([
+        loadGvizRange(spreadsheetId, sheetName, 'A:O'),
+        loadGvizRange(spreadsheetId, sheetName, 'Q:V')
+      ]);
+      const payload = mergeGvizPayloadsByRow(leftPayload, rightPayload);
       state.attendance = parseAttendanceSheet(payload);
       state.attendanceLoaded = true;
       initializeAttendanceDate();
@@ -6661,9 +6719,10 @@ window.FALLBACK_DATA = {
     } catch (err) {
       console.error('Attendance sheet load failed:', err);
       state.attendanceLoaded = false;
-      if ($('overviewAttendanceContent')) $('overviewAttendanceContent').innerHTML = '<div class="attendance-error">לא ניתן היה לטעון כרגע את נתוני הנוכחות. יש לוודא שהלשונית “נוכחות” זמינה לצפייה.</div>';
+      const attendanceErrorText = String(err?.message || err || 'שגיאה לא ידועה');
+      if ($('overviewAttendanceContent')) $('overviewAttendanceContent').innerHTML = '<div class="attendance-error">לא ניתן היה לטעון כרגע את נתוני הנוכחות.</div>';
       if ($('attendanceKpis')) $('attendanceKpis').innerHTML = '<div class="attendance-error" style="grid-column:1/-1">טעינת נתוני “נוכחות” נכשלה.</div>';
-      if ($('attendanceSourceStatus')) $('attendanceSourceStatus').textContent = 'טעינת נתוני הנוכחות נכשלה.';
+      if ($('attendanceSourceStatus')) $('attendanceSourceStatus').textContent = `טעינת נתוני הנוכחות נכשלה: ${attendanceErrorText}`;
     } finally {
       state.attendanceLoading = false;
     }
