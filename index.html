@@ -7071,7 +7071,7 @@ window.FALLBACK_DATA = {
       const teachers = [...new Set(rs.map(r=>r.teacher).filter(Boolean))];
       const phones = [...new Set(rs.flatMap(r=>r.phones||[]).filter(Boolean))];
       return {
-        key,
+        key: group.key,
         name: base.name,
         id: base.id,
         population: base.population,
