@@ -932,6 +932,80 @@ select:focus, input[type="search"]:focus {
 @media (max-width:1050px) { .students-overview-layout, .students-analysis-grid { grid-template-columns:1fr; } .students-kpis { grid-template-columns:repeat(2,1fr); } }
 @media (max-width:650px) { .students-kpis { grid-template-columns:1fr; } .student-donut-wrap { flex-direction:column; align-items:stretch; } .student-donut { margin:auto; } .students-search, .students-filter { min-width:0; width:100%; } .students-filters { width:100%; } .student-mini-row { grid-template-columns:minmax(100px,1fr) 70px; } .student-mini-track { display:none; } }
 
+/* =========================================================
+   STUDENT ATTENDANCE / נוכחות
+   ========================================================= */
+.attendance-toolbar { margin-bottom:18px; }
+.attendance-toolbar-row { display:flex; gap:14px; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; }
+.attendance-toolbar-copy { min-width:240px; }
+.attendance-toolbar-copy h3 { margin:0; }
+.attendance-toolbar-copy p { margin:5px 0 0; color:var(--muted); font-size:12px; }
+.attendance-controls { display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap; }
+.attendance-field { display:grid; gap:5px; min-width:145px; }
+.attendance-field.wide { min-width:210px; }
+.attendance-field label { color:var(--muted); font-size:10px; font-weight:900; }
+.attendance-field input, .attendance-field select { min-height:42px; border:1px solid #deded9; border-radius:14px; background:#fff; color:var(--ink); padding:0 12px; font:inherit; outline:0; }
+.attendance-field input:focus, .attendance-field select:focus { border-color:#55a4d7; box-shadow:0 0 0 4px rgba(85,164,215,.10); }
+.attendance-presets { display:flex; gap:7px; flex-wrap:wrap; margin-top:12px; }
+.attendance-preset { border:1px solid #deded9; background:#fff; color:#5e5e5a; border-radius:999px; padding:7px 11px; font:inherit; font-size:11px; font-weight:800; }
+.attendance-preset:hover, .attendance-preset.active { border-color:#55a4d7; background:#eef7fb; color:#3f82ad; }
+.attendance-source-note { margin-top:10px; color:#7f7f79; font-size:11px; }
+.attendance-kpis { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:12px; margin-bottom:18px; }
+.attendance-kpi { background:#fff; border:1px solid #e9e8e3; border-radius:18px; padding:15px; box-shadow:0 10px 25px rgba(74,74,73,.05); position:relative; overflow:hidden; min-height:108px; }
+.attendance-kpi::before { content:""; position:absolute; top:0; right:0; left:0; height:4px; background:#55a4d7; }
+.attendance-kpi:nth-child(2)::before { background:#50b1b8; }
+.attendance-kpi:nth-child(3)::before { background:#8fc43a; }
+.attendance-kpi:nth-child(4)::before { background:#eb6c00; }
+.attendance-kpi:nth-child(5)::before { background:#e91b5c; }
+.attendance-kpi:nth-child(6)::before { background:#8068ad; }
+.attendance-kpi .v { font-size:27px; line-height:1; font-weight:900; color:#4a4a49; margin:8px 0 6px; }
+.attendance-kpi .l { color:#777773; font-size:11px; font-weight:900; }
+.attendance-kpi .n { color:#9a9a94; font-size:10px; line-height:1.35; }
+.attendance-grid { display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:18px; }
+.attendance-panel { min-width:0; }
+.attendance-mini-bars { display:grid; gap:10px; }
+.attendance-mini-row { display:grid; grid-template-columns:minmax(120px,180px) 1fr 58px; gap:10px; align-items:center; font-size:11px; }
+.attendance-mini-label { font-weight:800; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.attendance-mini-track { height:10px; border-radius:999px; background:#f0efeb; overflow:hidden; }
+.attendance-mini-fill { height:100%; border-radius:999px; background:linear-gradient(90deg,#55a4d7,#50b1b8); }
+.attendance-mini-value { font-weight:900; text-align:left; }
+.attendance-rate-good { color:#5c8521; }
+.attendance-rate-warn { color:#b2730a; }
+.attendance-rate-bad { color:#b43636; }
+.attendance-alert-panel { border-color:#f0d8d8; background:linear-gradient(135deg,#fff,#fff9f9); }
+.attendance-alert-list { display:grid; gap:9px; max-height:410px; overflow:auto; padding-left:2px; }
+.attendance-alert-item { border:1px solid #f0dede; border-radius:14px; background:#fff; padding:11px 12px; display:grid; grid-template-columns:minmax(0,1fr) auto; gap:10px; align-items:start; }
+.attendance-alert-name { font-size:12px; font-weight:900; color:#4a4a49; }
+.attendance-alert-meta { margin-top:3px; color:#85857f; font-size:10px; line-height:1.45; }
+.attendance-alert-contact { margin-top:6px; color:#5d5d59; font-size:10px; line-height:1.45; }
+.attendance-alert-date { white-space:nowrap; color:#b23d62; font-size:10px; font-weight:900; }
+.attendance-tag { display:inline-flex; align-items:center; padding:4px 8px; border-radius:999px; font-size:10px; font-weight:900; white-space:nowrap; }
+.attendance-tag.present { background:#eef7e7; color:#5d8128; }
+.attendance-tag.absent { background:#fff0f3; color:#b23d62; }
+.attendance-tag.pending { background:#fff7dc; color:#876a12; }
+.attendance-tag.unknown { background:#f1f1ee; color:#7a7a75; }
+.attendance-table-toolbar { display:flex; gap:10px; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; margin-bottom:12px; }
+.attendance-table-filters { display:flex; gap:8px; align-items:flex-end; flex-wrap:wrap; }
+.attendance-table-meta { color:var(--muted); font-size:11px; }
+.attendance-contact-missing { color:#b43636; font-weight:900; }
+.attendance-contact-ok { color:#5d8128; font-weight:800; }
+.attendance-empty, .attendance-loading { padding:25px 16px; text-align:center; color:var(--muted); }
+.attendance-error { padding:14px; border-radius:13px; background:#fff8dc; border:1px solid #eedf9d; color:#6f612b; font-size:12px; }
+.attendance-overview { margin-bottom:18px; }
+.attendance-overview-kpis { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; }
+.attendance-overview-card { border:1px solid #e8e7e2; border-radius:15px; background:#fafaf7; padding:13px 14px; }
+.attendance-overview-card strong { display:block; font-size:24px; font-weight:900; color:#4a4a49; }
+.attendance-overview-card span { color:#85857f; font-size:10px; font-weight:800; }
+.attendance-overview-note { margin-top:10px; color:#8b8b86; font-size:10px; }
+.attendance-repeat-list { display:grid; gap:9px; }
+.attendance-repeat-row { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:10px; align-items:center; padding:9px 11px; border:1px solid #e8e7e2; border-radius:12px; background:#fafaf7; }
+.attendance-repeat-row strong { font-size:11px; }
+.attendance-repeat-row span { color:#b23d62; font-size:11px; font-weight:900; }
+@media (max-width:1250px) { .attendance-kpis { grid-template-columns:repeat(3,1fr); } }
+@media (max-width:950px) { .attendance-grid { grid-template-columns:1fr; } .attendance-overview-kpis { grid-template-columns:repeat(2,1fr); } }
+@media (max-width:650px) { .attendance-kpis { grid-template-columns:1fr 1fr; } .attendance-controls, .attendance-field, .attendance-field.wide { width:100%; min-width:0; } .attendance-table-filters { width:100%; } .attendance-table-filters .attendance-field { flex:1 1 140px; } }
+@media (max-width:430px) { .attendance-kpis, .attendance-overview-kpis { grid-template-columns:1fr; } .attendance-mini-row { grid-template-columns:minmax(90px,1fr) 62px; } .attendance-mini-track { display:none; } }
+
 </style>
 </head>
 <body>
@@ -957,6 +1031,9 @@ select:focus, input[type="search"]:focus {
         </button>
         <button class="nav-item" data-view="students">
           <span class="nav-icon">◎</span><span>תלמידים</span>
+        </button>
+        <button class="nav-item" data-view="attendance">
+          <span class="nav-icon">✓</span><span>נוכחות</span>
         </button>
         <button class="nav-section-toggle" id="contentPedagogyToggle" type="button" aria-expanded="false" aria-controls="contentPedagogyMenu">
           <span class="nav-icon">▧</span><span>תוכן ופדגוגיה</span><span class="nav-section-caret" aria-hidden="true">◀</span>
@@ -1021,6 +1098,17 @@ select:focus, input[type="search"]:focus {
             <button class="btn btn-secondary btn-small" id="openStudentsBtn" type="button">לניתוח התלמידים</button>
           </div>
           <div id="overviewStudentsContent" class="students-loading">טוען נתוני תלמידים…</div>
+        </article>
+
+        <article class="panel attendance-overview" id="overviewAttendancePanel">
+          <div class="panel-head">
+            <div>
+              <h3>נוכחות תלמידים היום</h3>
+              <p id="overviewAttendanceSubtitle">טוען נתונים מהלשונית “נוכחות”…</p>
+            </div>
+            <button class="btn btn-secondary btn-small" id="openAttendanceBtn" type="button">לניהול הנוכחות</button>
+          </div>
+          <div id="overviewAttendanceContent" class="attendance-loading">טוען נתוני נוכחות…</div>
         </article>
 
         <article class="panel overview-absence-panel" id="overviewAbsencePanel">
@@ -1361,6 +1449,103 @@ select:focus, input[type="search"]:focus {
         </article>
       </section>
 
+      <section class="view" id="view-attendance">
+        <article class="panel attendance-toolbar">
+          <div class="attendance-toolbar-row">
+            <div class="attendance-toolbar-copy">
+              <h3>נוכחות תלמידים</h3>
+              <p>מעקב יומי ותקופתי מתוך גיליון “נוכחות”, כולל אחוזי נוכחות, חיסורים, פרטי קשר ומשימות טיפול.</p>
+            </div>
+            <div class="attendance-controls">
+              <div class="attendance-field">
+                <label for="attendanceStartDate">מתאריך</label>
+                <input type="date" id="attendanceStartDate">
+              </div>
+              <div class="attendance-field">
+                <label for="attendanceEndDate">עד תאריך</label>
+                <input type="date" id="attendanceEndDate">
+              </div>
+              <div class="attendance-field">
+                <label for="attendancePopulationFilter">סוג אוכלוסייה</label>
+                <select id="attendancePopulationFilter"><option value="">כל האוכלוסיות</option></select>
+              </div>
+              <div class="attendance-field">
+                <label for="attendanceClassFilter">כיתה בטכנודע</label>
+                <select id="attendanceClassFilter"><option value="">כל הכיתות</option></select>
+              </div>
+            </div>
+          </div>
+          <div class="attendance-presets" aria-label="בחירת תקופת מעקב">
+            <button class="attendance-preset" type="button" data-attendance-preset="today">היום</button>
+            <button class="attendance-preset" type="button" data-attendance-preset="7days">7 ימים אחרונים</button>
+            <button class="attendance-preset" type="button" data-attendance-preset="month">החודש</button>
+            <button class="attendance-preset" type="button" data-attendance-preset="all">כל התקופה</button>
+          </div>
+          <div class="attendance-source-note" id="attendanceSourceStatus">טוען נתונים מהלשונית “נוכחות”…</div>
+        </article>
+
+        <div class="attendance-kpis" id="attendanceKpis">
+          <div class="attendance-loading" style="grid-column:1/-1">טוען נתונים…</div>
+        </div>
+
+        <div class="attendance-grid">
+          <article class="panel attendance-panel">
+            <div class="panel-head"><div><h3>נוכחות לפי סוג אוכלוסייה</h3><p id="attendancePopulationSubtitle">בתקופה שנבחרה</p></div></div>
+            <div id="attendancePopulationChart" class="attendance-loading">טוען…</div>
+          </article>
+          <article class="panel attendance-panel">
+            <div class="panel-head"><div><h3>מגמת נוכחות לפי תאריך</h3><p>אחוז נוכחות בכל יום שבו קיימות רשומות</p></div></div>
+            <div id="attendanceTrendChart" class="attendance-loading">טוען…</div>
+          </article>
+        </div>
+
+        <div class="attendance-grid">
+          <article class="panel attendance-alert-panel">
+            <div class="panel-head">
+              <div><h3>דורשים יצירת קשר</h3><p>תלמידים שסומנו כלא נוכחים ואין להם הערה המתעדת טיפול או קשר</p></div>
+              <span class="overview-mini-badge" id="attendanceContactCount">—</span>
+            </div>
+            <div id="attendanceContactList" class="attendance-alert-list"></div>
+          </article>
+          <article class="panel attendance-panel">
+            <div class="panel-head"><div><h3>חיסורים חוזרים</h3><p>תלמידים עם שני חיסורים ומעלה בתקופה שנבחרה</p></div></div>
+            <div id="attendanceRepeatAbsences" class="attendance-repeat-list"></div>
+          </article>
+        </div>
+
+        <article class="panel">
+          <div class="attendance-table-toolbar">
+            <div>
+              <h3 style="margin:0">פירוט נוכחות ופרטי קשר</h3>
+              <div class="attendance-table-meta" id="attendanceTableMeta">טוען…</div>
+            </div>
+            <div class="attendance-table-filters">
+              <div class="attendance-field wide">
+                <label for="attendanceSearch">חיפוש תלמיד / הורה / מורה</label>
+                <input type="search" id="attendanceSearch" placeholder="שם, טלפון, קורס או בית ספר…" autocomplete="off">
+              </div>
+              <div class="attendance-field">
+                <label for="attendanceStatusFilter">מצב נוכחות</label>
+                <select id="attendanceStatusFilter">
+                  <option value="absent">לא נוכחים</option>
+                  <option value="">כל המצבים</option>
+                  <option value="present">נוכחים</option>
+                  <option value="pending">טרם נקבע</option>
+                  <option value="unknown">ללא דיווח</option>
+                </select>
+              </div>
+              <button class="btn btn-secondary btn-small" id="downloadAttendanceCsvBtn" type="button">הורדת CSV</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table" style="min-width:1350px">
+              <thead><tr><th>תאריך</th><th>תלמיד/ה</th><th>נוכחות</th><th>אוכלוסייה</th><th>כיתה</th><th>קורס</th><th>מורה</th><th>הורים</th><th>טלפונים</th><th>הערה / קשר</th><th>בית ספר</th></tr></thead>
+              <tbody id="attendanceTableBody"></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+
       <section class="view" id="view-friday-courses">
         <article class="panel friday-toolbar">
           <div class="friday-toolbar-row">
@@ -1415,14 +1600,14 @@ select:focus, input[type="search"]:focus {
 
         <article class="panel info-panel">
           <h3>איך הסנכרון עובד?</h3>
-          <p>במצב חי, האתר קורא בכל טעינה את Google Sheet הראשי דרך Web App קטן של Google Apps Script, ובנוסף קורא את הלשוניות “שהייה ופרטני”, “תלמידים” ו“קורסים ימי שישי” מאותו קובץ. אין בסיס נתונים נוסף ואין הזנת נתונים ידנית באתר.</p>
+          <p>במצב חי, האתר קורא בכל טעינה את Google Sheet הראשי דרך Web App קטן של Google Apps Script, ובנוסף קורא את הלשוניות “שהייה ופרטני”, “תלמידים”, “נוכחות” ו“קורסים ימי שישי” מאותו קובץ. אין בסיס נתונים נוסף ואין הזנת נתונים ידנית באתר.</p>
           <ol>
             <li>משנים נתון בקובץ “מערכות באופקית תשפ״ז”.</li>
             <li>לוחצים “רענון נתונים” באתר, או פותחים אותו מחדש.</li>
             <li>המערכת מציגה את הנתון המעודכן.</li>
           </ol>
           <div class="notice">
-            שעות התכניות נקראות מהלשונית “מערכת כללית תשפ״ז”, שעות השהייה והפרטני מהלשונית “שהייה ופרטני”, נתוני התלמידים מהלשונית “תלמידים”, וניתוח קורסי יום שישי מהלשונית “קורסים ימי שישי”. שעות התחלה/סיום אינן קיימות במקור ולכן אינן מוצגות.
+            שעות התכניות נקראות מהלשונית “מערכת כללית תשפ״ז”, שעות השהייה והפרטני מהלשונית “שהייה ופרטני”, נתוני התלמידים מהלשונית “תלמידים”, נתוני הנוכחות מהלשונית “נוכחות”, וניתוח קורסי יום שישי מהלשונית “קורסים ימי שישי”. שעות התחלה/סיום שאינן קיימות במקור אינן מוצגות.
           </div>
         </article>
       </section>
@@ -1440,6 +1625,7 @@ window.APP_CONFIG = {
   SOURCE_SPREADSHEET_ID: "1-VyMH84tm1kMS24_VibF1sTUoh2uwEBtG-VTBM8R5XI",
   AUX_SHEET_NAME: "שהייה ופרטני",
   STUDENTS_SHEET_NAME: "תלמידים",
+  ATTENDANCE_SHEET_NAME: "נוכחות",
   FRIDAY_SHEET_NAME: "קורסים ימי שישי",
   ABSENCE_SHEET_NAME: "היעדרויות",
   USE_DEMO_IF_API_MISSING: true,
@@ -5566,7 +5752,11 @@ window.FALLBACK_DATA = {
     selectedFridayStudentKey: '',
     students: null,
     studentsLoaded: false,
-    studentsLoading: false
+    studentsLoading: false,
+    attendance: null,
+    attendanceLoaded: false,
+    attendanceLoading: false,
+    attendancePreset: 'today'
   };
 
   const $ = (id) => document.getElementById(id);
@@ -5579,13 +5769,14 @@ window.FALLBACK_DATA = {
     bindUI();
     loadData();
     ensureStudentsLoaded();
+    ensureAttendanceLoaded();
   }
 
   function bindUI() {
     document.querySelectorAll('.nav-item').forEach(btn => btn.addEventListener('click', () => setView(btn.dataset.view)));
     $('contentPedagogyToggle').addEventListener('click', toggleContentPedagogyMenu);
     document.querySelectorAll('[data-jump]').forEach(btn => btn.addEventListener('click', () => setView(btn.dataset.jump)));
-    $('refreshBtn').addEventListener('click', () => { loadData(true); ensureAbsencesLoaded(true); ensureStudentsLoaded(true); if (state.currentView === 'friday-courses' || state.fridayCoursesLoaded) ensureFridayCoursesLoaded(true); });
+    $('refreshBtn').addEventListener('click', () => { loadData(true); ensureAbsencesLoaded(true); ensureStudentsLoaded(true); ensureAttendanceLoaded(true); if (state.currentView === 'friday-courses' || state.fridayCoursesLoaded) ensureFridayCoursesLoaded(true); });
     $('teacherSelect').addEventListener('change', e => selectTeacher(e.target.value, true));
     $('teacherSearch').addEventListener('input', renderTeachersTable);
     $('programFilter').addEventListener('change', renderTeachersTable);
@@ -5623,6 +5814,15 @@ window.FALLBACK_DATA = {
     $('downloadAbsencesCsvBtn').addEventListener('click', downloadAbsencesCsv);
     $('openAbsencesBtn').addEventListener('click', () => setView('absences'));
     $('openStudentsBtn').addEventListener('click', () => setView('students'));
+    $('openAttendanceBtn').addEventListener('click', () => setView('attendance'));
+    $('attendanceStartDate').addEventListener('change', () => { state.attendancePreset = ''; renderAttendance(); });
+    $('attendanceEndDate').addEventListener('change', () => { state.attendancePreset = ''; renderAttendance(); });
+    $('attendancePopulationFilter').addEventListener('change', renderAttendance);
+    $('attendanceClassFilter').addEventListener('change', renderAttendance);
+    $('attendanceStatusFilter').addEventListener('change', renderAttendanceTable);
+    $('attendanceSearch').addEventListener('input', renderAttendanceTable);
+    $('downloadAttendanceCsvBtn').addEventListener('click', downloadAttendanceCsv);
+    document.querySelectorAll('[data-attendance-preset]').forEach(btn => btn.addEventListener('click', () => setAttendancePreset(btn.dataset.attendancePreset)));
     $('studentsSearch').addEventListener('input', renderStudentsTable);
     $('studentsPopulationFilter').addEventListener('change', renderStudentsTable);
     $('studentsClassFilter').addEventListener('change', renderStudentsTable);
@@ -5658,6 +5858,7 @@ window.FALLBACK_DATA = {
       teachers: ['כל המורים', 'חיפוש, סינון והשוואת היקפי שעות'],
       absences: ['היעדרויות מורים', 'רישום, אישורים, חיסורים וסיכומים חודשיים'],
       students: ['תלמידים', 'ניתוח אוכלוסיות, כיתות וחיפוש תלמידים והורים בשנת תשפ״ז'],
+      attendance: ['נוכחות', 'מעקב יומי ותקופתי אחר נוכחות תלמידים, חיסורים ויצירת קשר'],
       'friday-courses': ['קורסים ימי שישי', 'בחירות תלמידים, רצועות זמן ותובנות פדגוגיות'],
       source: ['מקור וסנכרון', 'מצב החיבור לקובץ “מערכות באופקית תשפ״ז”']
     }[view];
@@ -5666,6 +5867,7 @@ window.FALLBACK_DATA = {
     $('sidebar').classList.remove('open');
     if (view === 'overview' || view === 'absences' || view === 'teacher') ensureAbsencesLoaded();
     if (view === 'overview' || view === 'students') ensureStudentsLoaded();
+    if (view === 'overview' || view === 'attendance') ensureAttendanceLoaded();
     if (view === 'friday-courses') ensureFridayCoursesLoaded();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -6396,6 +6598,441 @@ window.FALLBACK_DATA = {
 
 
   /* =========================================================
+     Student attendance / נוכחות
+     ========================================================= */
+  async function ensureAttendanceLoaded(force = false) {
+    if (state.attendanceLoading) return;
+    if (state.attendanceLoaded && !force) {
+      renderOverviewAttendance();
+      renderAttendance();
+      return;
+    }
+
+    state.attendanceLoading = true;
+    if ($('attendanceSourceStatus')) $('attendanceSourceStatus').textContent = 'טוען נתונים מהלשונית “נוכחות”…';
+    if ($('overviewAttendanceContent')) $('overviewAttendanceContent').innerHTML = '<div class="attendance-loading">טוען נתוני נוכחות…</div>';
+
+    try {
+      const spreadsheetId = (window.APP_CONFIG && window.APP_CONFIG.SOURCE_SPREADSHEET_ID || '').trim();
+      const sheetName = (window.APP_CONFIG && window.APP_CONFIG.ATTENDANCE_SHEET_NAME || 'נוכחות').trim();
+      if (!spreadsheetId || !sheetName) throw new Error('Attendance source is not configured');
+      const payload = await loadGvizSheet(spreadsheetId, sheetName);
+      state.attendance = parseAttendanceSheet(payload);
+      state.attendanceLoaded = true;
+      initializeAttendanceDates();
+      populateAttendanceFilters();
+      renderOverviewAttendance();
+      renderAttendance();
+      if ($('attendanceSourceStatus')) {
+        const dates = state.attendance.dates;
+        const rangeText = dates.length ? `${formatAttendanceDate(dates[0])}–${formatAttendanceDate(dates[dates.length-1])}` : 'ללא תאריכים';
+        $('attendanceSourceStatus').textContent = `${fmt(state.attendance.records.length)} רשומות נטענו מהלשונית “${sheetName}” · טווח נתונים: ${rangeText}.`;
+      }
+    } catch (err) {
+      console.error('Attendance sheet load failed:', err);
+      state.attendanceLoaded = false;
+      if ($('overviewAttendanceContent')) $('overviewAttendanceContent').innerHTML = '<div class="attendance-error">לא ניתן היה לטעון כרגע את נתוני הנוכחות. יש לוודא שהלשונית “נוכחות” זמינה לצפייה.</div>';
+      if ($('attendanceKpis')) $('attendanceKpis').innerHTML = '<div class="attendance-error" style="grid-column:1/-1">טעינת נתוני “נוכחות” נכשלה.</div>';
+      if ($('attendancePopulationChart')) $('attendancePopulationChart').innerHTML = '<div class="attendance-error">טעינת הנתונים נכשלה.</div>';
+      if ($('attendanceTrendChart')) $('attendanceTrendChart').innerHTML = '<div class="attendance-error">טעינת הנתונים נכשלה.</div>';
+      if ($('attendanceSourceStatus')) $('attendanceSourceStatus').textContent = 'טעינת נתוני הנוכחות נכשלה.';
+    } finally {
+      state.attendanceLoading = false;
+    }
+  }
+
+  function parseAttendanceSheet(payload) {
+    const table = payload?.table || {};
+    const rows = table.rows || [];
+    let headers = (table.cols || []).map((c, i) => String(c?.label || c?.id || `עמודה ${i+1}`).trim());
+    let dataRows = rows;
+    const genericHeaders = headers.every(h => !h || /^([A-Z]|עמודה\s+\d+)$/i.test(h));
+    if (genericHeaders && rows.length) {
+      const first = (rows[0]?.c || []).map(gvizText);
+      const looksLikeHeader = first.some(v => /תלמיד|תעודת|אוכלוס|תאריך שיעור|נוכחות|כיתה בטכנודע|מורה/.test(v));
+      if (looksLikeHeader) { headers = first; dataRows = rows.slice(1); }
+    }
+
+    const col = (patterns, exclude=[]) => findStudentColumn(headers, patterns, exclude);
+    const nameIdx = col(['תלמיד','שם התלמיד','שם תלמיד'], ['הורה','הורים']);
+    const idIdx = col(['תעודת זהות','תז תלמיד','מספר זהות']);
+    const populationIdx = col(['סוג אוכלוסיה','סוג אוכלוסייה','אוכלוסיה','אוכלוסייה']);
+    const ageIdx = col(['שכבת גיל','שכבה']);
+    const classIdx = col(['כיתה בטכנודע','כיתה']);
+    const dateIdx = col(['תאריך שיעור','תאריך']);
+    const hoursIdx = col(['שעות קורס','שעת קורס','שעות']);
+    const attendanceIdx = col(['נוכחות']);
+    const notesIdx = col(['הערות'], ['נוכחות']);
+    const parentsIdx = col(['הורים','שם הורים','שם הורה']);
+    const courseIdx = col(['סוג קורס','קורס']);
+    const dayIdx = col(['יום']);
+    const locationIdx = col(['מתחם','חדר','מיקום']);
+    const teacherIdx = col(['מורה']);
+    const attendanceNotesIdx = col(['הערות נוכחות']);
+    const fatherPhoneIdx = col(['מספר נייד אבא','נייד אבא','טלפון אבא']);
+    const motherPhoneIdx = col(['מספר נייד אמא','נייד אמא','טלפון אמא']);
+    const studentPhoneIdx = col(['מספר נייד של התלמיד','נייד תלמיד','טלפון תלמיד']);
+    const schoolIdx = col(['בית ספר','ביהס','ביה״ס']);
+    const emailIdx = col(['כתובת אמייל','אימייל','מייל'], ['אב']);
+    const fatherEmailIdx = col(['כתובת אמייל אב','אימייל אב','מייל אב']);
+
+    const records = [];
+    dataRows.forEach((row, rowIndex) => {
+      const cells = row?.c || [];
+      const values = headers.map((_, i) => gvizText(cells[i]));
+      const name = nameIdx >= 0 ? values[nameIdx] : '';
+      const dateRaw = dateIdx >= 0 ? values[dateIdx] : '';
+      if (!name || /^(תלמיד|שם התלמיד)$/.test(name) || !dateRaw) return;
+      const date = parseAttendanceDate(dateRaw);
+      if (!date) return;
+      const statusRaw = attendanceIdx >= 0 ? values[attendanceIdx] : '';
+      const status = normalizeAttendanceStatus(statusRaw);
+      const notes = notesIdx >= 0 ? values[notesIdx] : '';
+      const attendanceHistory = attendanceNotesIdx >= 0 ? gvizMultilineText(cells[attendanceNotesIdx]) : '';
+      const contactHistoryNote = extractAttendanceDateNote(attendanceHistory, date);
+      const contactNote = String(notes || contactHistoryNote || '').trim();
+      const fatherPhone = fatherPhoneIdx >= 0 ? values[fatherPhoneIdx] : '';
+      const motherPhone = motherPhoneIdx >= 0 ? values[motherPhoneIdx] : '';
+      const studentPhone = studentPhoneIdx >= 0 ? values[studentPhoneIdx] : '';
+      const phones = [...new Set([fatherPhone,motherPhone,studentPhone].filter(Boolean))];
+      const population = normalizeStudentPopulation(populationIdx >= 0 ? values[populationIdx] : inferPopulation(values));
+      const className = classIdx >= 0 ? values[classIdx] : '';
+      const id = idIdx >= 0 ? values[idIdx] : '';
+      const raw = Object.fromEntries(headers.map((h, i) => [h || `עמודה ${i+1}`, values[i] || '']));
+      records.push({
+        rowIndex, name, id, population,
+        ageGroup: ageIdx >= 0 ? values[ageIdx] : '',
+        className, date, dateRaw, status, statusRaw,
+        hours: hoursIdx >= 0 ? values[hoursIdx] : '',
+        notes, contactHistoryNote, contactNote,
+        parents: parentsIdx >= 0 ? values[parentsIdx] : '',
+        course: courseIdx >= 0 ? values[courseIdx] : '',
+        day: dayIdx >= 0 ? values[dayIdx] : '',
+        location: locationIdx >= 0 ? values[locationIdx] : '',
+        teacher: teacherIdx >= 0 ? values[teacherIdx] : '',
+        attendanceHistory, fatherPhone, motherPhone, studentPhone, phones,
+        school: schoolIdx >= 0 ? values[schoolIdx] : '',
+        email: emailIdx >= 0 ? values[emailIdx] : '',
+        fatherEmail: fatherEmailIdx >= 0 ? values[fatherEmailIdx] : '',
+        raw,
+        searchText: values.join(' ').toLowerCase()
+      });
+    });
+
+    records.sort((a,b) => a.date - b.date || a.name.localeCompare(b.name,'he'));
+    const dates = [...new Set(records.map(r => localIsoDate(r.date)))].sort();
+    return { records, headers, dates, loadedAt:new Date() };
+  }
+
+  function gvizMultilineText(cell) {
+    const value = cell?.f ?? cell?.v ?? '';
+    return String(value).replace(/\r\n/g,'\n').replace(/\r/g,'\n').trim();
+  }
+
+  function parseAttendanceDate(value) {
+    const s = String(value || '').trim();
+    if (!s) return null;
+    let m = s.match(/^(\d{1,2})[\/\.\-](\d{1,2})[\/\.\-](\d{2,4})$/);
+    if (m) {
+      let year = Number(m[3]);
+      if (year < 100) year += 2000;
+      const d = new Date(year, Number(m[2])-1, Number(m[1]), 12, 0, 0);
+      return isNaN(d.getTime()) ? null : d;
+    }
+    m = s.match(/^Date\((\d{4}),(\d{1,2}),(\d{1,2})/);
+    if (m) return new Date(Number(m[1]), Number(m[2]), Number(m[3]), 12, 0, 0);
+    const d = new Date(s);
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  function normalizeAttendanceStatus(value) {
+    const s = String(value || '').replace(/\s+/g,' ').trim();
+    if (!s) return 'unknown';
+    if (/לא\s*נוכח|נעדר|חסר/.test(s)) return 'absent';
+    if (/עוד\s*לא\s*נקבע|טרם|לא\s*נקבע|אין\s*דיווח|לא\s*סומן/.test(s)) return 'pending';
+    if (/נוכח|הגיע/.test(s)) return 'present';
+    return 'unknown';
+  }
+
+  function extractAttendanceDateNote(history, date) {
+    if (!history || !date) return '';
+    const dd = String(date.getDate()).padStart(2,'0');
+    const mm = String(date.getMonth()+1).padStart(2,'0');
+    const yy = String(date.getFullYear()).slice(-2);
+    const yyyy = String(date.getFullYear());
+    const lines = String(history).split(/\n+/).map(x=>x.trim()).filter(Boolean);
+    const current = lines.filter(line => line.startsWith(`${dd}/${mm}/${yy}`) || line.startsWith(`${dd}/${mm}/${yyyy}`));
+    for (let i=current.length-1; i>=0; i--) {
+      const line = current[i];
+      const m = line.match(/הערות\s*:\s*(.+)$/);
+      if (m && m[1].trim()) return m[1].trim();
+    }
+    return '';
+  }
+
+  function initializeAttendanceDates() {
+    if (!state.attendanceLoaded || !state.attendance) return;
+    const today = new Date();
+    const iso = localIsoDate(today);
+    if (!$('attendanceStartDate').value || !$('attendanceEndDate').value) {
+      $('attendanceStartDate').value = iso;
+      $('attendanceEndDate').value = iso;
+      state.attendancePreset = 'today';
+    }
+    updateAttendancePresetButtons();
+  }
+
+  function setAttendancePreset(preset) {
+    if (!state.attendanceLoaded || !state.attendance) return;
+    const end = new Date();
+    end.setHours(12,0,0,0);
+    let start = new Date(end);
+    if (preset === '7days') start.setDate(end.getDate()-6);
+    if (preset === 'month') start = new Date(end.getFullYear(), end.getMonth(), 1, 12, 0, 0);
+    if (preset === 'all' && state.attendance.dates.length) {
+      start = parseAttendanceDate(state.attendance.dates[0]) || start;
+      const last = parseAttendanceDate(state.attendance.dates[state.attendance.dates.length-1]);
+      if (last) end.setTime(last.getTime());
+    }
+    $('attendanceStartDate').value = localIsoDate(start);
+    $('attendanceEndDate').value = localIsoDate(end);
+    state.attendancePreset = preset;
+    updateAttendancePresetButtons();
+    renderAttendance();
+  }
+
+  function updateAttendancePresetButtons() {
+    document.querySelectorAll('[data-attendance-preset]').forEach(btn => btn.classList.toggle('active', btn.dataset.attendancePreset === state.attendancePreset));
+  }
+
+  function populateAttendanceFilters() {
+    if (!state.attendanceLoaded || !state.attendance) return;
+    const populations = countBy(state.attendance.records, r=>r.population);
+    const classes = countBy(state.attendance.records.filter(r=>r.className), r=>r.className).sort((a,b)=>a.label.localeCompare(b.label,'he',{numeric:true}));
+    const popEl = $('attendancePopulationFilter');
+    const classEl = $('attendanceClassFilter');
+    const popValue = popEl.value, classValue = classEl.value;
+    popEl.innerHTML = '<option value="">כל האוכלוסיות</option>' + populations.map(x=>`<option value="${escapeAttr(x.label)}">${escapeHtml(x.label)} (${x.value})</option>`).join('');
+    classEl.innerHTML = '<option value="">כל הכיתות</option>' + classes.map(x=>`<option value="${escapeAttr(x.label)}">${escapeHtml(x.label)} (${x.value})</option>`).join('');
+    if ([...popEl.options].some(o=>o.value===popValue)) popEl.value = popValue;
+    if ([...classEl.options].some(o=>o.value===classValue)) classEl.value = classValue;
+  }
+
+  function attendanceRange() {
+    const start = parseAttendanceDate($('attendanceStartDate')?.value || '');
+    const end = parseAttendanceDate($('attendanceEndDate')?.value || '');
+    if (start) start.setHours(0,0,0,0);
+    if (end) end.setHours(23,59,59,999);
+    return { start, end };
+  }
+
+  function getAttendanceFilteredRecords(includeSearch=false) {
+    if (!state.attendanceLoaded || !state.attendance) return [];
+    const {start,end} = attendanceRange();
+    const population = $('attendancePopulationFilter')?.value || '';
+    const className = $('attendanceClassFilter')?.value || '';
+    const q = includeSearch ? ($('attendanceSearch')?.value || '').trim().toLowerCase() : '';
+    return state.attendance.records.filter(r => {
+      const time = r.date.getTime();
+      const inRange = (!start || time >= start.getTime()) && (!end || time <= end.getTime());
+      const haystack = [r.name,r.parents,r.phones.join(' '),r.population,r.className,r.course,r.teacher,r.school,r.notes,r.contactHistoryNote].join(' ').toLowerCase();
+      return inRange && (!population || r.population===population) && (!className || r.className===className) && (!q || haystack.includes(q));
+    });
+  }
+
+  function attendanceKpi(label,value,note) {
+    return `<div class="attendance-kpi"><div class="l">${escapeHtml(label)}</div><div class="v">${escapeHtml(String(value))}</div><div class="n">${escapeHtml(note)}</div></div>`;
+  }
+
+  function renderAttendance() {
+    if (!state.attendanceLoaded || !state.attendance) return;
+    updateAttendancePresetButtons();
+    const rows = getAttendanceFilteredRecords(false);
+    const present = rows.filter(r=>r.status==='present');
+    const absent = rows.filter(r=>r.status==='absent');
+    const pending = rows.filter(r=>r.status==='pending' || r.status==='unknown');
+    const decided = present.length + absent.length;
+    const rate = decided ? present.length/decided*100 : 0;
+    const missingContact = absent.filter(r=>!r.contactNote);
+    const uniqueStudents = new Set(rows.map(r=>r.id || r.name)).size;
+    const {start,end} = attendanceRange();
+    const periodText = formatAttendancePeriod(start,end);
+
+    $('attendanceKpis').innerHTML = [
+      attendanceKpi('רשומות בתקופה', fmt(rows.length), periodText),
+      attendanceKpi('תלמידים ייחודיים', fmt(uniqueStudents), 'לפי תעודת זהות או שם'),
+      attendanceKpi('נוכחים', fmt(present.length), decided ? `${rate.toFixed(1)}% נוכחות` : 'אין דיווחים סופיים'),
+      attendanceKpi('לא נוכחים', fmt(absent.length), decided ? `${(100-rate).toFixed(1)}% מהדיווחים הסופיים` : '—'),
+      attendanceKpi('דורשים קשר', fmt(missingContact.length), 'נעדרים ללא הערה'),
+      attendanceKpi('טרם נקבע / חסר', fmt(pending.length), 'רשומות ללא מצב סופי')
+    ].join('');
+
+    const popStats = buildAttendancePopulationStats(rows);
+    $('attendancePopulationSubtitle').textContent = periodText;
+    $('attendancePopulationChart').innerHTML = popStats.length ? renderAttendancePopulationBars(popStats) : '<div class="attendance-empty">אין נתוני נוכחות בתקופה שנבחרה.</div>';
+    $('attendanceTrendChart').innerHTML = renderAttendanceTrend(rows);
+    renderAttendanceContactList(missingContact);
+    renderAttendanceRepeatAbsences(rows);
+    renderAttendanceTable();
+  }
+
+  function buildAttendancePopulationStats(rows) {
+    const map = new Map();
+    rows.forEach(r => {
+      if (!map.has(r.population)) map.set(r.population,{label:r.population,present:0,absent:0,pending:0,total:0});
+      const x = map.get(r.population); x.total++;
+      if (r.status==='present') x.present++;
+      else if (r.status==='absent') x.absent++;
+      else x.pending++;
+    });
+    return [...map.values()].map(x=>({...x,decided:x.present+x.absent,rate:(x.present+x.absent)?x.present/(x.present+x.absent)*100:0})).sort((a,b)=>b.total-a.total || a.label.localeCompare(b.label,'he'));
+  }
+
+  function renderAttendancePopulationBars(stats) {
+    return `<div class="attendance-mini-bars">${stats.map(x=>{
+      const cls = attendanceRateClass(x.rate);
+      return `<div class="attendance-mini-row"><div class="attendance-mini-label" title="${escapeAttr(x.label)}">${escapeHtml(x.label)}</div><div class="attendance-mini-track"><div class="attendance-mini-fill" style="width:${Math.max(0,Math.min(100,x.rate))}%"></div></div><div class="attendance-mini-value ${cls}">${x.decided?x.rate.toFixed(1)+'%':'—'}</div></div>`;
+    }).join('')}</div>`;
+  }
+
+  function renderAttendanceTrend(rows) {
+    const map = new Map();
+    rows.forEach(r => {
+      const key = localIsoDate(r.date);
+      if (!map.has(key)) map.set(key,{date:r.date,present:0,absent:0,pending:0});
+      const x = map.get(key);
+      if (r.status==='present') x.present++;
+      else if (r.status==='absent') x.absent++;
+      else x.pending++;
+    });
+    const dates = [...map.values()].sort((a,b)=>a.date-b.date);
+    if (!dates.length) return '<div class="attendance-empty">אין תאריכים להצגה.</div>';
+    const visible = dates.slice(-18);
+    return `<div class="attendance-mini-bars">${visible.map(x=>{
+      const decided=x.present+x.absent; const rate=decided?x.present/decided*100:0;
+      return `<div class="attendance-mini-row"><div class="attendance-mini-label">${escapeHtml(formatAttendanceDate(x.date))}</div><div class="attendance-mini-track"><div class="attendance-mini-fill" style="width:${rate}%"></div></div><div class="attendance-mini-value ${attendanceRateClass(rate)}">${decided?rate.toFixed(0)+'%':'—'}</div></div>`;
+    }).join('')}</div>`;
+  }
+
+  function attendanceRateClass(rate) {
+    if (rate >= 90) return 'attendance-rate-good';
+    if (rate >= 80) return 'attendance-rate-warn';
+    return 'attendance-rate-bad';
+  }
+
+  function renderAttendanceContactList(rows) {
+    $('attendanceContactCount').textContent = fmt(rows.length);
+    const root = $('attendanceContactList');
+    if (!rows.length) {
+      root.innerHTML = '<div class="manager-empty">אין כרגע נעדרים ללא הערת קשר בתקופה שנבחרה.</div>';
+      return;
+    }
+    root.innerHTML = rows.slice().sort((a,b)=>b.date-a.date || a.name.localeCompare(b.name,'he')).slice(0,80).map(r=>`<div class="attendance-alert-item">
+      <div><div class="attendance-alert-name">${escapeHtml(r.name)}</div><div class="attendance-alert-meta">${escapeHtml([r.population,r.className,r.course,r.teacher].filter(Boolean).join(' · '))}</div><div class="attendance-alert-contact">${escapeHtml(r.parents || 'ללא שם הורה')} · ${escapeHtml(r.phones.join(' | ') || 'ללא מספר טלפון')}</div></div>
+      <div class="attendance-alert-date">${escapeHtml(formatAttendanceDate(r.date))}</div>
+    </div>`).join('');
+  }
+
+  function renderAttendanceRepeatAbsences(rows) {
+    const map = new Map();
+    rows.filter(r=>r.status==='absent').forEach(r=>{
+      const key=r.id || r.name;
+      if (!map.has(key)) map.set(key,{name:r.name,className:r.className,population:r.population,count:0,dates:[]});
+      const x=map.get(key); x.count++; x.dates.push(r.date);
+    });
+    const repeated=[...map.values()].filter(x=>x.count>=2).sort((a,b)=>b.count-a.count || a.name.localeCompare(b.name,'he'));
+    const root=$('attendanceRepeatAbsences');
+    if (!repeated.length) { root.innerHTML='<div class="attendance-empty">לא נמצאו תלמידים עם שני חיסורים ומעלה בתקופה שנבחרה.</div>'; return; }
+    root.innerHTML=repeated.slice(0,30).map(x=>`<div class="attendance-repeat-row"><div><strong>${escapeHtml(x.name)}</strong><div class="attendance-alert-meta">${escapeHtml([x.population,x.className].filter(Boolean).join(' · '))}</div></div><span>${x.count} חיסורים</span></div>`).join('');
+  }
+
+  function renderAttendanceTable() {
+    if (!state.attendanceLoaded || !state.attendance) return;
+    let rows = getAttendanceFilteredRecords(true);
+    const status = $('attendanceStatusFilter')?.value || '';
+    if (status) rows = rows.filter(r=>r.status===status);
+    rows.sort((a,b)=>b.date-a.date || a.name.localeCompare(b.name,'he'));
+    $('attendanceTableMeta').textContent = `${fmt(rows.length)} רשומות מוצגות · ${formatAttendancePeriod(attendanceRange().start, attendanceRange().end)}`;
+    $('attendanceTableBody').innerHTML = rows.length ? rows.map(r=>`<tr>
+      <td>${escapeHtml(formatAttendanceDate(r.date))}</td>
+      <td><strong>${escapeHtml(r.name)}</strong></td>
+      <td>${attendanceStatusTag(r)}</td>
+      <td>${escapeHtml(r.population || '—')}</td>
+      <td>${escapeHtml(r.className || r.ageGroup || '—')}</td>
+      <td>${escapeHtml(r.course || '—')}${r.hours?`<div class="student-parent"><span>${escapeHtml(r.hours)}</span></div>`:''}</td>
+      <td>${escapeHtml(r.teacher || '—')}</td>
+      <td>${escapeHtml(r.parents || '—')}</td>
+      <td><div class="student-parent"><span>${escapeHtml(r.phones.join(' | ') || '—')}</span></div></td>
+      <td>${r.contactNote?`<span class="attendance-contact-ok">${escapeHtml(r.contactNote)}</span>`:(r.status==='absent'?'<span class="attendance-contact-missing">לא נכתבה הערה</span>':'—')}</td>
+      <td>${escapeHtml(r.school || '—')}</td>
+    </tr>`).join('') : '<tr><td colspan="11"><div class="attendance-empty">לא נמצאו רשומות התואמות לתקופה ולסינון.</div></td></tr>';
+  }
+
+  function attendanceStatusTag(r) {
+    const label = r.status==='present' ? 'נוכח' : r.status==='absent' ? 'לא נוכח' : r.status==='pending' ? 'טרם נקבע' : (r.statusRaw || 'ללא דיווח');
+    return `<span class="attendance-tag ${r.status}">${escapeHtml(label)}</span>`;
+  }
+
+  function renderOverviewAttendance() {
+    const root = $('overviewAttendanceContent');
+    if (!root) return;
+    if (!state.attendanceLoaded || !state.attendance) {
+      if (!state.attendanceLoading) root.innerHTML='<div class="attendance-loading">טוען נתוני נוכחות…</div>';
+      return;
+    }
+    const today = new Date(); today.setHours(0,0,0,0);
+    const tomorrow = new Date(today); tomorrow.setDate(today.getDate()+1);
+    const rows = state.attendance.records.filter(r=>r.date>=today && r.date<tomorrow);
+    const present=rows.filter(r=>r.status==='present').length;
+    const absent=rows.filter(r=>r.status==='absent').length;
+    const pending=rows.filter(r=>r.status!=='present' && r.status!=='absent').length;
+    const decided=present+absent;
+    const rate=decided?present/decided*100:0;
+    const noContact=rows.filter(r=>r.status==='absent' && !r.contactNote).length;
+    const latestIso=state.attendance.dates[state.attendance.dates.length-1] || '';
+    const latestDate=latestIso?parseAttendanceDate(latestIso):null;
+    $('overviewAttendanceSubtitle').textContent = rows.length ? `נתוני היום, ${formatAttendanceDate(today)}` : `אין רשומות להיום, ${formatAttendanceDate(today)}`;
+    root.className='';
+    root.innerHTML=`<div class="attendance-overview-kpis">
+      <div class="attendance-overview-card"><strong>${fmt(present)}</strong><span>נוכחים היום</span></div>
+      <div class="attendance-overview-card"><strong>${decided?rate.toFixed(1)+'%':'—'}</strong><span>אחוז נוכחות</span></div>
+      <div class="attendance-overview-card"><strong>${fmt(absent)}</strong><span>לא נוכחים</span></div>
+      <div class="attendance-overview-card"><strong>${fmt(noContact)}</strong><span>נעדרים ללא הערה</span></div>
+    </div><div class="attendance-overview-note">${rows.length ? `${fmt(rows.length)} רשומות היום${pending?` · ${fmt(pending)} טרם נקבעו`:''}.` : `התאריך האחרון שקיים בגיליון: ${latestDate?formatAttendanceDate(latestDate):'—'}.`}</div>`;
+  }
+
+  function formatAttendanceDate(date) {
+    if (!date) return '—';
+    const d = date instanceof Date ? date : parseAttendanceDate(date);
+    if (!d) return String(date || '—');
+    return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+  }
+
+  function formatAttendancePeriod(start,end) {
+    if (start && end && localIsoDate(start)===localIsoDate(end)) return formatAttendanceDate(start);
+    if (start && end) return `${formatAttendanceDate(start)} עד ${formatAttendanceDate(end)}`;
+    if (start) return `מ־${formatAttendanceDate(start)}`;
+    if (end) return `עד ${formatAttendanceDate(end)}`;
+    return 'כל התקופה';
+  }
+
+  function downloadAttendanceCsv() {
+    if (!state.attendanceLoaded || !state.attendance) return;
+    let rows=getAttendanceFilteredRecords(true);
+    const status=$('attendanceStatusFilter')?.value || '';
+    if (status) rows=rows.filter(r=>r.status===status);
+    rows.sort((a,b)=>b.date-a.date || a.name.localeCompare(b.name,'he'));
+    const header=['תאריך','תלמיד','תעודת זהות','נוכחות','סוג אוכלוסייה','כיתה','קורס','שעות','מורה','הורים','טלפונים','הערה / קשר','בית ספר'];
+    const csvRows=[header,...rows.map(r=>[formatAttendanceDate(r.date),r.name,r.id,r.statusRaw || r.status,r.population,r.className,r.course,r.hours,r.teacher,r.parents,r.phones.join(' | '),r.contactNote,r.school])];
+    const csv='\uFEFF'+csvRows.map(row=>row.map(csvCell).join(',')).join('\r\n');
+    const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+    const url=URL.createObjectURL(blob); const a=document.createElement('a');
+    a.href=url; a.download=`attendance_${localIsoDate(new Date())}.csv`; a.click(); URL.revokeObjectURL(url);
+  }
+
+
+
+  /* =========================================================
      Friday courses / content & pedagogy
      ========================================================= */
   async function ensureFridayCoursesLoaded(force = false) {
@@ -6890,7 +7527,7 @@ window.FALLBACK_DATA = {
     if (!state.data) return;
     const source = state.data.source || {};
     $('sourceFileName').textContent = source.fileName || window.APP_CONFIG.SOURCE_FILE_NAME || '—';
-    const sheetNames = [source.sheetName || window.APP_CONFIG.SOURCE_SHEET_NAME, source.auxSheetName || window.APP_CONFIG.AUX_SHEET_NAME, source.studentsSheetName || window.APP_CONFIG.STUDENTS_SHEET_NAME, window.APP_CONFIG.FRIDAY_SHEET_NAME].filter(Boolean);
+    const sheetNames = [source.sheetName || window.APP_CONFIG.SOURCE_SHEET_NAME, source.auxSheetName || window.APP_CONFIG.AUX_SHEET_NAME, source.studentsSheetName || window.APP_CONFIG.STUDENTS_SHEET_NAME, window.APP_CONFIG.ATTENDANCE_SHEET_NAME, window.APP_CONFIG.FRIDAY_SHEET_NAME].filter(Boolean);
     $('sourceSheetName').textContent = sheetNames.length ? `לשוניות: ${sheetNames.join(' + ')}` : '—';
     const live = state.data.mode === 'live';
     $('connectionMode').textContent = live ? 'סנכרון חי פעיל' : 'צילום מצב מקומי';
