@@ -1641,6 +1641,9 @@ window.APP_CONFIG = {
   AUX_SHEET_NAME: "שהייה ופרטני",
   STUDENTS_SHEET_NAME: "תלמידים",
   ATTENDANCE_SHEET_NAME: "נוכחות",
+  ATTENDANCE_SHEET_GID: 1870832848,
+  ATTENDANCE_MAX_ROWS: 2500,
+  ATTENDANCE_API_URL: "https://script.google.com/macros/s/AKfycbwJzJEhBizDyIrEjIenfC3IdGyo13Zo3tAyG8JO3WcsoQ2ZcDjBFSs9KqkdAYBMOfoc/exec",
   FRIDAY_SHEET_NAME: "קורסים ימי שישי",
   ABSENCE_SHEET_NAME: "היעדרויות",
   USE_DEMO_IF_API_MISSING: true,
@@ -6014,6 +6017,128 @@ window.FALLBACK_DATA = {
     });
   }
 
+  function loadGvizRangeByGid(spreadsheetId, gid, range) {
+    return new Promise((resolve, reject) => {
+      const callbackName = `__gviz_gid_cb_${Date.now()}_${Math.floor(Math.random()*100000)}`;
+      const timer = setTimeout(() => cleanup(new Error(`Google Sheets timeout (gid ${gid}, ${range})`)), 30000);
+      const script = document.createElement('script');
+      const tqx = `out:json;responseHandler:${callbackName}`;
+      script.src = `https://docs.google.com/spreadsheets/d/${encodeURIComponent(spreadsheetId)}/gviz/tq?gid=${encodeURIComponent(String(gid))}&range=${encodeURIComponent(range)}&headers=1&tqx=${encodeURIComponent(tqx)}&_=${Date.now()}`;
+      script.async = true;
+
+      window[callbackName] = (payload) => {
+        if (payload && payload.status === 'error') {
+          const details = payload.errors?.map(e => e?.detailed_message || e?.message).filter(Boolean).join(' | ');
+          cleanup(new Error(`Google Sheets returned an error (gid ${gid}, ${range})${details ? ': ' + details : ''}`));
+          return;
+        }
+        cleanup();
+        resolve(payload);
+      };
+      script.onerror = () => cleanup(new Error(`Google Sheets JSONP error (gid ${gid}, ${range})`));
+      document.head.appendChild(script);
+
+      function cleanup(error) {
+        clearTimeout(timer);
+        script.remove();
+        try { delete window[callbackName]; } catch (_) { window[callbackName] = undefined; }
+        if (error) reject(error);
+      }
+    });
+  }
+
+  function attendanceRowsToGvizPayload(headers, rows) {
+    const safeHeaders = Array.isArray(headers) ? headers.map(x => String(x ?? '')) : [];
+    const safeRows = Array.isArray(rows) ? rows : [];
+    return {
+      status: 'ok',
+      table: {
+        cols: safeHeaders.map((h, i) => ({ id: String.fromCharCode(65 + (i % 26)), label: h, type: 'string' })),
+        rows: safeRows.map(row => ({ c: safeHeaders.map((_, i) => ({ v: Array.isArray(row) ? (row[i] ?? '') : '' })) }))
+      }
+    };
+  }
+
+  async function loadAttendanceFromAppScript() {
+    const configured = (window.APP_CONFIG?.ATTENDANCE_API_URL || '').trim();
+    const baseUrl = configured || (window.APP_CONFIG?.API_URL || '').trim();
+    if (!baseUrl) throw new Error('Attendance Apps Script URL missing');
+    const separator = baseUrl.includes('?') ? '&' : '?';
+    const data = await loadJsonp(`${baseUrl}${separator}action=attendance`);
+    if (!data || data.ok === false) throw new Error(data?.error || 'Apps Script attendance response failed');
+
+    // Supported response shapes:
+    // {ok:true, attendance:{headers:[...], rows:[[...]]}}
+    // {ok:true, headers:[...], rows:[[...]]}
+    // {ok:true, attendance:[{...},{...}]}
+    const block = data.attendance && !Array.isArray(data.attendance) ? data.attendance : data;
+    if (Array.isArray(block.headers) && Array.isArray(block.rows)) {
+      return attendanceRowsToGvizPayload(block.headers, block.rows);
+    }
+    if (Array.isArray(data.attendance) && data.attendance.length && typeof data.attendance[0] === 'object' && !Array.isArray(data.attendance[0])) {
+      const headers = [...new Set(data.attendance.flatMap(Object.keys))];
+      const rows = data.attendance.map(obj => headers.map(h => obj[h] ?? ''));
+      return attendanceRowsToGvizPayload(headers, rows);
+    }
+    throw new Error('Apps Script did not return attendance headers/rows');
+  }
+
+  async function loadAttendancePayload(spreadsheetId, sheetName) {
+    const gid = Number(window.APP_CONFIG?.ATTENDANCE_SHEET_GID || 0);
+    const maxRows = Math.max(100, Number(window.APP_CONFIG?.ATTENDANCE_MAX_ROWS || 2500));
+    const leftRange = `A1:O${maxRows}`;
+    const rightRange = `Q1:V${maxRows}`;
+    const errors = [];
+
+    // 1) Preferred: the same Apps Script server path used by the main system.
+    // This works even when the spreadsheet itself is not anonymously readable from GitHub Pages.
+    try {
+      const payload = await loadAttendanceFromAppScript();
+      return { payload, method: 'Apps Script' };
+    } catch (err) {
+      errors.push(`Apps Script: ${String(err?.message || err)}`);
+      console.warn('Attendance load via Apps Script failed:', err);
+    }
+
+    // 2) Browser fallback: numeric gid + explicit bounded ranges.
+    if (gid) {
+      try {
+        const [leftPayload, rightPayload] = await Promise.all([
+          loadGvizRangeByGid(spreadsheetId, gid, leftRange),
+          loadGvizRangeByGid(spreadsheetId, gid, rightRange)
+        ]);
+        return { payload: mergeGvizPayloadsByRow(leftPayload, rightPayload), method: `gid ${gid}` };
+      } catch (err) {
+        errors.push(`gid: ${String(err?.message || err)}`);
+        console.warn('Attendance load via gid failed:', err);
+      }
+    }
+
+    // 2) Fallback: sheet name + explicit bounded ranges.
+    try {
+      const [leftPayload, rightPayload] = await Promise.all([
+        loadGvizRange(spreadsheetId, sheetName, leftRange),
+        loadGvizRange(spreadsheetId, sheetName, rightRange)
+      ]);
+      return { payload: mergeGvizPayloadsByRow(leftPayload, rightPayload), method: 'sheet ranges' };
+    } catch (err) {
+      errors.push(`sheet ranges: ${String(err?.message || err)}`);
+      console.warn('Attendance load via sheet ranges failed:', err);
+    }
+
+    // 3) Last live fallback: query only the needed columns, still skipping P.
+    try {
+      const query = 'select A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,Q,R,S,T,U,V';
+      const payload = await loadGvizSheet(spreadsheetId, sheetName, query);
+      return { payload, method: 'column query' };
+    } catch (err) {
+      errors.push(`query: ${String(err?.message || err)}`);
+      console.warn('Attendance load via column query failed:', err);
+    }
+
+    throw new Error(errors.join(' || ') || 'All attendance loading methods failed');
+  }
+
   function mergeGvizPayloadsByRow(leftPayload, rightPayload) {
     const leftTable = leftPayload?.table || {};
     const rightTable = rightPayload?.table || {};
@@ -6695,16 +6820,13 @@ window.FALLBACK_DATA = {
       const spreadsheetId = (window.APP_CONFIG && window.APP_CONFIG.SOURCE_SPREADSHEET_ID || '').trim();
       const sheetName = (window.APP_CONFIG && window.APP_CONFIG.ATTENDANCE_SHEET_NAME || 'נוכחות').trim();
       if (!spreadsheetId || !sheetName) throw new Error('Attendance source is not configured');
-      // Column P ("הערות נוכחות") can be very large. Avoid Google Visualization
-      // query syntax here: some published/permission configurations reject tq=select
-      // even though a normal range read works. Read two plain ranges and merge them
-      // row-by-row, skipping only column P.
-      const [leftPayload, rightPayload] = await Promise.all([
-        loadGvizRange(spreadsheetId, sheetName, 'A:O'),
-        loadGvizRange(spreadsheetId, sheetName, 'Q:V')
-      ]);
-      const payload = mergeGvizPayloadsByRow(leftPayload, rightPayload);
+      // Column P ("הערות נוכחות") is intentionally skipped because it can be very large.
+      // Use the numeric sheet gid and bounded A1 ranges first; fall back automatically.
+      const loadedAttendance = await loadAttendancePayload(spreadsheetId, sheetName);
+      const payload = loadedAttendance.payload;
       state.attendance = parseAttendanceSheet(payload);
+      state.attendance.loadMethod = loadedAttendance.method;
+      if (!state.attendance.records.length) throw new Error('הטעינה הצליחה אך לא נמצאו רשומות נוכחות תקינות');
       state.attendanceLoaded = true;
       initializeAttendanceDate();
       populateAttendanceFilters();
@@ -6714,14 +6836,14 @@ window.FALLBACK_DATA = {
         const dates = state.attendance.dates;
         const first = dates.length ? formatAttendanceDate(parseAttendanceDate(dates[0])) : '—';
         const last = dates.length ? formatAttendanceDate(parseAttendanceDate(dates[dates.length-1])) : '—';
-        $('attendanceSourceStatus').textContent = `הנתונים נטענו מהלשונית “${sheetName}” · תאריכים זמינים: ${first} עד ${last} · ברירת המחדל היא כל השעות.`;
+        $('attendanceSourceStatus').textContent = `הנתונים נטענו מהלשונית “${sheetName}” · ${state.attendance.records.length} רשומות · תאריכים זמינים: ${first} עד ${last} · חיבור: ${state.attendance.loadMethod || 'Google Sheets'} · ברירת המחדל היא כל השעות.`;
       }
     } catch (err) {
       console.error('Attendance sheet load failed:', err);
       state.attendanceLoaded = false;
       const attendanceErrorText = String(err?.message || err || 'שגיאה לא ידועה');
-      if ($('overviewAttendanceContent')) $('overviewAttendanceContent').innerHTML = '<div class="attendance-error">לא ניתן היה לטעון כרגע את נתוני הנוכחות.</div>';
-      if ($('attendanceKpis')) $('attendanceKpis').innerHTML = '<div class="attendance-error" style="grid-column:1/-1">טעינת נתוני “נוכחות” נכשלה.</div>';
+      if ($('overviewAttendanceContent')) $('overviewAttendanceContent').innerHTML = `<div class="attendance-error">לא ניתן היה לטעון כרגע את נתוני הנוכחות.<br><small>${escapeHtml(attendanceErrorText)}</small></div>`;
+      if ($('attendanceKpis')) $('attendanceKpis').innerHTML = `<div class="attendance-error" style="grid-column:1/-1">טעינת נתוני “נוכחות” נכשלה.<br><small>${escapeHtml(attendanceErrorText)}</small></div>`;
       if ($('attendanceSourceStatus')) $('attendanceSourceStatus').textContent = `טעינת נתוני הנוכחות נכשלה: ${attendanceErrorText}`;
     } finally {
       state.attendanceLoading = false;
