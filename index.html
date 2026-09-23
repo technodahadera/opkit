@@ -5953,13 +5953,14 @@ window.FALLBACK_DATA = {
     }
   }
 
-  function loadGvizSheet(spreadsheetId, sheetName) {
+  function loadGvizSheet(spreadsheetId, sheetName, query = '') {
     return new Promise((resolve, reject) => {
-      const callbackName = `__stay_cb_${Date.now()}_${Math.floor(Math.random()*100000)}`;
-      const timer = setTimeout(() => cleanup(new Error('stay/individual timeout')), 15000);
+      const callbackName = `__gviz_cb_${Date.now()}_${Math.floor(Math.random()*100000)}`;
+      const timer = setTimeout(() => cleanup(new Error('Google Sheets timeout')), 25000);
       const script = document.createElement('script');
       const tqx = `out:json;responseHandler:${callbackName}`;
-      script.src = `https://docs.google.com/spreadsheets/d/${encodeURIComponent(spreadsheetId)}/gviz/tq?sheet=${encodeURIComponent(sheetName)}&tqx=${encodeURIComponent(tqx)}&_=${Date.now()}`;
+      const tq = query ? `&tq=${encodeURIComponent(query)}` : '';
+      script.src = `https://docs.google.com/spreadsheets/d/${encodeURIComponent(spreadsheetId)}/gviz/tq?sheet=${encodeURIComponent(sheetName)}&tqx=${encodeURIComponent(tqx)}${tq}&_=${Date.now()}`;
       script.async = true;
 
       window[callbackName] = (payload) => {
@@ -5970,7 +5971,7 @@ window.FALLBACK_DATA = {
         cleanup();
         resolve(payload);
       };
-      script.onerror = () => cleanup(new Error('stay/individual jsonp error'));
+      script.onerror = () => cleanup(new Error('Google Sheets JSONP error'));
       document.head.appendChild(script);
 
       function cleanup(error) {
@@ -6639,7 +6640,12 @@ window.FALLBACK_DATA = {
       const spreadsheetId = (window.APP_CONFIG && window.APP_CONFIG.SOURCE_SPREADSHEET_ID || '').trim();
       const sheetName = (window.APP_CONFIG && window.APP_CONFIG.ATTENDANCE_SHEET_NAME || 'נוכחות').trim();
       if (!spreadsheetId || !sheetName) throw new Error('Attendance source is not configured');
-      const payload = await loadGvizSheet(spreadsheetId, sheetName);
+      // The attendance sheet contains a very large historical-notes column (P).
+      // It is not needed for the daily attendance calculation and can make the
+      // Google Visualization response too large/slow. Load only the columns
+      // required by the attendance screen and student history.
+      const attendanceQuery = 'select A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,Q,R,S,T,U,V';
+      const payload = await loadGvizSheet(spreadsheetId, sheetName, attendanceQuery);
       state.attendance = parseAttendanceSheet(payload);
       state.attendanceLoaded = true;
       initializeAttendanceDate();
