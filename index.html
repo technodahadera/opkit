@@ -877,6 +877,61 @@ select:focus, input[type="search"]:focus {
 @media (max-width:1000px) { .friday-kpis { grid-template-columns:repeat(2,1fr); } .friday-ranking-grid { grid-template-columns:1fr; } }
 @media (max-width:600px) { .friday-kpis { grid-template-columns:1fr; } .friday-filter-block, .friday-student-search { min-width:0; width:100%; } .friday-toolbar-controls { width:100%; } .friday-student-choice-grid { grid-template-columns:1fr; } .friday-rank-row { grid-template-columns:28px minmax(100px,1fr) 70px; } .friday-rank-track { display:none; } }
 
+
+
+/* =========================================================
+   STUDENTS / תשפ״ז ANALYTICS
+   ========================================================= */
+.students-overview-panel { margin-bottom:18px; }
+.students-overview-layout { display:grid; grid-template-columns:minmax(270px,.72fr) minmax(0,1.28fr); gap:18px; align-items:center; }
+.student-donut-wrap { display:flex; align-items:center; gap:20px; min-width:0; }
+.student-donut { width:178px; height:178px; border-radius:50%; position:relative; flex:0 0 auto; box-shadow:inset 0 0 0 1px rgba(74,74,73,.05); }
+.student-donut::after { content:""; position:absolute; inset:29px; border-radius:50%; background:#fff; box-shadow:0 5px 18px rgba(74,74,73,.06); }
+.student-donut-center { position:absolute; inset:0; z-index:2; display:grid; place-content:center; text-align:center; pointer-events:none; }
+.student-donut-center strong { font-size:30px; line-height:1; font-weight:900; color:#4a4a49; }
+.student-donut-center span { margin-top:6px; color:#8b8b86; font-size:10px; font-weight:800; }
+.student-legend { display:grid; gap:9px; min-width:0; flex:1; }
+.student-legend-row { display:grid; grid-template-columns:10px minmax(0,1fr) auto; gap:8px; align-items:center; font-size:11px; }
+.student-legend-dot { width:10px; height:10px; border-radius:50%; }
+.student-legend-label { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:800; color:#5e5e5a; }
+.student-legend-value { font-weight:900; color:#4a4a49; }
+.student-mini-bars { display:grid; gap:10px; }
+.student-mini-row { display:grid; grid-template-columns:minmax(125px,190px) 1fr 44px; gap:10px; align-items:center; font-size:11px; }
+.student-mini-label { font-weight:800; color:#5d5d59; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.student-mini-track { height:10px; background:#f0efeb; border-radius:999px; overflow:hidden; }
+.student-mini-fill { height:100%; border-radius:999px; background:linear-gradient(90deg,#55a4d7,#50b1b8); }
+.student-mini-value { font-weight:900; text-align:left; }
+.student-dashboard-actions { display:flex; justify-content:flex-end; margin-top:14px; }
+.students-kpis { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; margin-bottom:18px; }
+.student-kpi { background:#fff; border:1px solid #e9e8e3; border-radius:18px; padding:16px; box-shadow:0 10px 25px rgba(74,74,73,.05); position:relative; overflow:hidden; }
+.student-kpi::before { content:""; position:absolute; top:0; right:0; left:0; height:4px; background:#55a4d7; }
+.student-kpi:nth-child(2)::before { background:#50b1b8; }
+.student-kpi:nth-child(3)::before { background:#8fc43a; }
+.student-kpi:nth-child(4)::before { background:#e91b5c; }
+.student-kpi .v { font-size:27px; font-weight:900; color:#4a4a49; margin-top:4px; }
+.student-kpi .l { color:#777773; font-size:11px; font-weight:800; }
+.student-kpi .n { color:#9a9a94; font-size:10px; margin-top:4px; }
+.students-analysis-grid { display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:18px; }
+.students-chart-panel { min-height:330px; }
+.students-chart-panel .student-donut-wrap { justify-content:center; min-height:220px; }
+.students-toolbar { margin-bottom:18px; }
+.students-toolbar-row { display:flex; gap:12px; align-items:end; justify-content:space-between; flex-wrap:wrap; }
+.students-search { display:grid; gap:5px; min-width:310px; flex:1; }
+.students-search label, .students-filter label { color:var(--muted); font-size:10px; font-weight:900; }
+.students-search input { width:100%; }
+.students-filters { display:flex; gap:10px; flex-wrap:wrap; align-items:end; }
+.students-filter { display:grid; gap:5px; min-width:165px; }
+.student-pop-tag { display:inline-flex; align-items:center; gap:6px; padding:5px 9px; border-radius:999px; background:#eef7fb; color:#3f82ad; font-size:10px; font-weight:900; white-space:nowrap; }
+.student-pop-tag::before { content:""; width:7px; height:7px; border-radius:50%; background:currentColor; opacity:.75; }
+.student-parent { display:grid; gap:2px; }
+.student-parent strong { font-size:11px; }
+.student-parent span { color:#888883; font-size:10px; direction:ltr; text-align:right; }
+.students-loading, .students-error, .students-empty { padding:26px 18px; text-align:center; color:var(--muted); }
+.students-error { background:#fff8dc; border:1px solid #eedf9d; border-radius:13px; color:#6f612b; }
+.students-source-note { margin-top:9px; color:#8a8a84; font-size:10px; }
+@media (max-width:1050px) { .students-overview-layout, .students-analysis-grid { grid-template-columns:1fr; } .students-kpis { grid-template-columns:repeat(2,1fr); } }
+@media (max-width:650px) { .students-kpis { grid-template-columns:1fr; } .student-donut-wrap { flex-direction:column; align-items:stretch; } .student-donut { margin:auto; } .students-search, .students-filter { min-width:0; width:100%; } .students-filters { width:100%; } .student-mini-row { grid-template-columns:minmax(100px,1fr) 70px; } .student-mini-track { display:none; } }
+
 </style>
 </head>
 <body>
@@ -899,6 +954,9 @@ select:focus, input[type="search"]:focus {
         </button>
         <button class="nav-item" data-view="absences">
           <span class="nav-icon">◷</span><span>היעדרויות מורים</span>
+        </button>
+        <button class="nav-item" data-view="students">
+          <span class="nav-icon">◎</span><span>תלמידים</span>
         </button>
         <button class="nav-section-toggle" id="contentPedagogyToggle" type="button" aria-expanded="false" aria-controls="contentPedagogyMenu">
           <span class="nav-icon">▧</span><span>תוכן ופדגוגיה</span><span class="nav-section-caret" aria-hidden="true">◀</span>
@@ -953,6 +1011,17 @@ select:focus, input[type="search"]:focus {
         </div>
 
         <div class="kpi-grid" id="overviewKpis"></div>
+
+        <article class="panel students-overview-panel" id="overviewStudentsPanel">
+          <div class="panel-head">
+            <div>
+              <h3>תלמידים תשפ״ז</h3>
+              <p>חלוקת התלמידים לפי סוג אוכלוסייה מתוך הלשונית “תלמידים”</p>
+            </div>
+            <button class="btn btn-secondary btn-small" id="openStudentsBtn" type="button">לניתוח התלמידים</button>
+          </div>
+          <div id="overviewStudentsContent" class="students-loading">טוען נתוני תלמידים…</div>
+        </article>
 
         <article class="panel overview-absence-panel" id="overviewAbsencePanel">
           <div class="panel-head">
@@ -1237,6 +1306,61 @@ select:focus, input[type="search"]:focus {
       </section>
 
 
+
+      <section class="view" id="view-students">
+        <article class="panel students-toolbar">
+          <div class="students-toolbar-row">
+            <div>
+              <h3 style="margin:0">תלמידים – תשפ״ז</h3>
+              <p style="margin:5px 0 0;color:var(--muted);font-size:12px">ניתוח אוכלוסיות, כיתות ואיתור תלמידים והורים מתוך גיליון “תלמידים”.</p>
+            </div>
+            <div class="students-filters">
+              <div class="students-search">
+                <label for="studentsSearch">חיפוש תלמיד או הורה</label>
+                <input type="search" id="studentsSearch" placeholder="שם תלמיד, שם הורה, טלפון או פרט נוסף…" autocomplete="off" />
+              </div>
+              <div class="students-filter">
+                <label for="studentsPopulationFilter">סוג אוכלוסייה</label>
+                <select id="studentsPopulationFilter"><option value="">כל האוכלוסיות</option></select>
+              </div>
+              <div class="students-filter">
+                <label for="studentsClassFilter">כיתה</label>
+                <select id="studentsClassFilter"><option value="">כל הכיתות</option></select>
+              </div>
+            </div>
+          </div>
+          <div class="students-source-note" id="studentsSourceStatus">טוען נתונים מהלשונית “תלמידים”…</div>
+        </article>
+
+        <div class="students-kpis" id="studentsKpis">
+          <div class="students-loading">טוען נתונים…</div>
+        </div>
+
+        <div class="students-analysis-grid">
+          <article class="panel students-chart-panel">
+            <div class="panel-head"><div><h3>חלוקה לפי סוג אוכלוסייה</h3><p>מספר התלמידים בכל אוכלוסייה</p></div></div>
+            <div id="studentsPopulationChart" class="students-loading">טוען…</div>
+          </article>
+          <article class="panel students-chart-panel">
+            <div class="panel-head"><div><h3>מחוננים לפי כיתה</h3><p>פירוט כיתות בתוך אוכלוסיית המחוננים</p></div></div>
+            <div id="giftedClassChart" class="students-loading">טוען…</div>
+          </article>
+        </div>
+
+        <article class="panel">
+          <div class="panel-head">
+            <div><h3>רשימת תלמידים</h3><p>אפשר לחפש גם לפי פרטי ההורה</p></div>
+          </div>
+          <div class="table-meta" id="studentsTableMeta">טוען…</div>
+          <div class="table-wrap">
+            <table class="data-table" style="min-width:1050px">
+              <thead><tr><th>תלמיד/ה</th><th>סוג אוכלוסייה</th><th>כיתה</th><th>בית ספר</th><th>הורה</th><th>טלפון</th><th>דוא״ל</th></tr></thead>
+              <tbody id="studentsTableBody"></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+
       <section class="view" id="view-friday-courses">
         <article class="panel friday-toolbar">
           <div class="friday-toolbar-row">
@@ -1291,14 +1415,14 @@ select:focus, input[type="search"]:focus {
 
         <article class="panel info-panel">
           <h3>איך הסנכרון עובד?</h3>
-          <p>במצב חי, האתר קורא בכל טעינה את Google Sheet הראשי דרך Web App קטן של Google Apps Script, ובנוסף קורא את הלשוניות “שהייה ופרטני” ו“קורסים ימי שישי” מאותו קובץ. אין בסיס נתונים נוסף ואין הזנת נתונים ידנית באתר.</p>
+          <p>במצב חי, האתר קורא בכל טעינה את Google Sheet הראשי דרך Web App קטן של Google Apps Script, ובנוסף קורא את הלשוניות “שהייה ופרטני”, “תלמידים” ו“קורסים ימי שישי” מאותו קובץ. אין בסיס נתונים נוסף ואין הזנת נתונים ידנית באתר.</p>
           <ol>
             <li>משנים נתון בקובץ “מערכות באופקית תשפ״ז”.</li>
             <li>לוחצים “רענון נתונים” באתר, או פותחים אותו מחדש.</li>
             <li>המערכת מציגה את הנתון המעודכן.</li>
           </ol>
           <div class="notice">
-            שעות התכניות נקראות מהלשונית “מערכת כללית תשפ״ז”, שעות השהייה והפרטני מהלשונית “שהייה ופרטני”, וניתוח קורסי יום שישי מהלשונית “קורסים ימי שישי”. שעות התחלה/סיום אינן קיימות במקור ולכן אינן מוצגות.
+            שעות התכניות נקראות מהלשונית “מערכת כללית תשפ״ז”, שעות השהייה והפרטני מהלשונית “שהייה ופרטני”, נתוני התלמידים מהלשונית “תלמידים”, וניתוח קורסי יום שישי מהלשונית “קורסים ימי שישי”. שעות התחלה/סיום אינן קיימות במקור ולכן אינן מוצגות.
           </div>
         </article>
       </section>
@@ -1315,6 +1439,7 @@ window.APP_CONFIG = {
   SOURCE_SHEET_NAME: "מערכת כללית תשפ״ז",
   SOURCE_SPREADSHEET_ID: "1-VyMH84tm1kMS24_VibF1sTUoh2uwEBtG-VTBM8R5XI",
   AUX_SHEET_NAME: "שהייה ופרטני",
+  STUDENTS_SHEET_NAME: "תלמידים",
   FRIDAY_SHEET_NAME: "קורסים ימי שישי",
   ABSENCE_SHEET_NAME: "היעדרויות",
   USE_DEMO_IF_API_MISSING: true,
@@ -5438,7 +5563,10 @@ window.FALLBACK_DATA = {
     fridayCourses: null,
     fridayCoursesLoaded: false,
     fridayCoursesLoading: false,
-    selectedFridayStudentKey: ''
+    selectedFridayStudentKey: '',
+    students: null,
+    studentsLoaded: false,
+    studentsLoading: false
   };
 
   const $ = (id) => document.getElementById(id);
@@ -5450,13 +5578,14 @@ window.FALLBACK_DATA = {
   function init() {
     bindUI();
     loadData();
+    ensureStudentsLoaded();
   }
 
   function bindUI() {
     document.querySelectorAll('.nav-item').forEach(btn => btn.addEventListener('click', () => setView(btn.dataset.view)));
     $('contentPedagogyToggle').addEventListener('click', toggleContentPedagogyMenu);
     document.querySelectorAll('[data-jump]').forEach(btn => btn.addEventListener('click', () => setView(btn.dataset.jump)));
-    $('refreshBtn').addEventListener('click', () => { loadData(true); ensureAbsencesLoaded(true); if (state.currentView === 'friday-courses' || state.fridayCoursesLoaded) ensureFridayCoursesLoaded(true); });
+    $('refreshBtn').addEventListener('click', () => { loadData(true); ensureAbsencesLoaded(true); ensureStudentsLoaded(true); if (state.currentView === 'friday-courses' || state.fridayCoursesLoaded) ensureFridayCoursesLoaded(true); });
     $('teacherSelect').addEventListener('change', e => selectTeacher(e.target.value, true));
     $('teacherSearch').addEventListener('input', renderTeachersTable);
     $('programFilter').addEventListener('change', renderTeachersTable);
@@ -5493,6 +5622,10 @@ window.FALLBACK_DATA = {
     $('absenceSearch').addEventListener('input', renderAbsences);
     $('downloadAbsencesCsvBtn').addEventListener('click', downloadAbsencesCsv);
     $('openAbsencesBtn').addEventListener('click', () => setView('absences'));
+    $('openStudentsBtn').addEventListener('click', () => setView('students'));
+    $('studentsSearch').addEventListener('input', renderStudentsTable);
+    $('studentsPopulationFilter').addEventListener('change', renderStudentsTable);
+    $('studentsClassFilter').addEventListener('change', renderStudentsTable);
     $('fridayGradeFilter').addEventListener('change', renderFridayCourses);
     $('fridayStudentSearch').addEventListener('input', handleFridayStudentSearchInput);
     $('fridayStudentSearch').addEventListener('focus', () => renderFridayStudentMenu($('fridayStudentSearch').value));
@@ -5524,6 +5657,7 @@ window.FALLBACK_DATA = {
       teacher: ['מערכת מורה', 'בחירת מורה והפקת מערכת שבועית'],
       teachers: ['כל המורים', 'חיפוש, סינון והשוואת היקפי שעות'],
       absences: ['היעדרויות מורים', 'רישום, אישורים, חיסורים וסיכומים חודשיים'],
+      students: ['תלמידים', 'ניתוח אוכלוסיות, כיתות וחיפוש תלמידים והורים בשנת תשפ״ז'],
       'friday-courses': ['קורסים ימי שישי', 'בחירות תלמידים, רצועות זמן ותובנות פדגוגיות'],
       source: ['מקור וסנכרון', 'מצב החיבור לקובץ “מערכות באופקית תשפ״ז”']
     }[view];
@@ -5531,6 +5665,7 @@ window.FALLBACK_DATA = {
     $('pageSubtitle').textContent = meta[1];
     $('sidebar').classList.remove('open');
     if (view === 'overview' || view === 'absences' || view === 'teacher') ensureAbsencesLoaded();
+    if (view === 'overview' || view === 'students') ensureStudentsLoaded();
     if (view === 'friday-courses') ensureFridayCoursesLoaded();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -5684,6 +5819,7 @@ window.FALLBACK_DATA = {
     data.stayIndividualUnmatched = unmatched;
     data.source = data.source || {};
     data.source.auxSheetName = window.APP_CONFIG.AUX_SHEET_NAME || 'שהייה ופרטני';
+    data.source.studentsSheetName = window.APP_CONFIG.STUDENTS_SHEET_NAME || 'תלמידים';
     return data;
   }
 
@@ -5821,6 +5957,7 @@ window.FALLBACK_DATA = {
     renderOverview();
     renderTeachersTable();
     renderSource();
+    if (state.studentsLoaded) renderStudents();
     if (state.fridayCoursesLoaded) renderFridayCourses();
     if (state.selectedTeacher) renderTeacher(state.selectedTeacher);
   }
@@ -5871,6 +6008,7 @@ window.FALLBACK_DATA = {
         <td>${fmt(t.totalMoE)}</td><td>${fmt(t.totalTechnoda)}</td><td>${t.activeDays}</td>
       </tr>`).join('');
     bindTeacherLinks($('topTeachersBody'));
+    renderOverviewStudents();
     renderOverviewAbsenceDashboard();
   }
 
@@ -5976,6 +6114,286 @@ window.FALLBACK_DATA = {
       setView('teacher');
     }));
   }
+
+
+
+  /* =========================================================
+     Students / תשפ״ז analytics
+     ========================================================= */
+  async function ensureStudentsLoaded(force = false) {
+    if (state.studentsLoading) return;
+    if (state.studentsLoaded && !force) {
+      renderOverviewStudents();
+      renderStudents();
+      return;
+    }
+
+    state.studentsLoading = true;
+    if ($('studentsSourceStatus')) $('studentsSourceStatus').textContent = 'טוען נתונים מהלשונית “תלמידים”…';
+    if ($('overviewStudentsContent')) $('overviewStudentsContent').innerHTML = '<div class="students-loading">טוען נתוני תלמידים…</div>';
+
+    try {
+      const spreadsheetId = (window.APP_CONFIG && window.APP_CONFIG.SOURCE_SPREADSHEET_ID || '').trim();
+      const sheetName = (window.APP_CONFIG && window.APP_CONFIG.STUDENTS_SHEET_NAME || 'תלמידים').trim();
+      if (!spreadsheetId || !sheetName) throw new Error('Students source is not configured');
+      const payload = await loadGvizSheet(spreadsheetId, sheetName);
+      state.students = parseStudentsSheet(payload);
+      state.studentsLoaded = true;
+      renderOverviewStudents();
+      renderStudents();
+      if ($('studentsSourceStatus')) $('studentsSourceStatus').textContent = `${state.students.records.length} תלמידים נטענו מהלשונית “${sheetName}”.`;
+    } catch (err) {
+      console.error('Students sheet load failed:', err);
+      state.studentsLoaded = false;
+      if ($('overviewStudentsContent')) $('overviewStudentsContent').innerHTML = '<div class="students-error">לא ניתן היה לטעון כרגע את נתוני התלמידים. יש לוודא שהלשונית “תלמידים” זמינה לצפייה.</div>';
+      if ($('studentsKpis')) $('studentsKpis').innerHTML = '<div class="students-error" style="grid-column:1/-1">לא ניתן היה לטעון כרגע את נתוני “תלמידים”.</div>';
+      if ($('studentsPopulationChart')) $('studentsPopulationChart').innerHTML = '<div class="students-error">טעינת הנתונים נכשלה.</div>';
+      if ($('giftedClassChart')) $('giftedClassChart').innerHTML = '<div class="students-error">טעינת הנתונים נכשלה.</div>';
+      if ($('studentsSourceStatus')) $('studentsSourceStatus').textContent = 'טעינת נתוני התלמידים נכשלה.';
+    } finally {
+      state.studentsLoading = false;
+    }
+  }
+
+  function normalizeHeader(value) {
+    return String(value || '').toLowerCase().replace(/["״׳'`.,:;()_\-\/\\]/g, ' ').replace(/\s+/g, ' ').trim();
+  }
+
+  function findStudentColumn(headers, patterns, exclude = []) {
+    const normalized = headers.map(normalizeHeader);
+    for (const pattern of patterns) {
+      const p = normalizeHeader(pattern);
+      const idx = normalized.findIndex(h => h && h.includes(p) && !exclude.some(x => h.includes(normalizeHeader(x))));
+      if (idx >= 0) return idx;
+    }
+    return -1;
+  }
+
+  function parseStudentsSheet(payload) {
+    const table = payload?.table || {};
+    const rows = table.rows || [];
+    let headers = (table.cols || []).map((c, i) => String(c?.label || c?.id || `עמודה ${i+1}`).trim());
+    let dataRows = rows;
+
+    const genericHeaders = headers.every(h => !h || /^([A-Z]|עמודה\s+\d+)$/i.test(h));
+    if (genericHeaders && rows.length) {
+      const first = (rows[0]?.c || []).map(gvizText);
+      const looksLikeHeader = first.some(v => /שם|תלמיד|הורה|כיתה|אוכלוס|טלפון|מייל|דוא|בית ספר/.test(v));
+      if (looksLikeHeader) { headers = first; dataRows = rows.slice(1); }
+    }
+
+    const fullNameIdx = findStudentColumn(headers, ['שם התלמיד', 'שם תלמיד', 'שם הילד', 'שם הילדה', 'שם מלא', 'שם'], ['הורה','הורים','אב','אבא','אם','אמא','לקוח']);
+    const firstNameIdx = findStudentColumn(headers, ['שם פרטי תלמיד', 'שם פרטי של התלמיד', 'שם פרטי'], ['הורה','אב','אם']);
+    const lastNameIdx = findStudentColumn(headers, ['שם משפחה תלמיד', 'שם משפחה של התלמיד', 'שם משפחה'], ['הורה','אב','אם']);
+    const idIdx = findStudentColumn(headers, ['תעודת זהות תלמיד', 'תז תלמיד', 'ת.ז תלמיד', 'מספר זהות תלמיד', 'תעודת זהות'], ['הורה','אב','אם']);
+    const populationIdx = findStudentColumn(headers, ['סוג אוכלוסיה', 'סוג אוכלוסייה', 'אוכלוסיה', 'אוכלוסייה', 'מסגרת', 'תכנית', 'תוכנית']);
+    const classIdx = findStudentColumn(headers, ['כיתה', 'קבוצה']);
+    const schoolIdx = findStudentColumn(headers, ['בית ספר', 'ביהס', 'ביה״ס', 'מוסד']);
+    const parentNameIdx = findStudentColumn(headers, ['הורים', 'שם הורה', 'שם ההורה', 'שם לקוח', 'הורה', 'שם האב', 'שם האם']);
+    const fatherPhoneIdx = findStudentColumn(headers, ['מספר נייד אבא', 'נייד אבא', 'טלפון אבא', 'טלפון אב']);
+    const motherPhoneIdx = findStudentColumn(headers, ['מספר נייד אמא', 'נייד אמא', 'טלפון אמא', 'טלפון אם']);
+    const parentPhoneIdx = findStudentColumn(headers, ['טלפון הורה', 'נייד הורה', 'טלפון', 'נייד', 'פלאפון']);
+    const fatherEmailIdx = findStudentColumn(headers, ['כתובת דואר אלקטרוני אבא', 'דואר אלקטרוני אבא', 'כתובת אמייל אב', 'מייל אבא', 'אימייל אבא']);
+    const motherEmailIdx = findStudentColumn(headers, ['כתובת דואר אלקטרוני אמא', 'דואר אלקטרוני אמא', 'מייל אמא', 'אימייל אמא']);
+    const parentEmailIdx = findStudentColumn(headers, ['מייל הורה', 'דואל הורה', 'דוא״ל הורה', 'דואר אלקטרוני', 'אמייל', 'אימייל', 'email', 'מייל', 'דואל', 'דוא״ל']);
+    const statusIdx = findStudentColumn(headers, ['מצב', 'סטטוס']);
+
+    const records = [];
+    const seen = new Set();
+    dataRows.forEach((row, rowIndex) => {
+      const cells = row?.c || [];
+      const values = headers.map((_, i) => gvizText(cells[i]));
+      if (!values.some(Boolean)) return;
+      const raw = Object.fromEntries(headers.map((h, i) => [h || `עמודה ${i+1}`, values[i] || '']));
+      let name = fullNameIdx >= 0 ? values[fullNameIdx] : '';
+      const firstName = firstNameIdx >= 0 ? values[firstNameIdx] : '';
+      const lastName = lastNameIdx >= 0 ? values[lastNameIdx] : '';
+      if (!name) name = [firstName, lastName].filter(Boolean).join(' ').replace(/\s+/g,' ').trim();
+      if (!name) {
+        const likely = values.find((v, i) => v && i !== parentNameIdx && !/^\d+$/.test(v) && v.length > 2);
+        name = likely || '';
+      }
+      if (!name || /שם\s*(התלמיד|תלמיד|פרטי|משפחה)/.test(name)) return;
+
+      const className = classIdx >= 0 ? values[classIdx] : '';
+      const explicitPopulation = populationIdx >= 0 ? values[populationIdx] : '';
+      const population = normalizeStudentPopulation(explicitPopulation || inferPopulation(values));
+      const status = statusIdx >= 0 ? values[statusIdx] : '';
+      if (status && status !== 'פעיל') return;
+      const parentName = parentNameIdx >= 0 ? values[parentNameIdx] : inferParentField(headers, values, 'name');
+      const parentPhones = [fatherPhoneIdx >= 0 ? values[fatherPhoneIdx] : '', motherPhoneIdx >= 0 ? values[motherPhoneIdx] : ''].filter(Boolean);
+      const parentPhone = parentPhones.length ? [...new Set(parentPhones)].join(' | ') : (parentPhoneIdx >= 0 ? values[parentPhoneIdx] : inferParentField(headers, values, 'phone'));
+      const parentEmails = [fatherEmailIdx >= 0 ? values[fatherEmailIdx] : '', motherEmailIdx >= 0 ? values[motherEmailIdx] : ''].filter(Boolean);
+      const parentEmail = parentEmails.length ? [...new Set(parentEmails)].join(' | ') : (parentEmailIdx >= 0 ? values[parentEmailIdx] : inferParentField(headers, values, 'email'));
+      const id = idIdx >= 0 ? values[idIdx] : '';
+      const school = schoolIdx >= 0 ? values[schoolIdx] : '';
+      const uniqueKey = (id || [name, className, parentPhone, parentName].join('|')).toLowerCase().replace(/\s+/g,' ').trim();
+      if (seen.has(uniqueKey)) return;
+      seen.add(uniqueKey);
+      records.push({ rowIndex, name, firstName, lastName, id, population, className, school, parentName, parentPhone, parentEmail, raw, searchText: values.join(' ').toLowerCase() });
+    });
+
+    records.sort((a,b) => a.name.localeCompare(b.name,'he'));
+    return { records, headers, loadedAt:new Date() };
+  }
+
+  function inferParentField(headers, values, mode) {
+    for (let i=0; i<headers.length; i++) {
+      const h = normalizeHeader(headers[i]);
+      const v = values[i] || '';
+      if (!v) continue;
+      const parentish = /הורה|הורים|אב|אבא|אם|אמא|לקוח/.test(h);
+      if (!parentish) continue;
+      if (mode === 'phone' && /טלפון|נייד|פלאפון/.test(h)) return v;
+      if (mode === 'email' && /מייל|דואל|דוא|email/.test(h)) return v;
+      if (mode === 'name' && /שם|הורה|לקוח/.test(h) && !/טלפון|נייד|מייל|דוא|email/.test(h)) return v;
+    }
+    return '';
+  }
+
+  function inferPopulation(values) {
+    const text = values.join(' ');
+    if (/מחוננ/.test(text)) return 'מחוננים';
+    if (/מצטייני\s*יישוב/.test(text)) return 'מצטייני יישוב';
+    if (/מצטיינ/.test(text)) return 'מצטיינים';
+    if (/יח[״\"]?ד/.test(text)) return 'יח״ד';
+    return 'לא מסווג';
+  }
+
+  function normalizeStudentPopulation(value) {
+    const s = String(value || '').replace(/\s+/g,' ').trim();
+    return s || 'לא מסווג';
+  }
+
+  function countBy(items, getter) {
+    const m = new Map();
+    items.forEach(item => {
+      const key = String(getter(item) || 'לא מסווג').trim() || 'לא מסווג';
+      m.set(key, (m.get(key) || 0) + 1);
+    });
+    return [...m.entries()].map(([label,value]) => ({label,value})).sort((a,b) => b.value-a.value || a.label.localeCompare(b.label,'he'));
+  }
+
+  function studentPalette(index) {
+    return ['#55a4d7','#50b1b8','#8fc43a','#f9ca13','#eb6c00','#e91b5c','#8068ad','#8c9aa1'][index % 8];
+  }
+
+  function donutGradient(groups) {
+    const total = sum(groups.map(g => g.value));
+    if (!total) return '#ecebe7';
+    let cursor = 0;
+    const parts = groups.map((g,i) => {
+      const start = cursor;
+      cursor += (g.value / total) * 100;
+      return `${studentPalette(i)} ${start.toFixed(2)}% ${cursor.toFixed(2)}%`;
+    });
+    return `conic-gradient(${parts.join(',')})`;
+  }
+
+  function renderDonutAndLegend(groups, total, centerLabel='תלמידים') {
+    return `<div class="student-donut-wrap">
+      <div class="student-donut" style="background:${donutGradient(groups)}"><div class="student-donut-center"><strong>${fmt(total)}</strong><span>${escapeHtml(centerLabel)}</span></div></div>
+      <div class="student-legend">${groups.map((g,i) => `<div class="student-legend-row"><span class="student-legend-dot" style="background:${studentPalette(i)}"></span><span class="student-legend-label">${escapeHtml(g.label)}</span><span class="student-legend-value">${fmt(g.value)}</span></div>`).join('')}</div>
+    </div>`;
+  }
+
+  function renderMiniBars(groups, emptyText='אין נתונים להצגה') {
+    if (!groups.length) return `<div class="students-empty">${escapeHtml(emptyText)}</div>`;
+    const max = Math.max(1, ...groups.map(g => g.value));
+    return `<div class="student-mini-bars">${groups.map(g => `<div class="student-mini-row"><div class="student-mini-label" title="${escapeAttr(g.label)}">${escapeHtml(g.label)}</div><div class="student-mini-track"><div class="student-mini-fill" style="width:${(g.value/max)*100}%"></div></div><div class="student-mini-value">${fmt(g.value)}</div></div>`).join('')}</div>`;
+  }
+
+  function renderOverviewStudents() {
+    const root = $('overviewStudentsContent');
+    if (!root) return;
+    if (!state.studentsLoaded || !state.students) {
+      if (!state.studentsLoading) root.innerHTML = '<div class="students-loading">טוען נתוני תלמידים…</div>';
+      return;
+    }
+    const records = state.students.records;
+    const groups = countBy(records, r => r.population);
+    root.className = '';
+    root.innerHTML = `<div class="students-overview-layout">
+      <div>${renderDonutAndLegend(groups, records.length, 'תלמידים')}</div>
+      <div>${renderMiniBars(groups)}</div>
+    </div>`;
+  }
+
+  function renderStudents() {
+    if (!state.studentsLoaded || !state.students) return;
+    const records = state.students.records;
+    const populations = countBy(records, r => r.population);
+    const classes = countBy(records.filter(r => r.className), r => r.className);
+    const schools = new Set(records.map(r => String(r.school || '').trim()).filter(Boolean));
+    const gifted = records.filter(r => /מחוננ/.test(r.population));
+    const giftedClasses = countBy(gifted, r => giftedClassLabel(r.className));
+
+    $('studentsKpis').innerHTML = [
+      studentKpi('סה״כ תלמידים', records.length, 'כל הרשומות הייחודיות'),
+      studentKpi('סוגי אוכלוסייה', populations.length, populations.slice(0,2).map(x=>x.label).join(' · ') || '—'),
+      studentKpi('תלמידים מחוננים', gifted.length, `${giftedClasses.length} כיתות`),
+      studentKpi('בתי ספר', schools.size, 'בתי ספר שונים בגיליון')
+    ].join('');
+
+    $('studentsPopulationChart').innerHTML = renderDonutAndLegend(populations, records.length, 'תלמידים');
+    $('giftedClassChart').innerHTML = renderMiniBars(giftedClasses, 'לא נמצאו כיתות של תלמידים מחוננים');
+    populateStudentFilters(populations, classes);
+    renderStudentsTable();
+  }
+
+  function studentKpi(label, value, note) {
+    return `<div class="student-kpi"><div class="l">${escapeHtml(label)}</div><div class="v">${fmt(value)}</div><div class="n">${escapeHtml(note)}</div></div>`;
+  }
+
+  function giftedClassLabel(className) {
+    let c = String(className || '').trim().replace(/^כיתה\s+/, '');
+    if (!c) return 'כיתה לא צוינה';
+    return /מחוננ/.test(c) ? c : `${c} מחוננים`;
+  }
+
+  function populateStudentFilters(populations, classes) {
+    const popEl = $('studentsPopulationFilter');
+    const classEl = $('studentsClassFilter');
+    if (!popEl || !classEl) return;
+    const popValue = popEl.value, classValue = classEl.value;
+    popEl.innerHTML = '<option value="">כל האוכלוסיות</option>' + populations.map(x => `<option value="${escapeAttr(x.label)}">${escapeHtml(x.label)} (${x.value})</option>`).join('');
+    classEl.innerHTML = '<option value="">כל הכיתות</option>' + classes.sort((a,b)=>a.label.localeCompare(b.label,'he',{numeric:true})).map(x => `<option value="${escapeAttr(x.label)}">${escapeHtml(x.label)} (${x.value})</option>`).join('');
+    if ([...popEl.options].some(o=>o.value===popValue)) popEl.value = popValue;
+    if ([...classEl.options].some(o=>o.value===classValue)) classEl.value = classValue;
+  }
+
+  function renderStudentsTable() {
+    if (!state.studentsLoaded || !state.students) return;
+    const q = ($('studentsSearch')?.value || '').trim().toLowerCase();
+    const population = $('studentsPopulationFilter')?.value || '';
+    const className = $('studentsClassFilter')?.value || '';
+    const rows = state.students.records.filter(r => {
+      const haystack = [r.name,r.parentName,r.parentPhone,r.parentEmail,r.population,r.className,r.school,r.searchText].join(' ').toLowerCase();
+      return (!q || haystack.includes(q)) && (!population || r.population === population) && (!className || r.className === className);
+    });
+
+    $('studentsTableMeta').textContent = `${rows.length} תלמידים מוצגים מתוך ${state.students.records.length}`;
+    $('studentsTableBody').innerHTML = rows.length ? rows.map((r,i) => {
+      const popColor = studentPalette(Math.max(0, countBy(state.students.records, x=>x.population).findIndex(x=>x.label===r.population)));
+      return `<tr>
+        <td><strong>${escapeHtml(r.name)}</strong></td>
+        <td><span class="student-pop-tag" style="color:${popColor};background:${hexToRgba(popColor,.10)}">${escapeHtml(r.population)}</span></td>
+        <td>${escapeHtml(r.className || '—')}</td>
+        <td>${escapeHtml(r.school || '—')}</td>
+        <td><div class="student-parent"><strong>${escapeHtml(r.parentName || '—')}</strong></div></td>
+        <td><div class="student-parent"><span>${escapeHtml(r.parentPhone || '—')}</span></div></td>
+        <td><div class="student-parent"><span>${escapeHtml(r.parentEmail || '—')}</span></div></td>
+      </tr>`;
+    }).join('') : '<tr><td colspan="7"><div class="students-empty">לא נמצאו תלמידים התואמים לחיפוש או לסינון.</div></td></tr>';
+  }
+
+  function hexToRgba(hex, alpha) {
+    const h = String(hex || '').replace('#','');
+    if (!/^[0-9a-f]{6}$/i.test(h)) return `rgba(85,164,215,${alpha})`;
+    const n = parseInt(h,16);
+    return `rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${alpha})`;
+  }
+
 
   /* =========================================================
      Friday courses / content & pedagogy
@@ -6472,7 +6890,7 @@ window.FALLBACK_DATA = {
     if (!state.data) return;
     const source = state.data.source || {};
     $('sourceFileName').textContent = source.fileName || window.APP_CONFIG.SOURCE_FILE_NAME || '—';
-    const sheetNames = [source.sheetName || window.APP_CONFIG.SOURCE_SHEET_NAME, source.auxSheetName || window.APP_CONFIG.AUX_SHEET_NAME, window.APP_CONFIG.FRIDAY_SHEET_NAME].filter(Boolean);
+    const sheetNames = [source.sheetName || window.APP_CONFIG.SOURCE_SHEET_NAME, source.auxSheetName || window.APP_CONFIG.AUX_SHEET_NAME, source.studentsSheetName || window.APP_CONFIG.STUDENTS_SHEET_NAME, window.APP_CONFIG.FRIDAY_SHEET_NAME].filter(Boolean);
     $('sourceSheetName').textContent = sheetNames.length ? `לשוניות: ${sheetNames.join(' + ')}` : '—';
     const live = state.data.mode === 'live';
     $('connectionMode').textContent = live ? 'סנכרון חי פעיל' : 'צילום מצב מקומי';
