@@ -1013,6 +1013,10 @@ select:focus, input[type="search"]:focus {
 .attendance-simple-kpis .attendance-kpi:nth-child(1)::before { background:#8fc43a; }
 .attendance-simple-kpis .attendance-kpi:nth-child(2)::before { background:#e91b5c; }
 .attendance-simple-kpis .attendance-kpi:nth-child(3)::before { background:#55a4d7; }
+.attendance-kpi-button { width:100%; text-align:right; font:inherit; cursor:pointer; color:inherit; }
+.attendance-kpi-button:hover { transform:translateY(-1px); border-color:#cfdfe5; }
+.attendance-kpi-button.active { box-shadow:0 0 0 3px rgba(85,164,215,.13), 0 10px 25px rgba(74,74,73,.05); border-color:#8fc7e4; }
+.attendance-kpi-button.absent-card.active { border-color:#ef9fba; box-shadow:0 0 0 3px rgba(233,27,92,.10), 0 10px 25px rgba(74,74,73,.05); }
 .attendance-daily-panel { margin-bottom:18px; }
 .attendance-hours-summary { max-width:330px; white-space:normal; line-height:1.55; color:#666661; font-size:10px; }
 .attendance-student-panel { margin-top:18px; }
@@ -1488,12 +1492,16 @@ select:focus, input[type="search"]:focus {
           <div class="attendance-toolbar-row">
             <div class="attendance-toolbar-copy">
               <h3>נוכחות תלמידים</h3>
-              <p>בוחרים תאריך ושעות. כל תלמיד נספר פעם אחת בלבד; בבחירת כל השעות, נוכחות ברצועה אחת מספיקה כדי להיחשב נוכח באותו יום.</p>
+              <p>בוחרים תאריך או תקופה ושעות. כל תלמיד נספר פעם אחת בכל יום; בבחירת כל השעות, נוכחות ברצועה אחת מספיקה כדי להיחשב נוכח באותו יום.</p>
             </div>
             <div class="attendance-controls">
               <div class="attendance-field">
-                <label for="attendanceDate">תאריך</label>
-                <input type="date" id="attendanceDate">
+                <label for="attendanceDateFrom">מתאריך</label>
+                <input type="date" id="attendanceDateFrom">
+              </div>
+              <div class="attendance-field">
+                <label for="attendanceDateTo">עד תאריך</label>
+                <input type="date" id="attendanceDateTo">
               </div>
               <div class="attendance-field wide">
                 <label for="attendanceHoursFilter">שעות קורס</label>
@@ -1519,7 +1527,7 @@ select:focus, input[type="search"]:focus {
         <article class="panel attendance-daily-panel">
           <div class="attendance-table-toolbar">
             <div>
-              <h3 style="margin:0">מי הגיע בתאריך שנבחר?</h3>
+              <h3 style="margin:0">נוכחות בתקופה שנבחרה</h3>
               <div class="attendance-table-meta" id="attendanceTableMeta">טוען…</div>
             </div>
             <div class="attendance-table-filters">
@@ -1539,8 +1547,8 @@ select:focus, input[type="search"]:focus {
             </div>
           </div>
           <div class="table-wrap">
-            <table class="data-table attendance-daily-table" style="min-width:1320px">
-              <thead><tr><th>תלמיד/ה</th><th>מצב ביום</th><th>פירוט שעות</th><th>אוכלוסייה</th><th>כיתה</th><th>קורס</th><th>מורה</th><th>הורים</th><th>טלפונים</th><th>יצרו קשר?</th><th>הערה</th></tr></thead>
+            <table class="data-table attendance-daily-table" style="min-width:1420px">
+              <thead><tr><th>תאריך</th><th>תלמיד/ה</th><th>מצב ביום</th><th>פירוט שעות</th><th>אוכלוסייה</th><th>כיתה</th><th>קורס</th><th>מורה</th><th>הורים</th><th>טלפונים</th><th>יצרו קשר?</th><th>הערה</th></tr></thead>
               <tbody id="attendanceTableBody"></tbody>
             </table>
           </div>
@@ -5833,11 +5841,19 @@ window.FALLBACK_DATA = {
     $('openAbsencesBtn').addEventListener('click', () => setView('absences'));
     $('openStudentsBtn').addEventListener('click', () => setView('students'));
     $('openAttendanceBtn').addEventListener('click', () => setView('attendance'));
-    $('attendanceDate').addEventListener('change', renderAttendance);
+    $('attendanceDateFrom').addEventListener('change', () => { syncAttendanceDateRange('from'); renderAttendance(); });
+    $('attendanceDateTo').addEventListener('change', () => { syncAttendanceDateRange('to'); renderAttendance(); });
     $('attendanceHoursFilter').addEventListener('change', renderAttendance);
     $('attendancePopulationFilter').addEventListener('change', renderAttendance);
     $('attendanceClassFilter').addEventListener('change', renderAttendance);
-    $('attendanceStatusFilter').addEventListener('change', renderAttendanceDailyTable);
+    $('attendanceStatusFilter').addEventListener('change', renderAttendance);
+    $('attendanceKpis').addEventListener('click', e => {
+      const card = e.target.closest('[data-attendance-status]');
+      if (!card) return;
+      const status = card.dataset.attendanceStatus || '';
+      $('attendanceStatusFilter').value = status;
+      renderAttendance();
+    });
     $('attendanceDailySearch').addEventListener('input', renderAttendanceDailyTable);
     $('attendanceStudentSearch').addEventListener('input', renderAttendanceStudentSearch);
     $('attendanceStudentSearch').addEventListener('focus', renderAttendanceStudentSearch);
@@ -6732,7 +6748,7 @@ window.FALLBACK_DATA = {
     const classes = countBy(records.filter(r => r.className), r => r.className);
     const schools = new Set(records.map(r => String(r.school || '').trim()).filter(Boolean));
     const gifted = records.filter(r => /מחוננ/.test(r.population));
-    const giftedClasses = countBy(gifted, r => giftedClassLabel(r.className));
+    const giftedClasses = countBy(gifted, r => giftedClassLabel(r.className)).sort((a,b)=>compareClassLabels(a.label,b.label));
 
     $('studentsKpis').innerHTML = [
       studentKpi('סה״כ תלמידים', records.length, 'כל הרשומות הייחודיות'),
@@ -6757,13 +6773,28 @@ window.FALLBACK_DATA = {
     return /מחוננ/.test(c) ? c : `${c} מחוננים`;
   }
 
+  function classSortParts(label) {
+    const raw = String(label || '').trim();
+    const normalized = raw.replace(/^כיתה\s+/, '').replace(/מחוננ(?:ים|ות)?/g, '').trim();
+    const m = normalized.match(/([א-ט])['׳"]?\s*(\d+)?/);
+    const gradeMap = { 'א':1,'ב':2,'ג':3,'ד':4,'ה':5,'ו':6,'ז':7,'ח':8,'ט':9 };
+    if (!m) return [99, 999, raw];
+    return [gradeMap[m[1]] || 99, m[2] ? Number(m[2]) : 0, raw];
+  }
+
+  function compareClassLabels(a, b) {
+    const aa = classSortParts(a);
+    const bb = classSortParts(b);
+    return aa[0]-bb[0] || aa[1]-bb[1] || aa[2].localeCompare(bb[2], 'he', {numeric:true});
+  }
+
   function populateStudentFilters(populations, classes) {
     const popEl = $('studentsPopulationFilter');
     const classEl = $('studentsClassFilter');
     if (!popEl || !classEl) return;
     const popValue = popEl.value, classValue = classEl.value;
     popEl.innerHTML = '<option value="">כל האוכלוסיות</option>' + populations.map(x => `<option value="${escapeAttr(x.label)}">${escapeHtml(x.label)} (${x.value})</option>`).join('');
-    classEl.innerHTML = '<option value="">כל הכיתות</option>' + classes.sort((a,b)=>a.label.localeCompare(b.label,'he',{numeric:true})).map(x => `<option value="${escapeAttr(x.label)}">${escapeHtml(x.label)} (${x.value})</option>`).join('');
+    classEl.innerHTML = '<option value="">כל הכיתות</option>' + classes.sort((a,b)=>compareClassLabels(a.label,b.label)).map(x => `<option value="${escapeAttr(x.label)}">${escapeHtml(x.label)} (${x.value})</option>`).join('');
     if ([...popEl.options].some(o=>o.value===popValue)) popEl.value = popValue;
     if ([...classEl.options].some(o=>o.value===classValue)) classEl.value = classValue;
   }
@@ -6989,23 +7020,44 @@ window.FALLBACK_DATA = {
   }
 
   function initializeAttendanceDate() {
-    if (!state.attendanceLoaded || !state.attendance || !$('attendanceDate')) return;
-    const input = $('attendanceDate');
+    if (!state.attendanceLoaded || !state.attendance || !$('attendanceDateFrom') || !$('attendanceDateTo')) return;
+    const fromInput = $('attendanceDateFrom');
+    const toInput = $('attendanceDateTo');
     const dates = state.attendance.dates || [];
     if (dates.length) {
-      input.min = dates[0];
-      input.max = dates[dates.length-1];
+      fromInput.min = dates[0];
+      fromInput.max = dates[dates.length-1];
+      toInput.min = dates[0];
+      toInput.max = dates[dates.length-1];
     }
-    if (!input.value) {
+    if (!fromInput.value && !toInput.value) {
       const todayIso = localIsoDate(new Date());
-      input.value = dates.includes(todayIso) ? todayIso : (dates[dates.length-1] || todayIso);
+      const initial = dates.includes(todayIso) ? todayIso : (dates[dates.length-1] || todayIso);
+      fromInput.value = initial;
+      toInput.value = initial;
+    } else {
+      if (!fromInput.value) fromInput.value = toInput.value;
+      if (!toInput.value) toInput.value = fromInput.value;
+    }
+    syncAttendanceDateRange();
+  }
+
+  function syncAttendanceDateRange(changed='') {
+    const fromInput = $('attendanceDateFrom');
+    const toInput = $('attendanceDateTo');
+    if (!fromInput || !toInput) return;
+    if (!fromInput.value && toInput.value) fromInput.value = toInput.value;
+    if (!toInput.value && fromInput.value) toInput.value = fromInput.value;
+    if (fromInput.value && toInput.value && fromInput.value > toInput.value) {
+      if (changed === 'to') fromInput.value = toInput.value;
+      else toInput.value = fromInput.value;
     }
   }
 
   function populateAttendanceFilters() {
     if (!state.attendanceLoaded || !state.attendance) return;
     const populations = [...new Set(state.attendance.records.map(r=>r.population).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'he'));
-    const classes = [...new Set(state.attendance.records.map(r=>r.className).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'he',{numeric:true}));
+    const classes = [...new Set(state.attendance.records.map(r=>r.className).filter(Boolean))].sort(compareClassLabels);
     const hours = state.attendance.hours || [];
     const popEl = $('attendancePopulationFilter');
     const classEl = $('attendanceClassFilter');
@@ -7023,32 +7075,50 @@ window.FALLBACK_DATA = {
     return String(r.id || r.name || '').trim().toLowerCase();
   }
 
-  function getAttendanceSelectedDate() {
-    return parseAttendanceDate($('attendanceDate')?.value || '');
+  function getAttendanceSelectedRange() {
+    let from = parseAttendanceDate($('attendanceDateFrom')?.value || '');
+    let to = parseAttendanceDate($('attendanceDateTo')?.value || '');
+    if (!from && !to) return {from:null,to:null};
+    if (!from) from = to;
+    if (!to) to = from;
+    if (from > to) [from,to] = [to,from];
+    return {from,to};
+  }
+
+  function attendanceRangeLabel() {
+    const {from,to} = getAttendanceSelectedRange();
+    if (!from || !to) return '—';
+    const a = formatAttendanceDate(from);
+    const b = formatAttendanceDate(to);
+    return localIsoDate(from) === localIsoDate(to) ? a : `${a} עד ${b}`;
   }
 
   function getAttendanceSelectedRecords() {
     if (!state.attendanceLoaded || !state.attendance) return [];
-    const selectedDate = getAttendanceSelectedDate();
-    if (!selectedDate) return [];
-    const iso = localIsoDate(selectedDate);
+    const {from,to} = getAttendanceSelectedRange();
+    if (!from || !to) return [];
+    const fromIso = localIsoDate(from);
+    const toIso = localIsoDate(to);
     const hours = $('attendanceHoursFilter')?.value || '';
     const population = $('attendancePopulationFilter')?.value || '';
     const className = $('attendanceClassFilter')?.value || '';
-    return state.attendance.records.filter(r =>
-      localIsoDate(r.date) === iso &&
-      (!hours || r.hours === hours) &&
-      (!population || r.population === population) &&
-      (!className || r.className === className)
-    );
+    return state.attendance.records.filter(r => {
+      const iso = localIsoDate(r.date);
+      return iso >= fromIso && iso <= toIso &&
+        (!hours || r.hours === hours) &&
+        (!population || r.population === population) &&
+        (!className || r.className === className);
+    });
   }
 
   function aggregateAttendanceStudents(records) {
     const groups = new Map();
     records.forEach(r => {
-      const key = attendanceStudentKey(r);
-      if (!key) return;
-      if (!groups.has(key)) groups.set(key, { key, records:[] });
+      const studentKey = attendanceStudentKey(r);
+      if (!studentKey) return;
+      const iso = localIsoDate(r.date);
+      const key = `${studentKey}__${iso}`;
+      if (!groups.has(key)) groups.set(key, { key, studentKey, iso, records:[] });
       groups.get(key).records.push(r);
     });
     return [...groups.values()].map(group => {
@@ -7071,7 +7141,9 @@ window.FALLBACK_DATA = {
       const teachers = [...new Set(rs.map(r=>r.teacher).filter(Boolean))];
       const phones = [...new Set(rs.flatMap(r=>r.phones||[]).filter(Boolean))];
       return {
-        key: group.key,
+        key: group.studentKey,
+        date: base.date,
+        iso: group.iso,
         name: base.name,
         id: base.id,
         population: base.population,
@@ -7087,10 +7159,12 @@ window.FALLBACK_DATA = {
         contactNotes,
         contacted: status==='absent' && contactNotes.length>0
       };
-    }).sort((a,b)=>a.name.localeCompare(b.name,'he'));
+    }).sort((a,b)=>b.date-a.date || a.name.localeCompare(b.name,'he'));
   }
 
-  function attendanceKpi(label,value,note,extraClass='') {
+  function attendanceKpi(label,value,note,extraClass='',status='') {
+    const active = status && ($('attendanceStatusFilter')?.value || '') === status ? ' active' : '';
+    if (status) return `<button type="button" class="attendance-kpi attendance-kpi-button ${extraClass}${active}" data-attendance-status="${escapeAttr(status)}"><div class="l">${escapeHtml(label)}</div><div class="v">${escapeHtml(String(value))}</div><div class="n">${escapeHtml(note)}</div></button>`;
     return `<div class="attendance-kpi ${extraClass}"><div class="l">${escapeHtml(label)}</div><div class="v">${escapeHtml(String(value))}</div><div class="n">${escapeHtml(note)}</div></div>`;
   }
 
@@ -7101,15 +7175,14 @@ window.FALLBACK_DATA = {
     const present = students.filter(x=>x.status==='present');
     const absent = students.filter(x=>x.status==='absent');
     const rate = students.length ? present.length/students.length*100 : 0;
-    const selectedDate = getAttendanceSelectedDate();
     const hours = $('attendanceHoursFilter')?.value || '';
-    const dateText = selectedDate ? formatAttendanceDate(selectedDate) : '—';
+    const dateText = attendanceRangeLabel();
     const hoursText = hours || 'כל השעות';
 
     $('attendanceKpis').innerHTML = [
-      attendanceKpi('נוכחים', fmt(present.length), `${dateText} · ${hoursText}`, 'present-card'),
-      attendanceKpi('לא נוכחים', fmt(absent.length), `${dateText} · ${hoursText}`, 'absent-card'),
-      attendanceKpi('אחוז נוכחות', students.length ? `${rate.toFixed(1)}%` : '—', students.length ? `${fmt(present.length)} מתוך ${fmt(students.length)} תלמידים` : 'אין תלמידים בסינון', 'rate-card')
+      attendanceKpi('נוכחים', fmt(present.length), `${dateText} · ${hoursText}`, 'present-card', 'present'),
+      attendanceKpi('לא נוכחים', fmt(absent.length), `${dateText} · ${hoursText}`, 'absent-card', 'absent'),
+      attendanceKpi('אחוז נוכחות', students.length ? `${rate.toFixed(1)}%` : '—', students.length ? `${fmt(present.length)} מתוך ${fmt(students.length)} ${getAttendanceSelectedRange().from && getAttendanceSelectedRange().to && localIsoDate(getAttendanceSelectedRange().from)!==localIsoDate(getAttendanceSelectedRange().to)?'תלמידים לפי ימים':'תלמידים'}` : 'אין תלמידים בסינון', 'rate-card')
     ].join('');
 
     renderAttendanceDailyTable(students);
@@ -7123,14 +7196,17 @@ window.FALLBACK_DATA = {
     if (statusFilter) students = students.filter(x=>x.status===statusFilter);
     if (q) students = students.filter(x => [x.name,x.id,x.population,x.className,x.parents,x.phones.join(' '),x.courses.join(' '),x.teachers.join(' '),x.school].join(' ').toLowerCase().includes(q));
 
-    const selectedDate = getAttendanceSelectedDate();
     const hours = $('attendanceHoursFilter')?.value || '';
-    $('attendanceTableMeta').textContent = `${fmt(students.length)} תלמידים · ${selectedDate?formatAttendanceDate(selectedDate):'—'} · ${hours || 'כל השעות'}`;
+    const rangeText = attendanceRangeLabel();
+    const {from,to} = getAttendanceSelectedRange();
+    const oneDay = from && to && localIsoDate(from) === localIsoDate(to);
+    $('attendanceTableMeta').textContent = `${fmt(students.length)} ${oneDay?'תלמידים':'תלמידים לפי ימי התקופה'} · ${rangeText} · ${hours || 'כל השעות'}`;
     $('attendanceTableBody').innerHTML = students.length ? students.map(x=>{
       const hourText = x.hourDetails.map(h=>`${h.hours}: ${h.status==='present'?'נוכח':'לא נוכח'}`).join(' · ');
       const contact = x.status==='present' ? '—' : (x.contacted ? '<span class="attendance-contact-ok">כן</span>' : '<span class="attendance-contact-missing">לא</span>');
       const note = x.status==='present' ? '—' : (x.contactNotes.length ? escapeHtml(x.contactNotes.join(' | ')) : '<span class="attendance-contact-missing">אין הערה</span>');
       return `<tr>
+        <td>${escapeHtml(formatAttendanceDate(x.date))}</td>
         <td><button class="teacher-link-button attendance-student-open" type="button" onclick="selectAttendanceStudent('${escapeJsString(x.key)}')">${escapeHtml(x.name)}</button></td>
         <td>${attendanceBinaryStatusTag(x.status)}</td>
         <td><div class="attendance-hours-summary">${escapeHtml(hourText || '—')}</div></td>
@@ -7143,7 +7219,7 @@ window.FALLBACK_DATA = {
         <td>${contact}</td>
         <td>${note}</td>
       </tr>`;
-    }).join('') : '<tr><td colspan="11"><div class="attendance-empty">לא נמצאו תלמידים בתאריך ובסינון שנבחרו.</div></td></tr>';
+    }).join('') : '<tr><td colspan="12"><div class="attendance-empty">לא נמצאו תלמידים בתקופה ובסינון שנבחרו.</div></td></tr>';
   }
 
   function attendanceBinaryStatusTag(status) {
@@ -7306,9 +7382,8 @@ window.FALLBACK_DATA = {
     if (statusFilter) students=students.filter(x=>x.status===statusFilter);
     if (q) students=students.filter(x=>[x.name,x.id,x.population,x.className,x.parents,x.phones.join(' '),x.courses.join(' '),x.teachers.join(' '),x.school].join(' ').toLowerCase().includes(q));
     const header=['תאריך','תלמיד','תעודת זהות','מצב ביום','פירוט שעות','סוג אוכלוסייה','כיתה','קורס','מורה','הורים','טלפונים','יצרו קשר','הערה'];
-    const selectedDate=getAttendanceSelectedDate();
     const csvRows=[header,...students.map(x=>[
-      selectedDate?formatAttendanceDate(selectedDate):'',x.name,x.id,x.status==='present'?'נוכח':'לא נוכח',
+      x.date?formatAttendanceDate(x.date):'',x.name,x.id,x.status==='present'?'נוכח':'לא נוכח',
       x.hourDetails.map(h=>`${h.hours}: ${h.status==='present'?'נוכח':'לא נוכח'}`).join(' | '),x.population,x.className,
       x.courses.join(' | '),x.teachers.join(' | '),x.parents,x.phones.join(' | '),
       x.status==='present'?'':(x.contacted?'כן':'לא'),x.contactNotes.join(' | ')
@@ -7316,7 +7391,8 @@ window.FALLBACK_DATA = {
     const csv='\uFEFF'+csvRows.map(row=>row.map(csvCell).join(',')).join('\r\n');
     const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
     const url=URL.createObjectURL(blob); const a=document.createElement('a');
-    a.href=url; a.download=`attendance_${$('attendanceDate')?.value || localIsoDate(new Date())}.csv`; a.click(); URL.revokeObjectURL(url);
+    const from=$('attendanceDateFrom')?.value || localIsoDate(new Date()); const to=$('attendanceDateTo')?.value || from;
+    a.href=url; a.download=`attendance_${from}_${to}.csv`; a.click(); URL.revokeObjectURL(url);
   }
 
 
