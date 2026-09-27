@@ -1248,7 +1248,7 @@ select:focus, input[type="search"]:focus {
               <select id="sortTeachers">
                 <option value="total-desc">סה״כ שעות – מהגבוה לנמוך</option>
                 <option value="total-asc">סה״כ שעות – מהנמוך לגבוה</option>
-                <option value="name-asc">שם – א׳ עד ת׳</option>
+                <option value="name-asc" selected>שם – א׳ עד ת׳</option>
               </select>
               <button class="btn btn-secondary" id="downloadCsvBtn">הורד CSV</button>
             </div>
@@ -5892,6 +5892,10 @@ window.FALLBACK_DATA = {
 
   function setView(view) {
     state.currentView = view;
+    if (view === 'teachers' && $('sortTeachers')) {
+      $('sortTeachers').value = 'name-asc';
+      renderTeachersTable();
+    }
     document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === `view-${view}`));
     document.querySelectorAll('.nav-item').forEach(v => v.classList.toggle('active', v.dataset.view === view));
     const meta = {
