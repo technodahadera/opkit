@@ -585,6 +585,29 @@ select:focus, input[type="search"]:focus {
   .main-content { padding: 16px; }
 }
 
+
+/* Multi-teacher native print fallback: one complete teacher sheet per page. */
+#allTeachersBrowserPrint { display:none; }
+@media print {
+  @page { size: A4 landscape; margin: 7mm; }
+  body.pdf-all-print { background:#fff !important; }
+  body.pdf-all-print .app-shell { display:none !important; }
+  body.pdf-all-print #allTeachersBrowserPrint { display:block !important; }
+  body.pdf-all-print #allTeachersBrowserPrint .teacher-sheet {
+    display:block !important; width:100% !important; min-height:0 !important;
+    padding:5px !important; margin:0 !important; border:0 !important;
+    border-radius:0 !important; box-shadow:none !important;
+    break-after:page; page-break-after:always; break-inside:avoid;
+  }
+  body.pdf-all-print #allTeachersBrowserPrint .teacher-sheet:last-child { break-after:auto; page-break-after:auto; }
+  body.pdf-all-print #allTeachersBrowserPrint .schedule-wrap { overflow:visible !important; }
+  body.pdf-all-print #allTeachersBrowserPrint .schedule-grid { min-width:0 !important; width:100% !important; font-size:10px !important; }
+  body.pdf-all-print #allTeachersBrowserPrint .schedule-grid th,
+  body.pdf-all-print #allTeachersBrowserPrint .schedule-grid td { padding:4px !important; }
+  body.pdf-all-print #allTeachersBrowserPrint .teacher-kpis { margin:8px 0 !important; }
+  body.pdf-all-print #allTeachersBrowserPrint .teacher-sheet-title { padding:9px !important; font-size:18px !important; }
+  body.pdf-all-print #allTeachersBrowserPrint .schedule-cell { min-height:26px !important; }
+}
 </style>
 </head>
 <body>
@@ -699,6 +722,7 @@ select:focus, input[type="search"]:focus {
               <button class="btn btn-secondary" id="copyTeacherLinkBtn">העתק קישור למורה</button>
               <button class="btn btn-primary" id="printTeacherBtn">הדפס מערכת</button>
               <button class="btn btn-secondary" id="downloadAllTeachersPdfBtn">הורדת כל מערכות המורים ל־PDF</button>
+              <button class="btn btn-secondary" id="printAllTeachersBtn" title="אפשר גם לשמור כקובץ PDF בחלון ההדפסה">הדפסה חלופית לכל המורים</button>
             </div>
           </div>
         </article>
@@ -4926,6 +4950,7 @@ window.FALLBACK_DATA = {
     $('downloadCsvBtn').addEventListener('click', downloadCsv);
     $('printTeacherBtn').addEventListener('click', () => window.print());
     $('downloadAllTeachersPdfBtn').addEventListener('click', downloadAllTeachersPdf);
+    $('printAllTeachersBtn').addEventListener('click', printAllTeachersBrowser);
     $('copyTeacherLinkBtn').addEventListener('click', copyTeacherLink);
     $('mobileMenu').addEventListener('click', () => $('sidebar').classList.toggle('open'));
   }
@@ -5058,52 +5083,165 @@ window.FALLBACK_DATA = {
     }
   }
 
-  async function downloadAllTeachersPdf() {
-    if (!state.data?.teachers?.length) return;
-    const btn = $('downloadAllTeachersPdfBtn');
-    btn.disabled = true;
-    btn.textContent = 'מכין את מערכות המורים…';
-    const originalTeacher = state.selectedTeacher;
-    const container = document.createElement('div');
-    container.dir = 'rtl';
-    container.className = 'all-teachers-pdf';
-    container.style.cssText = 'position:fixed;left:-20000px;top:0;width:1050px;background:white;z-index:-1';
-    document.body.appendChild(container);
-    try {
-      const teachers = [...state.data.teachers].sort((a,b)=>a.name.localeCompare(b.name,'he'));
-      for (const t of teachers) {
-        renderTeacher(t);
-        const sheet = $('printableTeacherSheet').cloneNode(true);
-        sheet.removeAttribute('id');
-        sheet.style.cssText = 'width:100%;box-sizing:border-box;box-shadow:none;margin:0;padding:16px;border-radius:0;page-break-after:always;break-after:page';
-        container.appendChild(sheet);
-      }
-      renderTeacher(originalTeacher || teachers[0]);
-      if (!window.html2pdf) {
-        await new Promise((resolve,reject)=>{
-          const script=document.createElement('script');
-          script.src='https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
-          script.onload=resolve; script.onerror=()=>reject(new Error('PDF library unavailable'));
-          document.head.appendChild(script);
-        });
-      }
-      container.style.cssText = 'width:1050px;background:white;position:absolute;left:0;top:0;z-index:-1;opacity:0;pointer-events:none';
-      await html2pdf().set({
-        margin: [7,7,7,7], filename:'מערכות_כל_המורים_תשפז.pdf',
-        image:{type:'jpeg',quality:0.97},
-        html2canvas:{scale:1.5,useCORS:true,backgroundColor:'#ffffff',scrollY:0},
-        jsPDF:{unit:'mm',format:'a4',orientation:'landscape'},
-        pagebreak:{mode:['css','legacy'],before:'.teacher-sheet:not(:first-child)'}
-      }).from(container).save();
-    } catch(err) {
-      console.error(err);
-      alert('לא ניתן היה ליצור את קובץ ה־PDF. בדוק חיבור לאינטרנט ונסה שוב.');
-    } finally {
-      container.remove();
-      if (originalTeacher) renderTeacher(originalTeacher);
-      btn.disabled=false;
-      btn.textContent='הורדת כל מערכות המורים ל־PDF';
+  // Download ALL teachers as one real, paginated PDF. Render one teacher at a
+  // time to avoid browser canvas-size limits; never capture a hidden/off-screen
+  // or transparent container (html2canvas turns those into blank pages).
+  function loadPdfExportScript(src, ready) {
+    if (ready()) return Promise.resolve();
+    return new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = src;
+      script.async = true;
+      const timeout = setTimeout(() => {
+        script.remove();
+        reject(new Error('PDF library loading timed out'));
+      }, 20000);
+      script.onload = () => {
+        clearTimeout(timeout);
+        ready() ? resolve() : reject(new Error('PDF library did not initialize'));
+      };
+      script.onerror = () => {
+        clearTimeout(timeout);
+        reject(new Error('PDF library could not be loaded'));
+      };
+      document.head.appendChild(script);
+    });
+  }
+
+  async function ensurePdfExportLibraries() {
+    await Promise.all([
+      loadPdfExportScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js', () => typeof window.html2canvas === 'function'),
+      loadPdfExportScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js', () => !!window.jspdf?.jsPDF)
+    ]);
+  }
+
+  function canvasContainsVisibleContent(canvas) {
+    if (!canvas || canvas.width < 600 || canvas.height < 250) return false;
+    // Sample the whole page: a correct sheet has a dark headline and colored cards.
+    const small = document.createElement('canvas');
+    small.width = 36;
+    small.height = 26;
+    const ctx = small.getContext('2d', {willReadFrequently:true});
+    if (!ctx) return false;
+    ctx.drawImage(canvas, 0, 0, small.width, small.height);
+    const pixels = ctx.getImageData(0, 0, small.width, small.height).data;
+    let nonWhite = 0;
+    for (let i = 0; i < pixels.length; i += 4) {
+      if (pixels[i] < 220 || pixels[i + 1] < 220 || pixels[i + 2] < 220) nonWhite++;
     }
+    return nonWhite >= 16;
+  }
+
+  async function downloadAllTeachersPdf() {
+    const teachers = [...(state.data?.teachers || [])].sort((a,b) => a.name.localeCompare(b.name, 'he'));
+    if (!teachers.length) {
+      alert('טרם נטענו נתוני המורים. יש לרענן את הנתונים ולנסות שוב.');
+      return;
+    }
+    const btn = $('downloadAllTeachersPdfBtn');
+    if (btn.disabled) return;
+    btn.disabled = true;
+    const initialLabel = btn.textContent;
+    const originalTeacher = state.selectedTeacher || teachers[0];
+    // The capture element must be VISIBLE, opaque, and on-screen. One sheet
+    // at a time prevents blank output caused by oversized HTML canvases.
+    const stage = document.createElement('div');
+    stage.setAttribute('dir', 'rtl');
+    stage.setAttribute('aria-hidden', 'true');
+    stage.style.cssText = 'position:fixed;right:0;top:0;width:1040px;max-width:none;background:#fff;z-index:2147483000;pointer-events:none;opacity:1;visibility:visible;padding:0;margin:0;';
+    const progress = document.createElement('div');
+    progress.setAttribute('role', 'status');
+    progress.style.cssText = 'position:fixed;left:18px;bottom:18px;background:#123f50;color:#fff;border-radius:12px;padding:12px 18px;box-shadow:0 10px 30px #0003;z-index:2147483600;font-weight:800;direction:rtl;';
+    progress.textContent = 'מכין קובץ PDF…';
+    let downloadCompleted = false;
+    try {
+      btn.textContent = 'טוען כלי ייצוא PDF…';
+      await ensurePdfExportLibraries();
+      document.body.appendChild(stage);
+      document.body.appendChild(progress);
+      if (document.fonts?.ready) await document.fonts.ready;
+      const pdf = new window.jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4',compress:true});
+      const pageW = pdf.internal.pageSize.getWidth();
+      const pageH = pdf.internal.pageSize.getHeight();
+      const margin = 7;
+      for (let i = 0; i < teachers.length; i++) {
+        const teacher = teachers[i];
+        const status = `מכין PDF: ${i + 1} מתוך ${teachers.length} - ${teacher.name}`;
+        btn.textContent = `מייצא ${i + 1}/${teachers.length}…`;
+        progress.textContent = status;
+        renderTeacher(teacher);
+        const liveSheet = $('printableTeacherSheet');
+        if (!liveSheet) throw new Error(`Missing teacher sheet: ${teacher.name}`);
+        const sheet = liveSheet.cloneNode(true);
+        sheet.removeAttribute('id');
+        sheet.style.cssText = 'width:100%;max-width:none;box-sizing:border-box;box-shadow:none;margin:0;border-radius:0;padding:14px;background:#fff;';
+        stage.replaceChildren(sheet);
+        // Force layout before capture, including RTL table and web fonts.
+        await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+        const rect = sheet.getBoundingClientRect();
+        if (rect.width < 600 || rect.height < 250) throw new Error(`Teacher sheet was hidden or not laid out: ${teacher.name}`);
+        const canvas = await window.html2canvas(sheet, {
+          scale: 1.55,
+          backgroundColor:'#ffffff',
+          useCORS:true,
+          logging:false,
+          scrollX: 0,
+          scrollY: -window.scrollY,
+          windowWidth: Math.max(1100, window.innerWidth),
+          windowHeight: Math.max(900, window.innerHeight)
+        });
+        if (!canvasContainsVisibleContent(canvas)) throw new Error(`Blank captured page: ${teacher.name}`);
+        if (i > 0) pdf.addPage('a4', 'landscape');
+        const k = Math.min((pageW - 2 * margin) / canvas.width, (pageH - 2 * margin) / canvas.height);
+        const w = canvas.width * k;
+        const h = canvas.height * k;
+        pdf.addImage(canvas.toDataURL('image/jpeg',0.86),'JPEG',(pageW - w)/2,(pageH - h)/2,w,h,undefined,'FAST');
+        stage.replaceChildren();
+        // Yield so the browser stays responsive during a longer export.
+        if (i % 3 === 2) await new Promise(resolve => setTimeout(resolve,0));
+      }
+      const filename = 'מערכות_כל_המורים_תשפז.pdf';
+      await pdf.save(filename, {returnPromise:true});
+      downloadCompleted = true;
+    } catch (err) {
+      console.error('All-teachers PDF export failed:', err);
+      alert('לא ניתן היה להפיק PDF מלא. לא הורד קובץ ריק. אפשר להשתמש בכפתור "הדפסה חלופית לכל המורים" ולבחור "שמירה כ-PDF".\n\nפרטים: ' + (err?.message || String(err)));
+    } finally {
+      stage.remove();
+      progress.remove();
+      renderTeacher(originalTeacher);
+      btn.disabled = false;
+      btn.textContent = initialLabel;
+    }
+    if (downloadCompleted) toast('קובץ PDF של כל מערכות המורים נוצר בהצלחה');
+  }
+
+  // Native browser print is a dependency-free fallback and keeps text sharp.
+  // Select "Save as PDF" in the printer destination dialog.
+  function printAllTeachersBrowser() {
+    const teachers = [...(state.data?.teachers || [])].sort((a,b) => a.name.localeCompare(b.name,'he'));
+    if (!teachers.length) return alert('טרם נטענו נתוני המורים.');
+    const originalTeacher = state.selectedTeacher || teachers[0];
+    const printRoot = document.createElement('div');
+    printRoot.id = 'allTeachersBrowserPrint';
+    printRoot.dir = 'rtl';
+    for (const teacher of teachers) {
+      renderTeacher(teacher);
+      const sheet = $('printableTeacherSheet').cloneNode(true);
+      sheet.removeAttribute('id');
+      printRoot.appendChild(sheet);
+    }
+    renderTeacher(originalTeacher);
+    document.body.appendChild(printRoot);
+    document.body.classList.add('pdf-all-print');
+    const cleanUp = () => {
+      document.body.classList.remove('pdf-all-print');
+      printRoot.remove();
+      window.removeEventListener('afterprint', cleanUp);
+    };
+    window.addEventListener('afterprint', cleanUp);
+    try { window.print(); }
+    catch(err) { cleanUp(); alert('פתיחת הדפסה נכשלה. נסה שוב.'); }
   }
 
   async function loadStayIndividualSafe() {
