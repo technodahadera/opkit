@@ -4957,8 +4957,8 @@ window.FALLBACK_DATA = {
     if (apiUrl) {
       loadJsonp(apiUrl)
         .then(async data => {
-          const friday = await loadFridayHoursSafe();
-          if (friday) mergeFridayHours(data, friday);
+          const primaryHours = await loadMasterScheduleSafe();
+          if (primaryHours) mergeMasterScheduleHours(data, primaryHours);
           const extra = await loadStayIndividualSafe();
           if (extra) mergeStayIndividual(data, extra);
           applyData(data, 'live', extra ? '' : 'נתוני המערכת נטענו, אך לא ניתן היה לטעון כרגע את לשונית “שהייה ופרטני”.');
@@ -4967,9 +4967,9 @@ window.FALLBACK_DATA = {
           console.error(err);
           if (window.APP_CONFIG.USE_DEMO_IF_API_MISSING && window.FALLBACK_DATA) {
             const data = cloneData(window.FALLBACK_DATA);
-            const friday = await loadFridayHoursSafe();
-          if (friday) mergeFridayHours(data, friday);
-          const extra = await loadStayIndividualSafe();
+            const primaryHours = await loadMasterScheduleSafe();
+            if (primaryHours) mergeMasterScheduleHours(data, primaryHours);
+            const extra = await loadStayIndividualSafe();
             if (extra) mergeStayIndividual(data, extra);
             applyData(data, 'snapshot', 'החיבור החי לנתוני התכניות לא הצליח, לכן מוצג צילום המצב המצורף לאתר.');
           } else {
@@ -4980,7 +4980,8 @@ window.FALLBACK_DATA = {
     } else {
       if (window.FALLBACK_DATA) {
         const data = cloneData(window.FALLBACK_DATA);
-        loadStayIndividualSafe().then(extra => {
+        Promise.all([loadMasterScheduleSafe(), loadStayIndividualSafe()]).then(([main, extra]) => {
+          if (main) mergeMasterScheduleHours(data, main);
           if (extra) mergeStayIndividual(data, extra);
           applyData(data, 'snapshot', 'האתר עדיין במצב הדגמה עבור נתוני התכניות.');
         }).finally(doneLoading);
@@ -4995,41 +4996,63 @@ window.FALLBACK_DATA = {
     return JSON.parse(JSON.stringify(data));
   }
 
-  async function loadFridayHoursSafe() {
+  // Read ALL seven program blocks from the current 59-column source layout.
+  // A new middle-school Friday column (I) shifted all subsequent programs right.
+  // The Apps Script may still expose the older positional mapping, so we replace
+  // its per-day hours with the actual spreadsheet values before calculating totals.
+  async function loadMasterScheduleSafe() {
     try {
       const id = (window.APP_CONFIG?.SOURCE_SPREADSHEET_ID || '1-VyMH84tm1kMS24_VibF1sTUoh2uwEBtG-VTBM8R5XI').trim();
       const payload = await loadGvizSheet(id, 'מערכת כללית תשפ"ז');
       const rows = payload?.table?.rows || [];
       const entries = [];
-      // In the master grid: B=teacher, H=Friday elementary, I=Friday middle school.
-      // The gviz endpoint can promote header rows into column labels; identify teacher rows by names.
+      // Zero-based offsets: C:H, K:P, R:W, Y:AD, AF:AK, AM:AR, AT:AY.
+      // Gifted MoE Friday is H (elementary) + I (middle school).
+      const programStart = {
+        gifted_moe: 2,
+        morning_moe: 10,
+        excellence_moe: 17,
+        yahad_moe: 24,
+        settlement_technoda: 31,
+        excellence_technoda: 38,
+        gifted_technoda: 45
+      };
       for (const row of rows) {
         const c = row?.c || [];
         const name = String(c[1]?.v ?? c[1]?.f ?? '').trim();
-        if (!name || name === 'שם' || name === 'שיבוץ במערכת') continue;
-        const elementary = toHours(c[7]?.v);
-        const middle = toHours(c[8]?.v);
-        entries.push({name, elementary, middle});
+        if (!name || name === 'שם' || name === 'שיבוץ במערכת' || name === 'סה״כ שעות') continue;
+        const programs = {};
+        for (const [key, start] of Object.entries(programStart)) {
+          programs[key] = Array.from({length: 6}, (_, day) => toHours(c[start + day]?.v ?? c[start + day]?.f));
+        }
+        const elementary = toHours(c[7]?.v ?? c[7]?.f);
+        const middle = toHours(c[8]?.v ?? c[8]?.f);
+        programs.gifted_moe[5] = elementary + middle;
+        entries.push({name, programs, fridayBreakdown: {elementary, middle}});
       }
       return entries;
-    } catch (e) { console.warn('Friday hours unavailable', e); return null; }
+    } catch (e) {
+      console.warn('Master teacher schedule is unavailable; using Apps Script data', e);
+      return null;
+    }
   }
 
-  function mergeFridayHours(data, entries) {
+  function mergeMasterScheduleHours(data, entries) {
     if (!Array.isArray(data?.teachers) || !Array.isArray(entries)) return;
     for (const entry of entries) {
       const t = resolveTeacher(entry.name, data.teachers);
-      if (!t) continue;
-      const friday = entry.elementary + entry.middle;
-      t.fridayBreakdown = {elementary: entry.elementary, middle: entry.middle};
-      const p = t.programs?.gifted_moe;
-      if (!p) continue;
-      // Replace rather than add: prevents double counting if the Apps Script is later updated.
-      p.days[5] = friday;
-      p.total = sum(p.days);
-      t.dayTotals = Array.from({length:6}, (_,i) => sum(Object.values(t.programs).map(x => x.days?.[i] || 0)));
-      t.totalMoE = sum(Object.values(t.programs).filter(x => x.funder === 'משה״ח').map(x => x.total));
-      t.totalTechnoda = sum(Object.values(t.programs).filter(x => x.funder === 'טכנודע').map(x => x.total));
+      if (!t || !t.programs) continue;
+      for (const [key, days] of Object.entries(entry.programs)) {
+        const p = t.programs[key];
+        if (!p) continue;
+        p.days = days.slice();
+        p.total = sum(p.days);
+      }
+      t.fridayBreakdown = {...entry.fridayBreakdown};
+      const programs = Object.values(t.programs);
+      t.dayTotals = Array.from({length: 6}, (_, day) => sum(programs.map(p => p.days?.[day] || 0)));
+      t.totalMoE = sum(programs.filter(p => p.funder === 'משה״ח').map(p => p.total));
+      t.totalTechnoda = sum(programs.filter(p => p.funder === 'טכנודע').map(p => p.total));
       t.total = t.totalMoE + t.totalTechnoda;
       t.activeDays = t.dayTotals.filter(x => x > 0).length;
     }
